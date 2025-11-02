@@ -3,6 +3,8 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
-import { useState } from "react";
 
 const prayerTypes = ["qaza", "infiradi", "jama", "takbeeri ola"];
 const reciteOptions = [
@@ -30,18 +31,22 @@ const reciteOptions = [
 ];
 
 const FormSchema = z.object({
-  fajr: z.string().min(1),
-  zuhr: z.string().min(1),
-  asar: z.string().min(1),
-  maghrib: z.string().min(1),
-  esha: z.string().min(1),
+  fajr: z.string().min(1, "Fajr prayer type is required"),
+  zuhr: z.string().min(1, "Zuhr prayer type is required"),
+  asar: z.string().min(1, "Asar prayer type is required"),
+  maghrib: z.string().min(1, "Maghrib prayer type is required"),
+  esha: z.string().min(1, "Esha prayer type is required"),
   recite: z.string().optional(),
-  zikr: z.boolean().default(false),
+  zikr: z.boolean(), // strict boolean type
   timestamp: z.string().optional(),
 });
 
-export default function PrayerForm() {
-  const form = useForm<z.infer<typeof FormSchema>>({
+type PrayerFormValues = z.infer<typeof FormSchema>;
+
+export function PrayerForm() {
+  const [customRecite, setCustomRecite] = useState("");
+
+  const form = useForm<PrayerFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       fajr: "",
@@ -50,14 +55,12 @@ export default function PrayerForm() {
       maghrib: "",
       esha: "",
       recite: "",
-      zikr: false,
-      timestamp: new Date().toISOString().slice(0, 16), // Local datetime
+      zikr: false, // strict boolean default
+      timestamp: new Date().toISOString().slice(0, 16), // local datetime
     },
   });
 
-  const [customRecite, setCustomRecite] = useState("");
-
-  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (values: PrayerFormValues) => {
     const data = {
       ...values,
       recite: values.recite === "custom" ? customRecite : values.recite,
@@ -66,7 +69,7 @@ export default function PrayerForm() {
     try {
       const res = await fetch("/api/prayers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(data),
       });
 
@@ -91,19 +94,19 @@ export default function PrayerForm() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Each prayer */}
+          {/* Prayer Types */}
           {["fajr", "zuhr", "asar", "maghrib", "esha"].map((prayer) => (
             <FormField
               key={prayer}
               control={form.control}
-              name={prayer as "fajr" | "zuhr" | "asar" | "maghrib" | "esha"}
-              render={({ field }) => (
+              name={prayer as keyof PrayerFormValues}
+              render={({field}) => (
                 <FormItem>
                   <FormLabel className="capitalize">{prayer}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={`${field.value}`}
                       className="flex flex-wrap gap-3 mt-2"
                     >
                       {prayerTypes.map((type) => (
@@ -112,7 +115,10 @@ export default function PrayerForm() {
                           className="flex items-center space-x-2"
                         >
                           <FormControl>
-                            <RadioGroupItem value={type} id={`${prayer}-${type}`} />
+                            <RadioGroupItem
+                              value={type}
+                              id={`${prayer}-${type}`}
+                            />
                           </FormControl>
                           <FormLabel
                             htmlFor={`${prayer}-${type}`}
@@ -124,23 +130,22 @@ export default function PrayerForm() {
                       ))}
                     </RadioGroup>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
-              )}
-            />
+              )}></FormField>
           ))}
 
-          {/* Recite */}
+          {/* Recitation */}
           <FormField
             control={form.control}
             name="recite"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem>
                 <FormLabel>Recitation</FormLabel>
                 <FormControl>
                   <RadioGroup
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                     className="flex flex-wrap gap-3 mt-2"
                   >
                     {reciteOptions.map((option) => (
@@ -149,7 +154,7 @@ export default function PrayerForm() {
                         className="flex items-center space-x-2"
                       >
                         <FormControl>
-                          <RadioGroupItem value={option} id={option} />
+                          <RadioGroupItem value={option} id={option}/>
                         </FormControl>
                         <FormLabel
                           htmlFor={option}
@@ -161,6 +166,7 @@ export default function PrayerForm() {
                     ))}
                   </RadioGroup>
                 </FormControl>
+
                 {field.value === "custom" && (
                   <div className="mt-3">
                     <Input
@@ -170,22 +176,24 @@ export default function PrayerForm() {
                     />
                   </div>
                 )}
-                <FormMessage />
+
+                <FormMessage/>
               </FormItem>
             )}
           />
 
-          {/* Zikr */}
+          {/* Zikr Switch */}
           <FormField
             control={form.control}
             name="zikr"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                <div>
-                  <FormLabel>Zikr Done?</FormLabel>
-                </div>
+                <FormLabel>Zikr Done?</FormLabel>
                 <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -195,7 +203,7 @@ export default function PrayerForm() {
           <FormField
             control={form.control}
             name="timestamp"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem>
                 <FormLabel>Timestamp</FormLabel>
                 <FormControl>

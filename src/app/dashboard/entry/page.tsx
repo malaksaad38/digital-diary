@@ -1,4 +1,4 @@
-import PrayerForm from "@/components/PrayerForm";
+import {PrayerForm} from "@/components/PrayerForm";
 
 
 const EntryForm = () => {

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, CalendarDays, BookOpen, Moon, Sun, Heart } from "lucide-react";
+import { Loader2, CalendarDays, BookOpen, Moon, Heart } from "lucide-react";
 
 export default function PrayersPage() {
-  const [prayers, setPrayers] = useState([]);
+  const [prayers, setPrayers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,30 +60,22 @@ export default function PrayersPage() {
               </CardHeader>
 
               <CardContent className="space-y-3 text-sm text-gray-700">
-                <div className="flex justify-between">
-                  <span className="font-medium text-gray-600">🌅 Fajr:</span>
-                  <span>{prayer.fajr || "—"}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="font-medium text-gray-600">🏙️ Zuhr:</span>
-                  <span>{prayer.zuhr || "—"}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="font-medium text-gray-600">🌇 Asar:</span>
-                  <span>{prayer.asar || "—"}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="font-medium text-gray-600">🌆 Maghrib:</span>
-                  <span>{prayer.maghrib || "—"}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="font-medium text-gray-600">🌙 Esha:</span>
-                  <span>{prayer.esha || "—"}</span>
-                </div>
+                {["fajr", "zuhr", "asar", "maghrib", "esha"].map((name) => (
+                  <div key={name} className="flex justify-between">
+                    <span className="font-medium text-gray-600">
+                      {name === "fajr"
+                        ? "🌅 Fajr:"
+                        : name === "zuhr"
+                          ? "🏙️ Zuhr:"
+                          : name === "asar"
+                            ? "🌇 Asar:"
+                            : name === "maghrib"
+                              ? "🌆 Maghrib:"
+                              : "🌙 Esha:"}
+                    </span>
+                    <span>{prayer[name] || "—"}</span>
+                  </div>
+                ))}
 
                 <hr className="my-3" />
 

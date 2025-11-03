@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import Navbar from "@/components/dashboard/Navbar";
+import Navbar from "@/components/Navbar";
 
 export default async function LayoutPrivate({
                                               children,

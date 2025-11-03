@@ -86,38 +86,63 @@ export default function Navbar({ user }: { user: any }) {
       </motion.nav>
 
       {/* 📱 Mobile Top Bar */}
-      <div className="sm:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b shadow-sm">
-        <div className="flex items-center justify-between px-4 py-1">
-          {/* Page name */}
-          <div className="text-sm font-semibold text-foreground">
-            {currentPage}
+      {/* 📱 Mobile Top Bar (Visible only on mobile) */}
+      <div className="sm:hidden fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border shadow-sm">
+        <div className="grid grid-cols-3 items-center h-12 px-4">
+
+          {/* LEFT — Page + Date */}
+          <div className="flex flex-col justify-center items-start space-y-[2px]">
+      <span className="text-[13px] font-semibold text-foreground tracking-wide">
+        {currentPage}
+      </span>
+            <span className="text-[11px] text-muted-foreground">
+        {time?.toLocaleDateString("en-GB")}
+      </span>
           </div>
 
-          {/* Time */}
-          <span className="text-sm font-mono text-muted-foreground">
-            {time.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            })}
-          </span>
+          {/* CENTER — Time + Day */}
+          <div className="flex flex-col justify-center items-center space-y-[2px]">
+      <span className="text-[13px] font-mono text-foreground font-medium">
+        {time?.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })}
+      </span>
+            <span className="text-[11px] text-muted-foreground capitalize">
+        {time?.toLocaleDateString("en-US", { weekday: "long" })}
+      </span>
+          </div>
 
-          {/* Theme toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="rounded-full hover:bg-accent"
-            aria-label="Toggle theme"
-          >
-            {theme === "light" ? (
-              <Moon size={18} className="text-foreground" />
-            ) : (
-              <Sun size={18} className="text-foreground" />
-            )}
-          </Button>
+          {/* RIGHT — Theme + Hijri */}
+          <div className="flex flex-col justify-center items-end space-y-[2px]">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className=" size-6 py-1 rounded-full hover:bg-accent transition-all duration-200"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? (
+                <Moon size={15} className="text-foreground" />
+              ) : (
+                <Sun size={15} className="text-foreground" />
+              )}
+            </Button>
+            <span className="text-[11px] text-muted-foreground">
+        {new Intl.DateTimeFormat("en-SA-u-ca-islamic", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }).format(time)}
+      </span>
+          </div>
+
         </div>
       </div>
+
+
+
 
       {/* 📱 Mobile Bottom Bar */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-md">
@@ -226,16 +251,6 @@ function UserPopover({ user }: { user: any }) {
           <div className="border-t my-2" />
 
           <ButtonLogout/>
-          {/*<form action="/api/auth/signout" method="post">*/}
-          {/*  <Button*/}
-          {/*    type="submit"*/}
-          {/*    variant="ghost"*/}
-          {/*    className="w-full flex items-center justify-start gap-2 text-sm"*/}
-          {/*  >*/}
-          {/*    <LogOut className="w-4 h-4" />*/}
-          {/*    Logout*/}
-          {/*  </Button>*/}
-          {/*</form>*/}
         </div>
       </PopoverContent>
     </Popover>
@@ -252,12 +267,12 @@ export function NavIcon({ href, icon, label, active }: any) {
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 text-sm transition-all duration-200",
+        "flex flex-col items-center justify-center  text-sm transition-all duration-200",
         active ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
       )}
     >
       <div className={cn(
-        "flex items-center justify-center rounded-full p-2 transition-all",
+        "flex items-center justify-center rounded-full p-1 transition-all",
         active && "bg-primary/10 text-primary"
       )}>
         {icon}

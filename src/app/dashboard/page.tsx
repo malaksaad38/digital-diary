@@ -16,7 +16,6 @@ export default function DashboardPage() {
           <BookOpen className="text-indigo-600 w-6 h-6" />
           <span className="font-semibold text-lg">DigitalDiary</span>
         </div>
-       <ButtonLogout />
       </nav>
 
       {/* ---------- HEADER ---------- */}

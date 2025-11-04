@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Prayer from "@/models/Prayer";
-import { auth } from "@/auth"; // ✅ from auth.js setup (Auth.js official helper)
+import { auth } from "@/auth";
 
 // --- MongoDB Connection ---
 const MONGODB_URI = process.env.MONGODB_URI || "";
@@ -23,7 +23,6 @@ async function connectDB() {
 }
 
 // --- POST: Create New Prayer ---
-
 export async function POST(req: Request) {
   try {
     await connectDB();
@@ -41,13 +40,13 @@ export async function POST(req: Request) {
       const prayer = await Prayer.create({
         userId,
         date,
-        fajr,
-        zuhr,
-        asar,
-        maghrib,
-        esha,
-        recite,
-        zikr,
+        fajr: fajr.toLowerCase(),
+        zuhr: zuhr.toLowerCase(),
+        asar: asar.toLowerCase(),
+        maghrib: maghrib.toLowerCase(),
+        esha: esha.toLowerCase(),
+        recite: recite?.toLowerCase() || "",
+        zikr: zikr?.toLowerCase() || "",
       });
 
       return NextResponse.json({ success: true, data: prayer });
@@ -67,8 +66,8 @@ export async function POST(req: Request) {
   }
 }
 
-// --- GET: Fetch All Prayers for Logged-in User ---
-export async function GET() {
+// --- GET: Fetch All Prayers or Single Prayer by Date ---
+export async function GET(req: Request) {
   try {
     const session = await auth();
     if (!session || !session.user) {
@@ -79,16 +78,92 @@ export async function GET() {
     }
 
     await connectDB();
-    const prayers = await Prayer.find({ userId: session.user.id }).sort({
-      timestamp: -1,
-    });
 
-    return NextResponse.json({ success: true, data: prayers });
+    // Check if date parameter exists in URL
+    const { searchParams } = new URL(req.url);
+    const date = searchParams.get("date");
+
+    if (date) {
+      // Fetch single prayer for specific date
+      const prayer = await Prayer.findOne({
+        userId: session.user.id,
+        date: date
+      });
+
+      if (prayer) {
+        return NextResponse.json({ success: true, data: prayer });
+      } else {
+        return NextResponse.json({ success: false, data: null });
+      }
+    } else {
+      // Fetch all prayers for user
+      const prayers = await Prayer.find({ userId: session.user.id }).sort({
+        date: -1,
+      });
+      return NextResponse.json({ success: true, data: prayers });
+    }
   } catch (error: any) {
     console.error("❌ Error fetching prayers:", error);
     return NextResponse.json(
       { success: false, error: error.message || "Internal Server Error" },
       { status: 500 }
     );
+  }
+}
+
+// --- PUT: Update Existing Prayer ---
+export async function PUT(req: Request) {
+  try {
+    const session = await auth();
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+    const body = await req.json();
+
+    const { id, fajr, zuhr, asar, maghrib, esha, recite, zikr } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Prayer ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ validate required fields
+    if (!fajr || !zuhr || !asar || !maghrib || !esha) {
+      return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
+    }
+
+    // Update prayer and verify it belongs to the user
+    const updatedPrayer = await Prayer.findOneAndUpdate(
+      { _id: id, userId: session.user.id },
+      {
+        fajr: fajr.toLowerCase(),
+        zuhr: zuhr.toLowerCase(),
+        asar: asar.toLowerCase(),
+        maghrib: maghrib.toLowerCase(),
+        esha: esha.toLowerCase(),
+        recite: recite?.toLowerCase() || "",
+        zikr: zikr?.toLowerCase() || "",
+      },
+      { new: true }
+    );
+
+    if (!updatedPrayer) {
+      return NextResponse.json(
+        { success: false, error: "Prayer not found or unauthorized" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data: updatedPrayer });
+  } catch (error: any) {
+    console.error("Error updating prayer:", error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

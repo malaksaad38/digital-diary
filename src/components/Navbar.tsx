@@ -325,17 +325,8 @@ export function UserIcon({ user }: { user: any }) {
           </p>
         </div>
 
-        <div className="border-t border-border mt-4 pt-3">
-          <form action="/api/auth/signout" method="post">
-            <Button
-              type="submit"
-              variant="ghost"
-              className="w-full flex items-center justify-center gap-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-all"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </Button>
-          </form>
+        <div className="flex justify-center items-center border-t border-border mt-4 pt-3">
+          <ButtonLogout/>
         </div>
       </PopoverContent>
     </Popover>

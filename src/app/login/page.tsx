@@ -16,7 +16,7 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-[50vw] max-w-md bg-card border border-border rounded-2xl shadow-lg p-8 text-center space-y-6"
+        className="md:w-[50vw] w-full max-w-md bg-card border border-border rounded-2xl shadow-lg p-8 text-center space-y-6"
       >
         {/* Logo */}
         <div className="flex flex-col items-center space-y-3">

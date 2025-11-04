@@ -1,106 +1,113 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, CalendarDays, BookOpen, Moon, Heart } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Loader2, CalendarDays, BookOpen, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+
+interface Prayer {
+  _id: string;
+  date: string;
+  fajr: string;
+  zuhr: string;
+  asar: string;
+  maghrib: string;
+  esha: string;
+  recite?: string;
+  zikr?: string;
+}
 
 export default function PrayersPage() {
-  const [prayers, setPrayers] = useState<any[]>([]);
+  const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPrayers = async () => {
-      try {
-        const res = await fetch("/api/prayers");
-        const data = await res.json();
-
-        if (data.success) setPrayers(data.data);
-      } catch (err) {
-        console.error("❌ Error fetching prayers:", err);
-      } finally {
-        setLoading(false);
-      }
+      const res = await fetch("/api/prayers");
+      const data = await res.json();
+      setPrayers(data);
+      setLoading(false);
     };
-
     fetchPrayers();
   }, []);
 
   if (loading)
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="animate-spin w-8 h-8 text-gray-500" />
-      </div>
-    );
-
-  if (!loading && prayers.length === 0)
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-gray-600">
-        <BookOpen className="w-12 h-12 mb-3 text-gray-400" />
-        <p className="text-lg font-medium">No prayers found yet</p>
-        <p className="text-sm text-gray-400">Start by adding your first prayer.</p>
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="animate-spin h-6 w-6 text-muted-foreground" />
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center">🕌 My Prayers</h1>
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <h1 className="text-2xl font-semibold flex items-center gap-2">
+        <CalendarDays className="h-5 w-5 text-primary" /> My Prayers
+      </h1>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {prayers.map((prayer) => (
-            <Card
-              key={prayer._id}
-              className="border border-gray-200 hover:shadow-lg transition-all duration-300"
+      {prayers.length === 0 ? (
+        <p className="text-muted-foreground text-center mt-10">No prayer data found.</p>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-4">
+          {prayers.map((p) => (
+            <motion.div
+              key={p._id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <CalendarDays className="w-5 h-5 text-blue-500" />
-                  {new Date(prayer.timestamp).toLocaleDateString()}
-                </CardTitle>
-              </CardHeader>
+              <Card className="hover:shadow-md transition">
+                <CardHeader className="flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                    {p.date}
+                  </CardTitle>
+                  <Badge variant="outline">Recorded</Badge>
+                </CardHeader>
 
-              <CardContent className="space-y-3 text-sm text-gray-700">
-                {["fajr", "zuhr", "asar", "maghrib", "esha"].map((name) => (
-                  <div key={name} className="flex justify-between">
-                    <span className="font-medium text-gray-600">
-                      {name === "fajr"
-                        ? "🌅 Fajr:"
-                        : name === "zuhr"
-                          ? "🏙️ Zuhr:"
-                          : name === "asar"
-                            ? "🌇 Asar:"
-                            : name === "maghrib"
-                              ? "🌆 Maghrib:"
-                              : "🌙 Esha:"}
-                    </span>
-                    <span>{prayer[name] || "—"}</span>
+                <CardContent className="text-sm space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <PrayerField name="Fajr" value={p.fajr} />
+                    <PrayerField name="Zuhr" value={p.zuhr} />
+                    <PrayerField name="Asar" value={p.asar} />
+                    <PrayerField name="Maghrib" value={p.maghrib} />
+                    <PrayerField name="Esha" value={p.esha} />
                   </div>
-                ))}
 
-                <hr className="my-3" />
-
-                {prayer.recite && (
-                  <div className="flex items-start gap-2">
-                    <Heart className="w-4 h-4 text-pink-500 mt-1" />
-                    <p className="text-gray-600">
-                      <span className="font-medium">Recite:</span> {prayer.recite}
-                    </p>
-                  </div>
-                )}
-
-                {prayer.zikr && (
-                  <div className="flex items-start gap-2">
-                    <Moon className="w-4 h-4 text-indigo-500 mt-1" />
-                    <p className="text-gray-600">
-                      <span className="font-medium">Zikr:</span> {prayer.zikr}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  {p.recite && (
+                    <div className="flex items-center gap-2 mt-2 text-muted-foreground">
+                      <BookOpen className="h-4 w-4" />
+                      <span>Recitation: {p.recite}</span>
+                    </div>
+                  )}
+                  {p.zikr && (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Zikr: {p.zikr}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
-      </div>
+      )}
+    </div>
+  );
+}
+
+function PrayerField({ name, value }: { name: string; value: string }) {
+  const color =
+    value === "Missed"
+      ? "bg-destructive/10 text-destructive"
+      : value === "Late"
+        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400"
+        : value === "Jamaat"
+          ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+          : "bg-muted text-muted-foreground";
+
+  return (
+    <div className={`rounded-lg px-3 py-2 text-sm ${color}`}>
+      <strong>{name}: </strong>{value}
     </div>
   );
 }

@@ -23,38 +23,47 @@ async function connectDB() {
 }
 
 // --- POST: Create New Prayer ---
+
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
     await connectDB();
     const body = await req.json();
 
-    const newPrayer = await Prayer.create({
-      userId: session.user.id, // ✅ user ID from Auth.js session
-      fajr: body.fajr,
-      zuhr: body.zuhr,
-      asar: body.asar,
-      maghrib: body.maghrib,
-      esha: body.esha,
-      recite: body.recite,
-      zikr: body.zikr,
-      timestamp: body.timestamp || new Date().toISOString(),
-    });
+    const { userId, date, fajr, zuhr, asar, maghrib, esha, recite, zikr } = body;
 
-    return NextResponse.json({ success: true, data: newPrayer }, { status: 201 });
+    // ✅ validate required fields
+    if (!userId || !date || !fajr || !zuhr || !asar || !maghrib || !esha) {
+      return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
+    }
+
+    // ✅ Try inserting new prayer (unique per userId + date)
+    try {
+      const prayer = await Prayer.create({
+        userId,
+        date,
+        fajr,
+        zuhr,
+        asar,
+        maghrib,
+        esha,
+        recite,
+        zikr,
+      });
+
+      return NextResponse.json({ success: true, data: prayer });
+    } catch (error: any) {
+      // Duplicate date entry
+      if (error.code === 11000) {
+        return NextResponse.json(
+          { success: false, error: "Prayer log for this date already exists." },
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
   } catch (error: any) {
-    console.error("❌ Error saving prayer:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+    console.error("Error saving prayer:", error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 

@@ -1,10 +1,12 @@
-import {PrayerForm} from "@/components/PrayerForm";
+import PrayerForm from "@/components/PrayerForm";
+import {auth} from "@/auth";
 
 
-const EntryForm = () => {
+const EntryForm = async () => {
+    const session = await auth();
   return (
     <div>
-      <PrayerForm/>
+      <PrayerForm session={session} />
     </div>
   )
 }

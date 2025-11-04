@@ -1,223 +1,253 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Switch } from "@/components/ui/switch";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { toast } from "sonner";
 
-const prayerTypes = ["qaza", "infiradi", "jama", "takbeeri ola"];
-const reciteOptions = [
-  "less than 1 ruku",
-  "1 ruku",
-  "half para",
-  "3 pao",
-  "1 para",
-  "2 para",
-  "3 para",
-  "custom",
-];
+export default function PrayerForm({session}: any) {
+  const today = format(new Date(), "yyyy-MM-dd");
 
-const FormSchema = z.object({
-  fajr: z.string().min(1, "Fajr prayer type is required"),
-  zuhr: z.string().min(1, "Zuhr prayer type is required"),
-  asar: z.string().min(1, "Asar prayer type is required"),
-  maghrib: z.string().min(1, "Maghrib prayer type is required"),
-  esha: z.string().min(1, "Esha prayer type is required"),
-  recite: z.string().optional(),
-  zikr: z.boolean(), // strict boolean type
-  timestamp: z.string().optional(),
-});
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
-type PrayerFormValues = z.infer<typeof FormSchema>;
-
-export function PrayerForm() {
-  const [customRecite, setCustomRecite] = useState("");
-
-  const form = useForm<PrayerFormValues>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      fajr: "",
-      zuhr: "",
-      asar: "",
-      maghrib: "",
-      esha: "",
-      recite: "",
-      zikr: false, // strict boolean default
-      timestamp: new Date().toISOString().slice(0, 16), // local datetime
-    },
+  const [formData, setFormData] = useState({
+    date: today,
+    fajr: "",
+    zuhr: "",
+    asar: "",
+    maghrib: "",
+    esha: "",
+    recite: "",
+    zikr: "",
   });
 
-  const onSubmit = async (values: PrayerFormValues) => {
-    const data = {
-      ...values,
-      recite: values.recite === "custom" ? customRecite : values.recite,
-    };
+  const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
+  const prayerOptions = ["Missed", "Self", "Jamaat", "On Time"];
+  const reciteOptions = ["1 Parah", "2 Parah", "None", "Custom"];
+  const zikrOptions = ["Morning", "Evening", "Both", "None"];
+  const customReciteValues = ["0.25", "0.5", "0.75", "1", "1.5", "2", "3", "4", "5"];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleReciteChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, recite: value }));
+  };
+
+   const userId = session.userId;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     try {
       const res = await fetch("/api/prayers", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userId, // replace with session userId
+          ...formData,
+          date: format(selectedDate || new Date(), "yyyy-MM-dd"),
+        }),
       });
 
-      const result = await res.json();
-      if (result.success) {
-        alert("✅ Prayer saved successfully!");
-        form.reset();
+      const data = await res.json();
+      console.log(data);
+
+      if (data.success) {
+        toast.success("Prayer log saved successfully!", {
+          description: `Prayer log for ${formData.date} recorded.`,
+        });
       } else {
-        alert("❌ Failed to save prayer: " + result.error);
+        toast.error("Prayer log for this date already exists.");
       }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Something went wrong.");
+    } catch (error) {
+      toast.error("Something went wrong!");
+    }
+  };
+
+  const getRadioClass = (option: string) => {
+    switch (option) {
+      case "Missed":
+        return "accent-[#ef4444]";
+      case "Self":
+        return "accent-[#facc15]";
+      case "Jamaat":
+        return "accent-[#4ade80]";
+      case "On Time":
+        return "accent-[#38bdf8]";
+      default:
+        return "accent-[#9ca3af]";
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 border rounded-2xl shadow-sm bg-white">
-      <h2 className="text-2xl font-semibold mb-6 text-center">
-        🕌 Daily Prayer Form
-      </h2>
+    <Card className="max-w-3xl mx-auto mt-8 shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-center text-2xl font-bold">
+          Daily Prayer Log
+        </CardTitle>
+      </CardHeader>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Prayer Types */}
-          {["fajr", "zuhr", "asar", "maghrib", "esha"].map((prayer) => (
-            <FormField
-              key={prayer}
-              control={form.control}
-              name={prayer as keyof PrayerFormValues}
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel className="capitalize">{prayer}</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={`${field.value}`}
-                      className="flex flex-wrap gap-3 mt-2"
-                    >
-                      {prayerTypes.map((type) => (
-                        <FormItem
-                          key={type}
-                          className="flex items-center space-x-2"
-                        >
-                          <FormControl>
-                            <RadioGroupItem
-                              value={type}
-                              id={`${prayer}-${type}`}
-                            />
-                          </FormControl>
-                          <FormLabel
-                            htmlFor={`${prayer}-${type}`}
-                            className="text-sm font-normal capitalize cursor-pointer"
-                          >
-                            {type}
-                          </FormLabel>
-                        </FormItem>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              )}></FormField>
-          ))}
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-8">
 
-          {/* Recitation */}
-          <FormField
-            control={form.control}
-            name="recite"
-            render={({field}) => (
-              <FormItem>
-                <FormLabel>Recitation</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    className="flex flex-wrap gap-3 mt-2"
-                  >
-                    {reciteOptions.map((option) => (
-                      <FormItem
-                        key={option}
-                        className="flex items-center space-x-2"
-                      >
-                        <FormControl>
-                          <RadioGroupItem value={option} id={option}/>
-                        </FormControl>
-                        <FormLabel
-                          htmlFor={option}
-                          className="text-sm font-normal capitalize cursor-pointer"
-                        >
-                          {option}
-                        </FormLabel>
-                      </FormItem>
+          {/* --- DATE PICKER --- */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Select Date</h3>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[250px] justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* --- PRAYER TABLE --- */}
+          <div className="overflow-x-auto">
+            <h3 className="text-lg font-semibold mb-3">Prayers</h3>
+            <Table className="border rounded-md">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-32 text-left font-semibold">Prayer</TableHead>
+                  {prayerOptions.map((opt) => (
+                    <TableHead key={opt} className="text-center font-semibold">
+                      {opt}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {prayers.map((prayer) => (
+                  <TableRow key={prayer}>
+                    <TableCell className="capitalize font-semibold">{prayer}</TableCell>
+                    {prayerOptions.map((opt) => (
+                      <TableCell key={opt} className="text-center">
+                        <input
+                          type="radio"
+                          name={prayer}
+                          value={opt}
+                          checked={formData[prayer as keyof typeof formData] === opt}
+                          onChange={handleChange}
+                          className={`w-4 h-4 ${getRadioClass(opt)} cursor-pointer`}
+                          required
+                        />
+                      </TableCell>
                     ))}
-                  </RadioGroup>
-                </FormControl>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
-                {field.value === "custom" && (
-                  <div className="mt-3">
-                    <Input
-                      placeholder="Enter custom recite value"
-                      value={customRecite}
-                      onChange={(e) => setCustomRecite(e.target.value)}
-                    />
-                  </div>
-                )}
-
-                <FormMessage/>
-              </FormItem>
-            )}
-          />
-
-          {/* Zikr Switch */}
-          <FormField
-            control={form.control}
-            name="zikr"
-            render={({field}) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                <FormLabel>Zikr Done?</FormLabel>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
+          {/* --- RECITE --- */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Recite</h3>
+            <div className="flex flex-wrap gap-3 items-center">
+              {reciteOptions.map((opt) => (
+                <label
+                  key={opt}
+                  className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition ${
+                    formData.recite === opt
+                      ? "border-primary bg-muted/30"
+                      : "border-border hover:bg-muted/10"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="recite"
+                    value={opt}
+                    checked={formData.recite === opt}
+                    onChange={handleChange}
+                    className="accent-[hsl(var(--primary))]"
                   />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+                  <span className="text-sm font-medium">{opt}</span>
+                </label>
+              ))}
 
-          {/* Timestamp */}
-          <FormField
-            control={form.control}
-            name="timestamp"
-            render={({field}) => (
-              <FormItem>
-                <FormLabel>Timestamp</FormLabel>
-                <FormControl>
-                  <Input type="datetime-local" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+              {formData.recite === "Custom" && (
+                <Select onValueChange={handleReciteChange}>
+                  <SelectTrigger className="w-28">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customReciteValues.map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v} Parah
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          </div>
 
-          <Button type="submit" className="w-full">
-            Submit Prayer
+          {/* --- ZIKR --- */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Zikr</h3>
+            <div className="flex flex-wrap gap-3 items-center">
+              {zikrOptions.map((opt) => (
+                <label
+                  key={opt}
+                  className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition ${
+                    formData.zikr === opt
+                      ? "border-primary bg-muted/30"
+                      : "border-border hover:bg-muted/10"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="zikr"
+                    value={opt}
+                    checked={formData.zikr === opt}
+                    onChange={handleChange}
+                    className="accent-[hsl(var(--primary))]"
+                  />
+                  <span className="text-sm font-medium">{opt}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* --- SUBMIT --- */}
+          <Button type="submit" className="w-full mt-4">
+            Save Prayer Log
           </Button>
         </form>
-      </Form>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

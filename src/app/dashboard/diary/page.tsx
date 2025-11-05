@@ -131,7 +131,17 @@ export default function PrayerDiaryPage() {
 
   const handleEditClick = (date: string) => {
     // Both prayer and diary forms are on the same page
-    router.push(`/dashboard/entry?date=${date}`);
+    router.push(`/dashboard/entry?date=${date}#edit`);
+
+  };
+const handleAddDiary = (date: string) => {
+    // Both prayer and diary forms are on the same page
+    router.push(`/dashboard/entry?date=${date}#diary`);
+
+  };
+const handleEditDiary = (date: string) => {
+    // Both prayer and diary forms are on the same page
+    router.push(`/dashboard/entry?date=${date}#diaryEdit`);
 
   };
 
@@ -339,7 +349,7 @@ export default function PrayerDiaryPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEditClick(entry.date)}
+                          onClick={() => handleEditDiary(entry.date)}
                           className="h-7 px-2 hover:bg-primary/10"
                         >
                           <Edit2 className="h-3 w-3 mr-1" />
@@ -392,7 +402,7 @@ export default function PrayerDiaryPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleEditClick(entry.date)}
+                        onClick={() => handleAddDiary(entry.date)}
                       >
                         <BookOpen className="mr-2 h-3 w-3" />
                         Add Diary Entry

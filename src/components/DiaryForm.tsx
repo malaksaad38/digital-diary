@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
@@ -33,6 +33,8 @@ export default function DiaryForm({ session }: any) {
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     fajrToZuhr: "",
@@ -119,6 +121,8 @@ export default function DiaryForm({ session }: any) {
       setIsEditMode(true);
     }, 500);
     setIsFormDisabled(false);
+    router.push("#date")
+
   };
 
   const handleCancelEdit = () => {
@@ -234,7 +238,7 @@ export default function DiaryForm({ session }: any) {
   };
 
   return (
-    <Card className="max-w-4xl mx-auto mt-4 sm:mt-8 shadow-lg border-border/50">
+    <Card id={"diary"} className="max-w-4xl mx-auto mt-4 sm:mt-8 shadow-lg border-border/50">
       <CardHeader className="space-y-1 pb-4">
         <CardTitle className="text-center text-xl sm:text-2xl font-bold flex items-center justify-center gap-2">
           <BookOpen className="h-6 w-6" />
@@ -247,8 +251,8 @@ export default function DiaryForm({ session }: any) {
         )}
       </CardHeader>
 
-      <CardContent className="px-4 sm:px-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <CardContent  className="px-4 sm:px-6">
+        <form id={"date"} onSubmit={handleSubmit} className="space-y-6">
           {/* Date Picker */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-3">Select Date</h3>
@@ -326,13 +330,14 @@ export default function DiaryForm({ session }: any) {
                   placeholder="Summarize your day in a few words..."
                   value={formData.summary}
                   onChange={(e) => handleChange("summary", e.target.value)}
-                  disabled={isFormDisabled}
+                  disabled={true}
                   className="min-h-[80px] resize-none"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+
+              <div id={"diaryEdit"}  className="flex flex-col sm:flex-row gap-3 pt-2">
                 {existingDiaryId && !isEditMode ? (
                   <Button
                     type="button"
@@ -346,6 +351,7 @@ export default function DiaryForm({ session }: any) {
                 ) : (
                   <>
                     <Button
+
                       type="submit"
                       className="w-full sm:flex-1"
                       disabled={isFormDisabled || isSaving}

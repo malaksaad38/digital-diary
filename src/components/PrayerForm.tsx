@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -64,6 +64,8 @@ export default function PrayerForm({ session }: any) {
   const reciteOptions = ["0", "2", "Custom"];
   const zikrOptions = ["Half", "Full", "None"];
   const customReciteValues = ["0.25", "0.5", "0.75", "1", "1.5", "2", "3", "4", "5"];
+
+  const router = useRouter();
 
   const userId = session?.userId;
 
@@ -147,6 +149,8 @@ export default function PrayerForm({ session }: any) {
       setIsEditMode(true);
     }, 500);
     setIsFormDisabled(false);
+    router.push("#date")
+
   };
 
   const handleCancelEdit = () => {
@@ -253,8 +257,11 @@ export default function PrayerForm({ session }: any) {
         )}
       </CardHeader>
 
+
+
+
       <CardContent className="px-4 sm:px-6">
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+        <form id={"date"} onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {/* Date Picker */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-3">Select Date</h3>
@@ -281,6 +288,27 @@ export default function PrayerForm({ session }: any) {
             </Popover>
           </div>
 
+          {/* 📱 Compact Mobile Legend (One Line, shadcn style) */}
+          <div className="sm:hidden mb-3 flex flex-wrap justify-center items-center gap-2 text-[10px] font-medium text-muted-foreground">
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-600 border border-red-500/30">
+              <span className="w-2 h-2 rounded-full bg-red-500"></span>
+              <span>M=Missed</span>
+            </div>
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-yellow-400/10 text-yellow-600 border border-yellow-400/30">
+              <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <span>A=Alone</span>
+            </div>
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/30">
+              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+              <span>J=Jamaat</span>
+            </div>
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-sky-500/10 text-sky-600 border border-sky-500/30">
+              <span className="w-2 h-2 rounded-full bg-sky-500"></span>
+              <span>OT=OnTime</span>
+            </div>
+          </div>
+
+
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">
               Loading prayer data...
@@ -288,7 +316,7 @@ export default function PrayerForm({ session }: any) {
           ) : (
             <>
               {/* Prayer Table */}
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div  id={"edit"} className="overflow-x-auto -mx-4 sm:mx-0">
                 <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                   <h3 className="text-base sm:text-lg font-semibold mb-3">Prayers</h3>
                   <div className="border rounded-lg overflow-hidden">
@@ -345,8 +373,9 @@ export default function PrayerForm({ session }: any) {
                 </div>
               </div>
 
+
               {/* Recite Section (fixed) */}
-              <div>
+              <div >
                 <h3 className="text-base sm:text-lg font-semibold mb-3">Recite (Parah)</h3>
                 <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
                   {reciteOptions.map((opt) => (
@@ -359,6 +388,7 @@ export default function PrayerForm({ session }: any) {
                       } ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <input
+
                         type="radio"
                         name="reciteMode"
                         value={opt}
@@ -421,7 +451,7 @@ export default function PrayerForm({ session }: any) {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <div   className="flex flex-col sm:flex-row gap-3 pt-2">
                 {existingPrayerId && !isEditMode ? (
                   <Button
                     type="button"
@@ -429,12 +459,13 @@ export default function PrayerForm({ session }: any) {
                     className="w-full"
                     variant="outline"
                   >
-                    <Edit2 className="mr-2 h-4 w-4" />
+                    <Edit2 className="mr-2 h-4 w-4"  />
                     Edit Prayer Log
                   </Button>
                 ) : (
                   <>
                     <Button
+
                       type="submit"
                       className="w-full sm:flex-1"
                       disabled={isFormDisabled}

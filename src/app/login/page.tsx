@@ -55,16 +55,22 @@ export default function LoginPage() {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          By continuing, you agree to our{" "}
-          <a href="/terms" className="text-primary hover:underline">
-            Terms of Service
-          </a>{" "}
-          and{" "}
-          <a href="/privacy" className="text-primary hover:underline">
-            Privacy Policy
+          <a href="/" className="text-primary hover:underline">
+            Go back to Home page
           </a>
-          .
         </p>
+
+        {/*<p className="text-xs text-muted-foreground">*/}
+        {/*  By continuing, you agree to our{" "}*/}
+        {/*  <a href="/terms" className="text-primary hover:underline">*/}
+        {/*    Terms of Service*/}
+        {/*  </a>{" "}*/}
+        {/*  and{" "}*/}
+        {/*  <a href="/privacy" className="text-primary hover:underline">*/}
+        {/*    Privacy Policy*/}
+        {/*  </a>*/}
+        {/*  .*/}
+        {/*</p>*/}
       </motion.div>
     </div>
   );

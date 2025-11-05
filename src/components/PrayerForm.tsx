@@ -58,8 +58,8 @@ export default function PrayerForm({ session }: any) {
 
   const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
   const prayerOptions = ["Missed", "Alone", "Jamaat", "On Time"];
-  const reciteOptions = ["One", "Two", "None", "Custom"];
-  const zikrOptions = ["Morning", "Evening", "Both", "None"];
+  const reciteOptions = ["0", "2", "Custom"];
+  const zikrOptions = ["Half", "Full", "None"];
   const customReciteValues = ["0.25", "0.5", "0.75", "1", "1.5", "2", "3", "4", "5"];
 
   const userId = session?.userId;
@@ -135,7 +135,9 @@ export default function PrayerForm({ session }: any) {
   };
 
   const handleEditClick = () => {
-    setIsEditMode(true);
+    setTimeout(() => {
+      setIsEditMode(true);
+    }, 500);
     setIsFormDisabled(false);
   };
 
@@ -315,7 +317,7 @@ export default function PrayerForm({ session }: any) {
                                   onChange={handleChange}
                                   className={`w-4 h-4 ${getRadioClass(opt)} cursor-pointer`}
                                   required
-                                  disabled={isFormDisabled && !isEditMode}
+                                  disabled={isFormDisabled}
                                 />
                               </TableCell>
                             ))}
@@ -338,7 +340,7 @@ export default function PrayerForm({ session }: any) {
                         formData.recite === opt
                           ? "border-primary bg-primary/10"
                           : "border-border hover:bg-muted/50"
-                      } ${isFormDisabled && !isEditMode ? "opacity-50 cursor-not-allowed" : ""}`}
+                      } ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <input
                         type="radio"
@@ -347,7 +349,7 @@ export default function PrayerForm({ session }: any) {
                         checked={formData.recite === opt}
                         onChange={handleChange}
                         className="accent-primary"
-                        disabled={isFormDisabled && !isEditMode}
+                        disabled={isFormDisabled}
                       />
                       <span className="font-medium">{opt}</span>
                     </label>
@@ -356,7 +358,7 @@ export default function PrayerForm({ session }: any) {
                   {formData.recite === "Custom" && (
                     <Select
                       onValueChange={handleReciteChange}
-                      disabled={isFormDisabled && !isEditMode}
+                      disabled={isFormDisabled}
                     >
                       <SelectTrigger className="w-24 sm:w-28 text-xs sm:text-sm">
                         <SelectValue placeholder="Select" />
@@ -384,7 +386,7 @@ export default function PrayerForm({ session }: any) {
                         formData.zikr === opt
                           ? "border-primary bg-primary/10"
                           : "border-border hover:bg-muted/50"
-                      } ${isFormDisabled && !isEditMode ? "opacity-50 cursor-not-allowed" : ""}`}
+                      } ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <input
                         type="radio"
@@ -393,7 +395,7 @@ export default function PrayerForm({ session }: any) {
                         checked={formData.zikr === opt}
                         onChange={handleChange}
                         className="accent-primary"
-                        disabled={isFormDisabled && !isEditMode}
+                        disabled={isFormDisabled}
                       />
                       <span className="font-medium">{opt}</span>
                     </label>
@@ -418,7 +420,7 @@ export default function PrayerForm({ session }: any) {
                     <Button
                       type="submit"
                       className="w-full sm:flex-1"
-                      disabled={isFormDisabled && !isEditMode}
+                      disabled={isFormDisabled}
                     >
                       <Save className="mr-2 h-4 w-4" />
                       {isEditMode ? "Update Prayer Log" : "Save Prayer Log"}

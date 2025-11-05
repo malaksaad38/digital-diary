@@ -1,12 +1,14 @@
 import PrayerForm from "@/components/PrayerForm";
 import {auth} from "@/auth";
+import DiaryForm from "@/components/DiaryForm";
 
 
 const EntryForm = async () => {
     const session = await auth();
   return (
-    <div>
+    <div className={"px-4"}>
       <PrayerForm session={session} />
+      <DiaryForm session={session} />
     </div>
   )
 }

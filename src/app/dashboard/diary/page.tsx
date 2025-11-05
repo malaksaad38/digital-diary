@@ -60,6 +60,7 @@ const statusColor = (status: string) => {
     case "jamaat":
       return "text-green-500";
     case "on time":
+      return "text-sky-500";
     case "on-time":
       return "text-sky-500";
     default:
@@ -131,10 +132,12 @@ export default function PrayerDiaryPage() {
   const handleEditClick = (date: string) => {
     // Both prayer and diary forms are on the same page
     router.push(`/dashboard/entry?date=${date}`);
+
   };
 
   const handleAddNewClick = () => {
     router.push("/dashboard/entry");
+
   };
 
   return (
@@ -284,7 +287,7 @@ export default function PrayerDiaryPage() {
 
                       {/* Recite & Zikr */}
                       {(entry.prayer.recite || entry.prayer.zikr) && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2  gap-3 pt-2">
                           {entry.prayer.recite && entry.prayer.recite !== "none" && (
                             <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30">
                               <div className="flex-1">

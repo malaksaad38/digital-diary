@@ -52,9 +52,12 @@ export default function PrayerForm({ session }: any) {
     asar: "",
     maghrib: "",
     esha: "",
-    recite: "",
     zikr: "",
   });
+
+  // Recite states (fixed)
+  const [reciteMode, setReciteMode] = useState("");
+  const [customRecite, setCustomRecite] = useState("");
 
   const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
   const prayerOptions = ["Missed", "Alone", "Jamaat", "On Time"];
@@ -85,13 +88,21 @@ export default function PrayerForm({ session }: any) {
             asar: capitalizeFirst(data.data.asar),
             maghrib: capitalizeFirst(data.data.maghrib),
             esha: capitalizeFirst(data.data.esha),
-            recite: data.data.recite || "",
             zikr: capitalizeFirst(data.data.zikr) || "",
           });
+
+          // Recite mode fix: detect if value is numeric or custom
+          if (data.data.recite === "0" || data.data.recite === "2") {
+            setReciteMode(data.data.recite);
+            setCustomRecite("");
+          } else {
+            setReciteMode("Custom");
+            setCustomRecite(data.data.recite);
+          }
+
           setIsFormDisabled(true);
           setIsEditMode(false);
         } else {
-          // No prayer for this date
           resetForm();
           setExistingPrayerId(null);
           setIsFormDisabled(false);
@@ -120,18 +131,15 @@ export default function PrayerForm({ session }: any) {
       asar: "",
       maghrib: "",
       esha: "",
-      recite: "",
       zikr: "",
     });
+    setReciteMode("");
+    setCustomRecite("");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleReciteChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, recite: value }));
   };
 
   const handleEditClick = () => {
@@ -156,7 +164,9 @@ export default function PrayerForm({ session }: any) {
 
     const dateStr = format(selectedDate || new Date(), "yyyy-MM-dd");
 
-    // Convert all values to lowercase before saving
+    const finalRecite =
+      reciteMode === "Custom" ? customRecite : reciteMode || "";
+
     const dataToSave = {
       userId,
       date: dateStr,
@@ -165,7 +175,7 @@ export default function PrayerForm({ session }: any) {
       asar: formData.asar.toLowerCase(),
       maghrib: formData.maghrib.toLowerCase(),
       esha: formData.esha.toLowerCase(),
-      recite: formData.recite.toLowerCase(),
+      recite: finalRecite.toLowerCase(),
       zikr: formData.zikr.toLowerCase(),
     };
 
@@ -295,7 +305,13 @@ export default function PrayerForm({ session }: any) {
                             >
                               <span className="hidden sm:inline">{opt}</span>
                               <span className="sm:hidden">
-                                {opt === "Missed" ? "M" : opt === "Alone" ? "A" : opt === "Jamaat" ? "J" : "OT"}
+                                {opt === "Missed"
+                                  ? "M"
+                                  : opt === "Alone"
+                                    ? "A"
+                                    : opt === "Jamaat"
+                                      ? "J"
+                                      : "OT"}
                               </span>
                             </TableHead>
                           ))}
@@ -313,7 +329,7 @@ export default function PrayerForm({ session }: any) {
                                   type="radio"
                                   name={prayer}
                                   value={opt}
-                                  checked={formData[prayer as keyof typeof formData] === opt}
+                                  checked={formData[prayer as keyof typeof formData]?.toLowerCase() === opt.toLowerCase()}
                                   onChange={handleChange}
                                   className={`w-4 h-4 ${getRadioClass(opt)} cursor-pointer`}
                                   required
@@ -329,7 +345,7 @@ export default function PrayerForm({ session }: any) {
                 </div>
               </div>
 
-              {/* Recite Section */}
+              {/* Recite Section (fixed) */}
               <div>
                 <h3 className="text-base sm:text-lg font-semibold mb-3">Recite (Parah)</h3>
                 <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
@@ -337,17 +353,17 @@ export default function PrayerForm({ session }: any) {
                     <label
                       key={opt}
                       className={`flex items-center gap-2 px-2 sm:px-3 py-2 border rounded-md cursor-pointer transition text-xs sm:text-sm ${
-                        formData.recite === opt
+                        reciteMode === opt
                           ? "border-primary bg-primary/10"
                           : "border-border hover:bg-muted/50"
                       } ${isFormDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <input
                         type="radio"
-                        name="recite"
+                        name="reciteMode"
                         value={opt}
-                        checked={formData.recite === opt}
-                        onChange={handleChange}
+                        checked={reciteMode === opt}
+                        onChange={(e) => setReciteMode(e.target.value)}
                         className="accent-primary"
                         disabled={isFormDisabled}
                       />
@@ -355,9 +371,10 @@ export default function PrayerForm({ session }: any) {
                     </label>
                   ))}
 
-                  {formData.recite === "Custom" && (
+                  {reciteMode === "Custom" && (
                     <Select
-                      onValueChange={handleReciteChange}
+                      onValueChange={(value) => setCustomRecite(value)}
+                      value={customRecite}
                       disabled={isFormDisabled}
                     >
                       <SelectTrigger className="w-24 sm:w-28 text-xs sm:text-sm">

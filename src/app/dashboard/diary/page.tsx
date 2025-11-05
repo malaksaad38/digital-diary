@@ -165,9 +165,8 @@ const handleEditDiary = (date: string) => {
 
         {/* Legend */}
         <Card className="bg-muted/30">
-          <CardContent className="pt-4 pb-4">
-            <div className="flex flex-wrap items-center gap-3 sm:gap-5 text-xs sm:text-sm">
-              <span className="font-medium text-foreground mr-2">Legend:</span>
+          <CardContent >
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-5 text-xs sm:text-sm">
               <div className="flex items-center gap-1.5">
                 <Circle className="h-3 w-3 text-red-500 fill-red-500" />
                 <span>Missed</span>

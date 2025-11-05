@@ -120,7 +120,7 @@ export default function Navbar({ user }: { user: any }) {
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              className=" size-6 py-1 rounded-full hover:bg-accent transition-all duration-200"
+              className=" size-[20px] py-1 rounded-full hover:bg-accent transition-all duration-200"
               aria-label="Toggle theme"
             >
               {theme === "light" ? (
@@ -132,7 +132,7 @@ export default function Navbar({ user }: { user: any }) {
             <span className="text-[11px] text-muted-foreground">
         {new Intl.DateTimeFormat("en-SA-u-ca-islamic", {
           day: "2-digit",
-          month: "short",
+          month: "numeric",
           year: "numeric",
         }).format(time)}
       </span>

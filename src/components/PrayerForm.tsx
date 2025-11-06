@@ -196,7 +196,7 @@ export default function PrayerForm({ session }: any) {
   const getTextClass = (option: string) => {
     switch (option) {
       case "Missed": return "text-red-500";
-      case "Alone": return "text-yellow-400";
+      case "Alone": return "text-yellow-500";
       case "Jamaat": return "text-green-500";
       case "On Time": return "text-sky-500";
       default: return "text-gray-400";
@@ -247,20 +247,22 @@ export default function PrayerForm({ session }: any) {
           {/* Mobile Legend */}
           <div className="sm:hidden mb-3 flex flex-wrap justify-center items-center gap-2 text-[10px] font-medium text-muted-foreground">
             {[
-              { color: "red", label: "Missed" },
-              { color: "yellow", label: "Alone" },
-              { color: "green", label: "Jamaat" },
-              { color: "sky", label: "On Time" },
+              { label: "Missed", color: "bg-red-500", text: "text-red-500", border: "border-red-500/30" },
+              { label: "Alone", color: "bg-yellow-500", text: "text-yellow-500", border: "border-yellow-500/30" },
+              { label: "Jamaat", color: "bg-green-500", text: "text-green-500", border: "border-green-500/30" },
+              { label: "On Time", color: "bg-sky-500", text: "text-sky-500", border: "border-sky-500/30" },
             ].map((item) => (
               <div
                 key={item.label}
-                className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-${item.color}-500/10 text-${item.color}-600 border border-${item.color}-500/30`}
+                className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full ${item.text} ${item.border} bg-opacity-10 border`}
               >
-                <span className={`w-2 h-2 rounded-full bg-${item.color}-500`}></span>
+                <span className={`w-2 h-2 rounded-full ${item.color}`}></span>
                 <span>{item.label}</span>
               </div>
             ))}
           </div>
+
+
 
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">

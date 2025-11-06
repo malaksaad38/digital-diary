@@ -17,7 +17,7 @@ const statusColor = (status: string) => {
     case "missed": return "text-red-500";
     case "alone": return "text-yellow-400";
     case "jamaat": return "text-green-500";
-    case "on time":
+    case "on time": return "text-sky-500";
     case "on-time": return "text-sky-500";
     default: return "text-muted-foreground";
   }
@@ -69,7 +69,7 @@ export default function PrayerDiaryPage() {
             >
               <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
             </Button>
-            <Button onClick={handleAddNewClick} className="w-full sm:w-auto">
+            <Button onClick={handleAddNewClick} className="w-auto sm:w-auto">
               + Add New Entry
             </Button>
           </div>

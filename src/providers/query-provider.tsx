@@ -41,18 +41,3 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
   );
 }
 
-// Wrap your app with this provider in your root layout
-// app/layout.tsx
-// import QueryProvider from '@/providers/query-provider';
-//
-// export default function RootLayout({ children }) {
-//   return (
-//     <html>
-//       <body>
-//         <QueryProvider>
-//           {children}
-//         </QueryProvider>
-//       </body>
-//     </html>
-//   );
-// }

@@ -202,7 +202,7 @@ export default function PrayerDiaryPage() {
                                 aria-label="Show info about prayers"
                                 className="flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors"
                               >
-                                <CircleHelp size={14} className="relative mb-[4px]" />
+                                <CircleHelp size={14} className="relative" />
                               </button>
                             </DialogTrigger>
 

@@ -496,7 +496,7 @@ export default function PrayerForm({ session }: any) {
               {/* Zikr Section */}
               <div>
                 <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-1.5">
-                  Zikr (Daily Azkar)
+                  Zikr (Daily Tazbehaat)
                   <Dialog>
                     <DialogTrigger asChild>
                       <button

@@ -1,11 +1,11 @@
-// Updated PrayerDiaryPage with React Query
+// Updated PrayerDiaryPage with React Query and Search
 "use client";
 
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Circle, Diamond, Edit2, Loader2, BookOpen, CircleHelp, RefreshCw } from "lucide-react";
+import { Calendar, Circle, Diamond, Edit2, Loader2, BookOpen, CircleHelp, RefreshCw, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useCombinedHistory } from "@/hooks/use-prayer-queries";
@@ -29,9 +29,27 @@ const capitalizeFirst = (str: string) => {
 
 export default function PrayerDiaryPage() {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   // Use React Query hook with automatic caching
   const { data: combinedEntries = [], isLoading, refetch, isFetching } = useCombinedHistory();
+
+  // Filter entries based on search query
+  const filteredEntries = React.useMemo(() => {
+    if (!searchQuery.trim()) return combinedEntries;
+
+    const query = searchQuery.toLowerCase();
+    return combinedEntries.filter((entry: any) => {
+      const dateStr = new Date(entry.date).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).toLowerCase();
+
+      return dateStr.includes(query) || entry.date.includes(query);
+    });
+  }, [combinedEntries, searchQuery]);
 
   const handleEditClick = (date: string) => {
     router.push(`/dashboard/entry?date=${date}#edit`);
@@ -59,6 +77,10 @@ export default function PrayerDiaryPage() {
           </h1>
           <div className="flex gap-2">
             {/* Manual Refresh Button */}
+
+            <Button onClick={handleAddNewClick} className={"w-full shrink-1 "} >
+              + Add New Entry
+            </Button>
             <Button
               variant="outline"
               size="icon"
@@ -68,12 +90,30 @@ export default function PrayerDiaryPage() {
             >
               <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
             </Button>
-            <Button onClick={handleAddNewClick} className={"w-full shrink-1 "} >
-              + Add New Entry
-            </Button>
           </div>
         </div>
 
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search by date (e.g., January, 2025, Monday)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-10 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label="Clear search"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Search Bar */}
 
 
         {/* Legend */}
@@ -88,7 +128,7 @@ export default function PrayerDiaryPage() {
                   >
                     <span className="hidden sm:inline">What do these mean?</span>
                     <span className="sm:hidden">Info</span>
-                    <CircleHelp size={12} className="relative top-[2px]" />
+                    <CircleHelp size={12} className="relative" />
 
                   </button>
                 </DialogTrigger>
@@ -165,26 +205,37 @@ export default function PrayerDiaryPage() {
               </div>
             </CardContent>
           </Card>
-        ) : combinedEntries.length === 0 ? (
+        ) : filteredEntries.length === 0 ? (
           // Empty State
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
               <Calendar className="h-16 w-16 text-muted-foreground/50" />
               <div className="text-center space-y-2">
-                <h3 className="text-lg font-semibold">No Records Found</h3>
+                <h3 className="text-lg font-semibold">
+                  {searchQuery ? 'No Matching Entries' : 'No Records Found'}
+                </h3>
                 <p className="text-sm text-muted-foreground max-w-sm">
-                  Start tracking your daily prayers and thoughts by adding your first entry.
+                  {searchQuery
+                    ? `No entries found matching "${searchQuery}". Try a different search term.`
+                    : 'Start tracking your daily prayers and thoughts by adding your first entry.'
+                  }
                 </p>
               </div>
-              <Button onClick={handleAddNewClick} className="mt-4">
-                Add First Entry
-              </Button>
+              {searchQuery ? (
+                <Button onClick={() => setSearchQuery("")} variant="outline" className="mt-4">
+                  Clear Search
+                </Button>
+              ) : (
+                <Button onClick={handleAddNewClick} className="mt-4">
+                  Add First Entry
+                </Button>
+              )}
             </CardContent>
           </Card>
         ) : (
           // Combined Entries - keeping your existing UI structure
           <div className="space-y-4">
-            {combinedEntries.map((entry: any) => (
+            {filteredEntries.map((entry: any) => (
               <Card
                 key={entry.date}
                 className="border border-border/60 shadow-sm bg-card hover:shadow-md transition-all duration-200"
@@ -243,7 +294,7 @@ export default function PrayerDiaryPage() {
                       <Circle className="h-3 w-3 text-red-500 fill-red-500" />
                       <strong>Missed</strong>
                     </span>{" "}
-                                        — You <strong>missed the prayer time</strong> (Qaza), meaning you didn’t pray within its proper time.
+                                        — You <strong>missed the prayer time</strong> (Qaza), meaning you didn't pray within its proper time.
                                       </p>
 
                                       <p>

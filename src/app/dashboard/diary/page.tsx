@@ -75,28 +75,16 @@ export default function PrayerDiaryPage() {
           </div>
         </div>
 
+
+
         {/* Legend */}
         <Card className="bg-muted/30">
-          <CardContent className="flex flex-col items-center gap-2 py-3">
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-5 text-xs sm:text-sm">
-              {[
-                { icon: Circle, color: "red", label: "Missed" },
-                { icon: Circle, color: "yellow", label: "Alone" },
-                { icon: Circle, color: "green", label: "Jamaat" },
-                { icon: Diamond, color: "sky", label: "On Time" },
-              ].map(({ icon: Icon, color, label }) => (
-                <div key={label} className="flex items-center gap-1.5">
-                  <Icon className={`h-3 w-3 text-${color}-500 fill-${color}-500`} />
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
-
+          <CardContent className="flex flex-col items-center gap-2">
             <Dialog>
               <DialogTrigger asChild>
                 <button
                   aria-label="Show prayer status details"
-                  className="flex items-center gap-1.5 text-foreground/60 hover:text-foreground text-xs transition-colors"
+                  className="flex items-center gap-1.5 mb-1 text-foreground/60 hover:text-foreground text-xs transition-colors"
                 >
                   <CircleHelp size={14} className="relative top-[1px]" />
                   <span className="hidden sm:inline">What do these mean?</span>
@@ -130,6 +118,25 @@ export default function PrayerDiaryPage() {
                 </DialogHeader>
               </DialogContent>
             </Dialog>
+            <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-5 text-xs sm:text-sm">
+
+              {[
+                ["red", "Missed"],
+                ["yellow", "Alone"],
+                ["green", "Jamaat"],
+                ["sky", "On Time"],
+              ].map(([color, label]) => (
+
+                <div key={label} className="flex items-center gap-1.5">
+
+                  <div className={`h-3 w-3 rounded-full bg-${color}-500`} />
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+
+
+
           </CardContent>
         </Card>
 

@@ -27,31 +27,32 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
-
     const { userId, date, fajr, zuhr, asar, maghrib, esha, recite, zikr } = body;
 
-    // ✅ validate required fields
-    if (!userId || !date || !fajr || !zuhr || !asar || !maghrib || !esha) {
-      return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
+    // ✅ Only require userId and date
+    if (!userId || !date) {
+      return NextResponse.json(
+        { success: false, error: "Missing required fields: userId or date." },
+        { status: 400 }
+      );
     }
 
-    // ✅ Try inserting new prayer (unique per userId + date)
+    // ✅ Insert new prayer (radio fields optional)
     try {
       const prayer = await Prayer.create({
         userId,
         date,
-        fajr: fajr.toLowerCase(),
-        zuhr: zuhr.toLowerCase(),
-        asar: asar.toLowerCase(),
-        maghrib: maghrib.toLowerCase(),
-        esha: esha.toLowerCase(),
+        fajr: fajr?.toLowerCase() || "",
+        zuhr: zuhr?.toLowerCase() || "",
+        asar: asar?.toLowerCase() || "",
+        maghrib: maghrib?.toLowerCase() || "",
+        esha: esha?.toLowerCase() || "",
         recite: recite?.toLowerCase() || "",
         zikr: zikr?.toLowerCase() || "",
       });
 
       return NextResponse.json({ success: true, data: prayer });
     } catch (error: any) {
-      // Duplicate date entry
       if (error.code === 11000) {
         return NextResponse.json(
           { success: false, error: "Prayer log for this date already exists." },
@@ -70,38 +71,26 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     await connectDB();
 
-    // Check if date parameter exists in URL
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date");
 
     if (date) {
-      // Fetch single prayer for specific date
       const prayer = await Prayer.findOne({
         userId: session.user.id,
-        date: date
+        date,
       });
 
-      if (prayer) {
-        return NextResponse.json({ success: true, data: prayer });
-      } else {
-        return NextResponse.json({ success: false, data: null });
-      }
-    } else {
-      // Fetch all prayers for user
-      const prayers = await Prayer.find({ userId: session.user.id }).sort({
-        date: -1,
-      });
-      return NextResponse.json({ success: true, data: prayers });
+      return NextResponse.json({ success: true, data: prayer || null });
     }
+
+    const prayers = await Prayer.find({ userId: session.user.id }).sort({ date: -1 });
+    return NextResponse.json({ success: true, data: prayers });
   } catch (error: any) {
     console.error("❌ Error fetching prayers:", error);
     return NextResponse.json(
@@ -115,16 +104,12 @@ export async function GET(req: Request) {
 export async function PUT(req: Request) {
   try {
     const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     await connectDB();
     const body = await req.json();
-
     const { id, fajr, zuhr, asar, maghrib, esha, recite, zikr } = body;
 
     if (!id) {
@@ -134,22 +119,17 @@ export async function PUT(req: Request) {
       );
     }
 
-    // ✅ validate required fields
-    if (!fajr || !zuhr || !asar || !maghrib || !esha) {
-      return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
-    }
-
-    // Update prayer and verify it belongs to the user
+    // ✅ Update with optional radio fields
     const updatedPrayer = await Prayer.findOneAndUpdate(
       { _id: id, userId: session.user.id },
       {
-        fajr: fajr.toLowerCase(),
-        zuhr: zuhr.toLowerCase(),
-        asar: asar.toLowerCase(),
-        maghrib: maghrib.toLowerCase(),
-        esha: esha.toLowerCase(),
-        recite: recite?.toLowerCase() || "",
-        zikr: zikr?.toLowerCase() || "",
+        ...(fajr !== undefined && { fajr: fajr?.toLowerCase() || "" }),
+        ...(zuhr !== undefined && { zuhr: zuhr?.toLowerCase() || "" }),
+        ...(asar !== undefined && { asar: asar?.toLowerCase() || "" }),
+        ...(maghrib !== undefined && { maghrib: maghrib?.toLowerCase() || "" }),
+        ...(esha !== undefined && { esha: esha?.toLowerCase() || "" }),
+        ...(recite !== undefined && { recite: recite?.toLowerCase() || "" }),
+        ...(zikr !== undefined && { zikr: zikr?.toLowerCase() || "" }),
       },
       { new: true }
     );

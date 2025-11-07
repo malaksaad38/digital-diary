@@ -371,7 +371,7 @@ export default function PrayerForm({ session }: any) {
                                   checked={formData[prayer as keyof typeof formData]?.toLowerCase() === opt.toLowerCase()}
                                   onChange={handleChange}
                                   className={`w-4 h-4 ${getRadioClass(opt)} cursor-pointer`}
-                                  required
+                                  required={false}
                                   disabled={isFormDisabled}
                                 />
                               </TableCell>

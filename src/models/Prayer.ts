@@ -3,12 +3,12 @@ import mongoose from "mongoose";
 const PrayerSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   date: { type: String, required: true }, // YYYY-MM-DD format
-  fajr: { type: String, required: true },
-  zuhr: { type: String, required: true },
-  asar: { type: String, required: true },
-  maghrib: { type: String, required: true },
-  esha: { type: String, required: true },
-  recite: { type: String }, // stores both custom numeric or named value
+  fajr: { type: String, required: false },
+  zuhr: { type: String, required: false },
+  asar: { type: String, required: false },
+  maghrib: { type: String, required: false },
+  esha: { type: String, required: false },
+  recite: { type: String },
   zikr: { type: String },
 }, { timestamps: true });
 

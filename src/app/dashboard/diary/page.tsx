@@ -69,7 +69,7 @@ export default function PrayerDiaryPage() {
             >
               <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
             </Button>
-            <Button onClick={handleAddNewClick} className="w-auto sm:w-auto">
+            <Button onClick={handleAddNewClick} className={"w-full shrink-1 "} >
               + Add New Entry
             </Button>
           </div>

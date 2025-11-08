@@ -1,61 +1,487 @@
+// app/dashboard/analytics/page.tsx
 "use client";
 
-import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, TrendingUp, Target, Clock, Loader2 } from "lucide-react";
+import { useCombinedHistory } from "@/hooks/use-prayer-queries";
 import {
-  BarChart3,
-  Notebook,
-  User,
-  Settings,
-} from "lucide-react";
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend, ResponsiveContainer, PieChart, Pie, Cell, Line, LineChart } from "recharts";
 
-export default function DashboardClient({ user }: { user: any }) {
+const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
 
-  const cards = [
-    { title: "My Entries", icon: Notebook },
-    { title: "Analytics", icon: BarChart3 },
-    { title: "Profile", icon: User },
-    { title: "Settings", icon: Settings },
+const statusColors = {
+  missed: "#ef4444",
+  alone: "#facc15",
+  jamaat: "#22c55e",
+  "on time": "#0ea5e9",
+  "not selected": "#9ca3af",
+};
+
+const prayerLabels = {
+  fajr: "Fajr",
+  zuhr: "Zuhr",
+  asar: "Asar",
+  maghrib: "Maghrib",
+  esha: "Esha",
+};
+
+export default function PrayerAnalyticsDashboard() {
+  const { data: combinedEntries = [], isLoading } = useCombinedHistory();
+  const [selectedMonth, setSelectedMonth] = React.useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
+
+  // Calculate overall statistics
+  const overallStats = React.useMemo(() => {
+    const stats = {
+      missed: 0,
+      alone: 0,
+      jamaat: 0,
+      onTime: 0,
+      notSelected: 0,
+      total: 0,
+    };
+
+    combinedEntries.forEach((entry: any) => {
+      if (entry.prayer) {
+        prayers.forEach((prayer) => {
+          const status = entry.prayer[prayer]?.toLowerCase();
+          stats.total++;
+
+          if (!status || status === "not selected") {
+            stats.notSelected++;
+          } else if (status === "missed") {
+            stats.missed++;
+          } else if (status === "alone") {
+            stats.alone++;
+          } else if (status === "jamaat") {
+            stats.jamaat++;
+          } else if (status === "on time") {
+            stats.onTime++;
+          }
+        });
+      }
+    });
+
+    return stats;
+  }, [combinedEntries]);
+
+  // Calculate monthly statistics
+  const monthlyStats = React.useMemo(() => {
+    const stats = {
+      missed: 0,
+      alone: 0,
+      jamaat: 0,
+      onTime: 0,
+      notSelected: 0,
+      total: 0,
+      daysWithData: 0,
+    };
+
+    combinedEntries.forEach((entry: any) => {
+      const entryDate = new Date(entry.date);
+      const entryMonth = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`;
+
+      if (entryMonth === selectedMonth && entry.prayer) {
+        stats.daysWithData++;
+        prayers.forEach((prayer) => {
+          const status = entry.prayer[prayer]?.toLowerCase();
+          stats.total++;
+
+          if (!status || status === "not selected") {
+            stats.notSelected++;
+          } else if (status === "missed") {
+            stats.missed++;
+          } else if (status === "alone") {
+            stats.alone++;
+          } else if (status === "jamaat") {
+            stats.jamaat++;
+          } else if (status === "on time") {
+            stats.onTime++;
+          }
+        });
+      }
+    });
+
+    return stats;
+  }, [combinedEntries, selectedMonth]);
+
+  // Calculate prayer-wise statistics
+  const prayerWiseStats = React.useMemo(() => {
+    const stats: any = {};
+
+    prayers.forEach((prayer) => {
+      stats[prayer] = {
+        missed: 0,
+        alone: 0,
+        jamaat: 0,
+        onTime: 0,
+        notSelected: 0,
+        total: 0,
+      };
+    });
+
+    combinedEntries.forEach((entry: any) => {
+      if (entry.prayer) {
+        prayers.forEach((prayer) => {
+          const status = entry.prayer[prayer]?.toLowerCase();
+          stats[prayer].total++;
+
+          if (!status || status === "not selected") {
+            stats[prayer].notSelected++;
+          } else if (status === "missed") {
+            stats[prayer].missed++;
+          } else if (status === "alone") {
+            stats[prayer].alone++;
+          } else if (status === "jamaat") {
+            stats[prayer].jamaat++;
+          } else if (status === "on time") {
+            stats[prayer].onTime++;
+          }
+        });
+      }
+    });
+
+    return stats;
+  }, [combinedEntries]);
+
+  // Prepare chart data
+  const overallChartData = [
+    { name: "Missed", value: overallStats.missed, color: statusColors.missed },
+    { name: "Alone", value: overallStats.alone, color: statusColors.alone },
+    { name: "Jamaat", value: overallStats.jamaat, color: statusColors.jamaat },
+    { name: "On Time", value: overallStats.onTime, color: statusColors["on time"] },
+    { name: "Not Selected", value: overallStats.notSelected, color: statusColors["not selected"] },
   ];
 
+  const prayerWiseChartData = prayers.map((prayer) => ({
+    prayer: prayerLabels[prayer as keyof typeof prayerLabels],
+    missed: prayerWiseStats[prayer].missed,
+    alone: prayerWiseStats[prayer].alone,
+    jamaat: prayerWiseStats[prayer].jamaat,
+    onTime: prayerWiseStats[prayer].onTime,
+    notSelected: prayerWiseStats[prayer].notSelected,
+  }));
+
+  // Calculate success rate
+  const successRate = overallStats.total > 0
+    ? ((overallStats.jamaat + overallStats.onTime) / overallStats.total * 100).toFixed(1)
+    : 0;
+
+  const monthlySuccessRate = monthlyStats.total > 0
+    ? ((monthlyStats.jamaat + monthlyStats.onTime) / monthlyStats.total * 100).toFixed(1)
+    : 0;
+
+  // Get available months
+  const availableMonths = React.useMemo(() => {
+    const months = new Set<string>();
+    combinedEntries.forEach((entry: any) => {
+      const date = new Date(entry.date);
+      months.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+    });
+    return Array.from(months).sort().reverse();
+  }, [combinedEntries]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading analytics...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="space-y-6 p-6"
-    >
-      {/* Header */}
-      <div className="flex justify-between items-center py-6">
-        <div>
-          <h1 className="text-3xl font-bold">Welcome, {user.name?.split(" ")[0]}</h1>
-          <p className="text-muted-foreground text-sm">{user.email}</p>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 pt-8 sm:pt-14 pb-8">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <TrendingUp className="h-6 w-6 sm:h-7 sm:w-7" />
+            Prayer Analytics
+          </h1>
+          <p className="text-muted-foreground">Track your prayer consistency and progress</p>
         </div>
 
-      </div>
+        {/* Overall Statistics Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 text-center">
+          {/* Missed (Qaza) */}
+          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-red-50/80 to-transparent dark:from-red-950/20 py-3 sm:py-5 border border-transparent hover:border-red-200/40 transition-all duration-300">
+            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+              Missed (Qaza)
+            </p>
+            <p className="text-2xl sm:text-3xl font-semibold text-red-500 mt-1">
+              {overallStats.missed}
+            </p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+              {overallStats.total > 0
+                ? ((overallStats.missed / overallStats.total) * 100).toFixed(1)
+                : 0}
+              % of total
+            </p>
+          </div>
 
-      {/* Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((item, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card className="hover:shadow-lg transition cursor-pointer group">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{item.title}</CardTitle>
-                <item.icon className="h-6 w-6 text-primary group-hover:scale-110 transition" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Manage {item.title.toLowerCase()}
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+          {/* Alone */}
+          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-yellow-50/80 to-transparent dark:from-yellow-950/20 py-3 sm:py-5 border border-transparent hover:border-yellow-200/40 transition-all duration-300">
+            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+              Alone
+            </p>
+            <p className="text-2xl sm:text-3xl font-semibold text-yellow-500 mt-1">
+              {overallStats.alone}
+            </p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+              {overallStats.total > 0
+                ? ((overallStats.alone / overallStats.total) * 100).toFixed(1)
+                : 0}
+              % of total
+            </p>
+          </div>
+
+          {/* Jamaat */}
+          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-green-50/80 to-transparent dark:from-green-950/20 py-3 sm:py-5 border border-transparent hover:border-green-200/40 transition-all duration-300">
+            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+              Jamaat
+            </p>
+            <p className="text-2xl sm:text-3xl font-semibold text-green-600 mt-1">
+              {overallStats.jamaat}
+            </p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+              {overallStats.total > 0
+                ? ((overallStats.jamaat / overallStats.total) * 100).toFixed(1)
+                : 0}
+              % of total
+            </p>
+          </div>
+
+          {/* On Time */}
+          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-sky-50/80 to-transparent dark:from-sky-950/20 py-3 sm:py-5 border border-transparent hover:border-sky-200/40 transition-all duration-300">
+            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+              On Time
+            </p>
+            <p className="text-2xl sm:text-3xl font-semibold text-sky-600 mt-1">
+              {overallStats.onTime}
+            </p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+              {overallStats.total > 0
+                ? ((overallStats.onTime / overallStats.total) * 100).toFixed(1)
+                : 0}
+              % of total
+            </p>
+          </div>
+
+          {/* Success Rate */}
+          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-primary/10 to-transparent dark:from-primary/20 py-3 sm:py-5 border border-transparent hover:border-primary/40 transition-all duration-300">
+            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+              Success Rate
+            </p>
+            <p className="text-2xl sm:text-3xl font-semibold text-primary mt-1">
+              {successRate}%
+            </p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+              Jamaat + On Time
+            </p>
+          </div>
+        </div>
+
+
+        {/* Monthly Filter and Stats */}
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Monthly Report
+                </CardTitle>
+                <CardDescription>View statistics for a specific month</CardDescription>
+              </div>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="px-3 py-2 rounded-md border border-input bg-background text-sm"
+              >
+                {availableMonths.map((month) => (
+                  <option key={month} value={month}>
+                    {new Date(month + "-01").toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                    })}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Days Tracked</p>
+                <p className="text-2xl font-bold">{monthlyStats.daysWithData}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-red-600">Missed</p>
+                <p className="text-2xl font-bold text-red-500">{monthlyStats.missed}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-yellow-600">Alone</p>
+                <p className="text-2xl font-bold text-yellow-500">{monthlyStats.alone}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-green-600">Jamaat</p>
+                <p className="text-2xl font-bold text-green-500">{monthlyStats.jamaat}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-sky-600">On Time</p>
+                <p className="text-2xl font-bold text-sky-500">{monthlyStats.onTime}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-primary">Success Rate</p>
+                <p className="text-2xl font-bold text-primary">{monthlySuccessRate}%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5 w-full">
+          {/* Overall Distribution Pie Chart */}
+          <Card className="w-full">
+            <CardHeader className="pb-1 sm:pb-2 text-center">
+              <CardTitle className="text-[11px] sm:text-xs font-semibold">
+                Overall Prayer Distribution
+              </CardTitle>
+              <CardDescription className="text-[9px] sm:text-[10px]">
+                Total prayers: {overallStats.total}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center items-center p-1.5">
+              <ChartContainer
+                config={{
+                  missed: { label: "Missed", color: statusColors.missed },
+                  alone: { label: "Alone", color: statusColors.alone },
+                  jamaat: { label: "Jamaat", color: statusColors.jamaat },
+                  onTime: { label: "On Time", color: statusColors["on time"] },
+                  notSelected: { label: "Not Selected", color: statusColors["not selected"] },
+                }}
+                className="w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[210px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={overallChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={55}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {overallChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Prayer-wise Comparison Bar Chart */}
+          <Card className="w-full">
+            <CardHeader className="pb-1 sm:pb-2 text-center">
+              <CardTitle className="text-[11px] sm:text-xs font-semibold">
+                Prayer-wise Analysis
+              </CardTitle>
+              <CardDescription className="text-[9px] sm:text-[10px]">
+                Compare performance across prayers
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-1.5">
+              <div className="w-full overflow-x-auto">
+                <div className="min-w-[250px] sm:min-w-[300px] max-w-full mx-auto">
+                  <ChartContainer
+                    config={{
+                      missed: { label: "Missed", color: statusColors.missed },
+                      alone: { label: "Alone", color: statusColors.alone },
+                      jamaat: { label: "Jamaat", color: statusColors.jamaat },
+                      onTime: { label: "On Time", color: statusColors["on time"] },
+                    }}
+                    className="h-[160px] sm:h-[210px]"
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={prayerWiseChartData}
+                        margin={{ top: 4, right: 6, left: -15, bottom: 3 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="prayer" tick={{ fontSize: 8 }} />
+                        <YAxis tick={{ fontSize: 8 }} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Legend wrapperStyle={{ fontSize: 8 }} />
+                        <Bar dataKey="missed" stackId="a" fill={statusColors.missed} name="Missed" />
+                        <Bar dataKey="alone" stackId="a" fill={statusColors.alone} name="Alone" />
+                        <Bar dataKey="jamaat" stackId="a" fill={statusColors.jamaat} name="Jamaat" />
+                        <Bar dataKey="onTime" stackId="a" fill={statusColors["on time"]} name="On Time" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+
+
+        {/* Individual Prayer Performance Cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {prayers.map((prayer) => {
+            const stats = prayerWiseStats[prayer];
+            const prayerSuccessRate = stats.total > 0
+              ? ((stats.jamaat + stats.onTime) / stats.total * 100).toFixed(1)
+              : 0;
+
+            return (
+              <Card key={prayer}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg capitalize flex items-center justify-between">
+                    {prayerLabels[prayer as keyof typeof prayerLabels]}
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  </CardTitle>
+                  <CardDescription>Success: {prayerSuccessRate}%</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-red-500">Missed:</span>
+                    <span className="font-semibold">{stats.missed}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-yellow-500">Alone:</span>
+                    <span className="font-semibold">{stats.alone}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-500">Jamaat:</span>
+                    <span className="font-semibold">{stats.jamaat}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-sky-500">On Time:</span>
+                    <span className="font-semibold">{stats.onTime}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

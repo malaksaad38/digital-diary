@@ -3,7 +3,7 @@
 
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, TrendingUp, Target, Clock, Loader2 } from "lucide-react";
+import {Calendar, TrendingUp, Target, Clock, Loader2, CircleHelp, Circle, Diamond} from "lucide-react";
 import { useCombinedHistory } from "@/hooks/use-prayer-queries";
 import {
   ChartContainer,
@@ -11,6 +11,14 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend, ResponsiveContainer, PieChart, Pie, Cell, Line, LineChart } from "recharts";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
 
 const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
 
@@ -207,6 +215,70 @@ export default function PrayerAnalyticsDashboard() {
           <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
             <TrendingUp className="h-6 w-6 sm:h-7 sm:w-7" />
             Prayer Analytics
+            <Dialog>
+              <DialogTrigger asChild>
+                <button
+                  aria-label="Show info about prayers"
+                  className="flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors"
+                >
+                  <CircleHelp size={20} className="relative mt-1" />
+                </button>
+              </DialogTrigger>
+
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>About Daily Prayers</DialogTitle>
+                  <DialogDescription asChild>
+                    <div className="space-y-3 text-sm mt-2 leading-relaxed">
+                      <p>
+                        This section helps you track your five daily prayers —{" "}
+                        <strong>Fajr</strong>, <strong>Dhuhr</strong>, <strong>Asr</strong>,{" "}
+                        <strong>Maghrib</strong>, and <strong>Isha</strong>.
+                        Each prayer can be marked based on how it was performed:
+                      </p>
+
+                      <div className="space-y-3 pt-2">
+                        <p>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Circle className="h-3 w-3 " />
+                          <strong>Success Rate</strong>
+                        </span>{" "}
+                          — Your <strong>Success rate</strong> Based on Jamaat and On time (Takbeeri Oola). mean how many prayer you pray with Jamaat
+                        </p>
+                        <p>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Circle className="h-3 w-3 text-red-500 fill-red-500" />
+                          <strong>Missed</strong>
+                        </span>{" "}
+                          — You <strong>missed the prayer time</strong> (Qaza), meaning you didn't pray within its proper time.
+                        </p>
+                        <p>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Circle className="h-3 w-3 text-yellow-400 fill-yellow-400" />
+                          <strong>Alone</strong>
+                        </span>{" "}
+                          — You <strong>prayed alone</strong> and not in congregation (Jamaat).
+                        </p>
+                        <p>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Circle className="h-3 w-3 text-green-500 fill-green-500" />
+                          <strong>Jamaat</strong>
+                        </span>{" "}
+                          — You <strong>performed the prayer with Jamaat</strong> (in congregation).
+                        </p>
+                        <p>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Diamond className="h-3 w-3 text-sky-500 fill-sky-500" />
+                          <strong>On Time</strong>
+                        </span>{" "}
+                          — You <strong>prayed in Jamaat with Takbeeri Oola</strong> (the first Takbeer at the start of the prayer).
+                        </p>
+                      </div>
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
           </h1>
           <p className="text-muted-foreground">Track your prayer consistency and progress</p>
         </div>

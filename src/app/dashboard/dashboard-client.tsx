@@ -227,14 +227,14 @@ export default function PrayerAnalyticsDashboard() {
 
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>About Daily Prayers</DialogTitle>
+                  <DialogTitle>About Prayer Analytics</DialogTitle>
                   <DialogDescription asChild>
                     <div className="space-y-3 text-sm mt-2 leading-relaxed">
                       <p>
-                        This section helps you track your five daily prayers —{" "}
+                        This section helps you track your five daily prayers{" "}
                         <strong>Fajr</strong>, <strong>Dhuhr</strong>, <strong>Asr</strong>,{" "}
                         <strong>Maghrib</strong>, and <strong>Isha</strong>.
-                        Each prayer can be marked based on how it was performed:
+                        Each prayer log show the count of your prayers
                       </p>
 
                       <div className="space-y-3 pt-2">

@@ -14,7 +14,7 @@ export default function Breadcrumbs() {
   if (!segments.length) return null;
 
   return (
-    <nav className="px-6 sm:px-8 py-2 bg-background border-b border-border" aria-label="Breadcrumb">
+    <nav className="px-2 sm:px-8 py-2 bg-background border-b border-border" aria-label="Breadcrumb">
       <ol className="flex items-center space-x-1 sm:space-x-2 text-sm text-muted-foreground">
         {segments.map((seg, idx) => {
           const href = "/" + segments.slice(0, idx + 1).join("/");

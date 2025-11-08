@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Notebook, BarChart3, User, Settings } from "lucide-react";
+import {Notebook, BarChart3, User, Settings, Edit2, Edit3} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils"; // optional helper for conditional classes
@@ -11,9 +11,9 @@ export default function DashboardClient({ user }: { user: any }) {
   const pathname = usePathname();
 
   const cards = [
-    { title: "My Entries", icon: Notebook, href: "/dashboard/entry" },
     { title: "Prayer Analytics", icon: BarChart3, href: "/dashboard/analytics" },
-    { title: "Profile", icon: User, href: "/dashboard/profile" },
+    { title: "My Entries", icon: Edit3, href: "/dashboard/entry" },
+    { title: "My Diaries", icon: Notebook, href: "/dashboard/diary" },
     { title: "Settings", icon: Settings, href: "/dashboard/settings" },
   ];
 

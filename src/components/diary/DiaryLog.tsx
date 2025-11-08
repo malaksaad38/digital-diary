@@ -1,0 +1,99 @@
+// components/diary/DiaryLog.tsx
+"use client";
+
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Edit2 } from "lucide-react";
+
+interface DiaryData {
+  summary?: string;
+  fajrToZuhr?: string;
+  zuhrToAsar?: string;
+  asarToMaghrib?: string;
+  maghribToEsha?: string;
+  eshaToFajr?: string;
+  customNotes?: string;
+}
+
+interface DiaryLogProps {
+  diary: DiaryData | null;
+  date: string;
+  onEdit: (date: string) => void;
+  onAdd: (date: string) => void;
+}
+
+export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) {
+  if (!diary) {
+    return (
+      <div className="text-center py-4 border-t border rounded-lg bg-muted/20">
+        <p className="text-sm text-muted-foreground mb-2">No diary entry for this date</p>
+        <Button size="sm" variant="outline" onClick={() => onAdd(date)}>
+          <BookOpen className="mr-2 h-3 w-3" />
+          Add Diary Entry
+        </Button>
+      </div>
+    );
+  }
+
+  const periods = [
+    { label: "Fajr → Zuhr", value: diary.fajrToZuhr },
+    { label: "Zuhr → Asar", value: diary.zuhrToAsar },
+    { label: "Asar → Maghrib", value: diary.asarToMaghrib },
+    { label: "Maghrib → Esha", value: diary.maghribToEsha },
+    { label: "Esha → Fajr", value: diary.eshaToFajr },
+  ];
+
+  return (
+    <div className="space-y-3 border-t pt-4">
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+          <BookOpen className="h-4 w-4" />
+          Diary Entry
+        </h4>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onEdit(date)}
+          className="h-7 px-2 hover:bg-primary/10"
+        >
+          <Edit2 className="h-3 w-3 mr-1" />
+          Edit
+        </Button>
+      </div>
+
+      {/* Diary content */}
+      <div className="space-y-2">
+        {diary.summary && (
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <p className="text-xs font-medium text-primary mb-1">Day Summary</p>
+            <p className="text-sm text-foreground">{diary.summary}</p>
+          </div>
+        )}
+
+        {periods.map((period) => (
+          period.value && (
+            <div key={period.label} className="p-3 rounded-lg bg-muted/30">
+              <p className="text-xs font-medium text-muted-foreground mb-1">
+                {period.label}
+              </p>
+              <p className="text-sm text-foreground whitespace-pre-wrap">
+                {period.value}
+              </p>
+            </div>
+          )
+        ))}
+
+        {diary.customNotes && (
+          <div className="p-3 rounded-lg bg-muted/30">
+            <p className="text-xs font-medium text-muted-foreground mb-1">
+              Additional Notes
+            </p>
+            <p className="text-sm text-foreground whitespace-pre-wrap">
+              {diary.customNotes}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

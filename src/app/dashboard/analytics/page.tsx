@@ -3,7 +3,18 @@
 
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {Calendar, TrendingUp, Target, Clock, Loader2, CircleHelp, Circle, Diamond} from "lucide-react";
+import {
+  Calendar,
+  TrendingUp,
+  Target,
+  Clock,
+  Loader2,
+  CircleHelp,
+  Circle,
+  Diamond,
+  XCircle,
+  AlertCircle, Users
+} from "lucide-react";
 import { useCombinedHistory } from "@/hooks/use-prayer-queries";
 import {
   ChartContainer,
@@ -20,6 +31,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import {Select,SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
 
@@ -45,6 +57,8 @@ export default function PrayerAnalyticsDashboard() {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
+
+
 
   // Calculate overall statistics
   const overallStats = React.useMemo(() => {
@@ -93,6 +107,7 @@ export default function PrayerAnalyticsDashboard() {
       daysWithData: 0,
     };
 
+
     combinedEntries.forEach((entry: any) => {
       const entryDate = new Date(entry.date);
       const entryMonth = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`;
@@ -120,6 +135,8 @@ export default function PrayerAnalyticsDashboard() {
 
     return stats;
   }, [combinedEntries, selectedMonth]);
+
+
 
   // Calculate prayer-wise statistics
   const prayerWiseStats = React.useMemo(() => {
@@ -196,6 +213,45 @@ export default function PrayerAnalyticsDashboard() {
     });
     return Array.from(months).sort().reverse();
   }, [combinedEntries]);
+
+  const stats = [
+    {
+      label: "Days Tracked",
+      value: monthlyStats.daysWithData,
+      color: "text-foreground",
+      icon: <Calendar className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      label: "Missed",
+      value: monthlyStats.missed,
+      color: "text-red-500",
+      icon: <XCircle className="h-4 w-4 text-red-500" />,
+    },
+    {
+      label: "Alone",
+      value: monthlyStats.alone,
+      color: "text-yellow-500",
+      icon: <AlertCircle className="h-4 w-4 text-yellow-500" />,
+    },
+    {
+      label: "Jamaat",
+      value: monthlyStats.jamaat,
+      color: "text-green-500",
+      icon: <Users className="h-4 w-4 text-green-500" />,
+    },
+    {
+      label: "On Time",
+      value: monthlyStats.onTime,
+      color: "text-sky-500",
+      icon: <Clock className="h-4 w-4 text-sky-500" />,
+    },
+    {
+      label: "Success Rate",
+      value: `${monthlySuccessRate}%`,
+      color: "text-primary",
+      icon: <TrendingUp className="h-4 w-4 text-primary" />,
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -368,61 +424,61 @@ export default function PrayerAnalyticsDashboard() {
 
 
         {/* Monthly Filter and Stats */}
-        <Card>
-          <CardHeader>
+        <Card className="overflow-hidden border border-border/50 shadow-sm">
+          <CardHeader className="bg-muted/30 border-b border-border/50 p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
+              <div className="space-y-1">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-semibold">
+                  <Calendar className="h-5 w-5 text-primary" />
                   Monthly Report
                 </CardTitle>
-                <CardDescription>View statistics for a specific month</CardDescription>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Overview of your monthly performance
+                </CardDescription>
               </div>
-              <select
+
+              {/* ✨ Modern Month Selector */}
+              <Select
                 value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="px-3 py-2 rounded-md border border-input bg-background text-sm"
+                onValueChange={setSelectedMonth}
               >
-                {availableMonths.map((month) => (
-                  <option key={month} value={month}>
-                    {new Date(month + "-01").toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                    })}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select month" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableMonths.map((month) => (
+                    <SelectItem key={month} value={month}>
+                      {new Date(month + "-01").toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                      })}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Days Tracked</p>
-                <p className="text-2xl font-bold">{monthlyStats.daysWithData}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-red-600">Missed</p>
-                <p className="text-2xl font-bold text-red-500">{monthlyStats.missed}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-yellow-600">Alone</p>
-                <p className="text-2xl font-bold text-yellow-500">{monthlyStats.alone}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-green-600">Jamaat</p>
-                <p className="text-2xl font-bold text-green-500">{monthlyStats.jamaat}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-sky-600">On Time</p>
-                <p className="text-2xl font-bold text-sky-500">{monthlyStats.onTime}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-primary">Success Rate</p>
-                <p className="text-2xl font-bold text-primary">{monthlySuccessRate}%</p>
-              </div>
+
+          <CardContent className="p-4 sm:p-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+              {stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="flex flex-col items-center sm:items-start space-y-1"
+                >
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {stat.icon}
+                    <span>{stat.label}</span>
+                  </div>
+                  <p className={`text-xl sm:text-2xl font-semibold ${stat.color}`}>
+                    {stat.value}
+                  </p>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
+
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5 w-full">

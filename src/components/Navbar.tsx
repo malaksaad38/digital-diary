@@ -32,6 +32,7 @@ export default function Navbar({ user }: { user: any }) {
     "/dashboard/entry": "Entry",
     "/dashboard/diary": "Diary",
     "/dashboard/analytics": "Analytics",
+    "/dashboard/prayer-times": "Prayer Times",
   };
 
   const currentPage =

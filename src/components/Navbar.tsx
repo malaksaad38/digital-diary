@@ -58,6 +58,8 @@ export default function Navbar({ user }: { user: any }) {
         {/* Middle: Navigation */}
         <div className="flex items-center gap-6">
           <NavLink href="/dashboard" label="Dashboard" pathname={pathname} />
+          <NavLink href="/dashboard/analytics" label="Analytics" pathname={pathname} />
+          <NavLink href="/dashboard/prayer-times" label="Prayer Times" pathname={pathname} />
           <NavLink href="/dashboard/entry" label="Entry" pathname={pathname} />
           <NavLink href="/dashboard/diary" label="Diary" pathname={pathname} />
         </div>

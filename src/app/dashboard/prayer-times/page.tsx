@@ -22,61 +22,51 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { cn } from "@/lib/utils";
 
 export default function PrayerTimes() {
-  const [prayerData, setData] = useState(null);
+  const [prayerData, setPrayerData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isFromCache, setIsFromCache] = useState(false);
   const [currentPrayer, setCurrentPrayer] = useState('');
   const [nextPrayer, setNextPrayer] = useState('');
   const [countdown, setCountdown] = useState('');
+  const [qazaCountdown, setQazaCountdown] = useState('');
+  const [isFromCache, setIsFromCache] = useState(false);
 
   const fetchPrayerTimes = async (forceRefresh = false) => {
     setLoading(true);
     setError(null);
-
     try {
-      // Check localStorage first (unless force refresh)
-      if (!forceRefresh) {
-        const cachedData = localStorage.getItem('prayerTimesWeeklyData');
-        const cacheDate = localStorage.getItem('prayerTimesWeeklyCacheDate');
-        const today = new Date().toDateString();
+      const cacheKey = 'prayerTimesWeeklyData';
+      const cacheDateKey = 'prayerTimesWeeklyCacheDate';
+      const today = new Date().toDateString();
 
-        // If cached data exists and is from today, use it
+      if (!forceRefresh) {
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheDate = localStorage.getItem(cacheDateKey);
         if (cachedData && cacheDate === today) {
-          setData(JSON.parse(cachedData));
+          setPrayerData(JSON.parse(cachedData));
           setIsFromCache(true);
           setLoading(false);
           return;
         }
       }
 
-      // Fetch from API
-      const proxyUrl = 'https://api.allorigins.win/raw?url=';
-      const apiUrl = 'https://muslimsalat.com/timergara/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c';
+      const proxy = 'https://api.allorigins.win/raw?url=';
+      const apiUrl =
+        'https://muslimsalat.com/timergara/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c';
+      const res = await fetch(proxy + encodeURIComponent(apiUrl));
+      const data = await res.json();
 
-      const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+      if (!res.ok || data.error) throw new Error(data.error || 'Failed to fetch');
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch prayer times');
-      }
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheDateKey, today);
 
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      // Store in localStorage
-      const today = new Date().toDateString();
-      localStorage.setItem('prayerTimesWeeklyData', JSON.stringify(data));
-      localStorage.setItem('prayerTimesWeeklyCacheDate', today);
-
-      setData(data);
+      setPrayerData(data);
       setIsFromCache(false);
-      setLoading(false);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -87,96 +77,76 @@ export default function PrayerTimes() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (prayerData && prayerData.items && prayerData.items[0]) {
-      const getCurrentAndNextPrayer = () => {
-        const todayPrayers = prayerData.items[0];
-        const now = currentTime;
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
-
-        const prayers = [
-          { name: 'Fajr', time: todayPrayers.fajr },
-          { name: 'Dhuhr', time: todayPrayers.dhuhr },
-          { name: 'Asr', time: todayPrayers.asr },
-          { name: 'Maghrib', time: todayPrayers.maghrib },
-          { name: 'Isha', time: todayPrayers.isha }
-        ];
-
-        let current = 'Isha';
-        let next = 'Fajr';
-        let nextPrayerTime = null;
-
-        for (let i = 0; i < prayers.length; i++) {
-          const prayerTime24 = convertTo24Hour(prayers[i].time);
-          const [prayerHour, prayerMinute] = prayerTime24.split(':').map(Number);
-
-          const currentTotalMinutes = currentHour * 60 + currentMinute;
-          const prayerTotalMinutes = prayerHour * 60 + prayerMinute;
-
-          if (currentTotalMinutes < prayerTotalMinutes) {
-            next = prayers[i].name;
-            nextPrayerTime = { hour: prayerHour, minute: prayerMinute };
-
-            if (i > 0) {
-              current = prayers[i - 1].name;
-            } else {
-              current = 'Isha';
-            }
-            break;
-          }
-        }
-
-        // Calculate countdown
-        if (nextPrayerTime) {
-          const nextPrayerDate = new Date();
-          nextPrayerDate.setHours(nextPrayerTime.hour, nextPrayerTime.minute, 0, 0);
-
-          const diff = nextPrayerDate.getTime() - now.getTime();
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-          setCountdown(`${hours}h ${minutes}m ${seconds}s`);
-        } else {
-          // If no prayer found today, next is Fajr tomorrow
-          const fajrTime24 = convertTo24Hour(prayers[0].time);
-          const [fajrHour, fajrMinute] = fajrTime24.split(':').map(Number);
-
-          const tomorrow = new Date();
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          tomorrow.setHours(fajrHour, fajrMinute, 0, 0);
-
-          const diff = tomorrow.getTime() - now.getTime();
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-          setCountdown(`${hours}h ${minutes}m ${seconds}s`);
-        }
-
-        setCurrentPrayer(current);
-        setNextPrayer(next);
-      };
-
-      getCurrentAndNextPrayer();
-    }
-  }, [prayerData, currentTime]);
-
-  const convertTo24Hour = (time12h) => {
+  const convertTo24Hour = (time12h: string) => {
     const [time, modifier] = time12h.split(' ');
     let [hours, minutes] = time.split(':');
-
-    if (hours === '12') {
-      hours = '00';
-    }
-
-    if (modifier === 'pm') {
-      hours = parseInt(hours, 10) + 12;
-    }
-
-    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+    if (hours === '12') hours = '00';
+    if (modifier === 'pm') hours = String(parseInt(hours) + 12);
+    return `${hours.padStart(2, '0')}:${minutes}`;
   };
+
+  const calculateCountdown = (target: Date) => {
+    const diff = target.getTime() - new Date().getTime();
+    if (diff <= 0) return '00h 00m 00s';
+    const h = Math.floor(diff / (1000 * 60 * 60));
+    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((diff % (1000 * 60)) / 1000);
+    return `${h}h ${m}m ${s}s`;
+  };
+
+  useEffect(() => {
+    if (!prayerData) return;
+    const today = prayerData.items[0];
+    const prayers = [
+      { name: 'Fajr', time: today.fajr },
+      { name: 'Dhuhr', time: today.dhuhr },
+      { name: 'Asr', time: today.asr },
+      { name: 'Maghrib', time: today.maghrib },
+      { name: 'Isha', time: today.isha },
+    ];
+
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+
+    let current = 'Isha';
+    let next = 'Fajr';
+    let nextTime: any = null;
+
+    for (let i = 0; i < prayers.length; i++) {
+      const [h, m] = convertTo24Hour(prayers[i].time).split(':').map(Number);
+      const prayerMins = h * 60 + m;
+      if (nowMins < prayerMins) {
+        next = prayers[i].name;
+        nextTime = { h, m };
+        current = i > 0 ? prayers[i - 1].name : 'Isha';
+        break;
+      }
+    }
+
+    // Countdown for next prayer
+    if (nextTime) {
+      const nextDate = new Date();
+      nextDate.setHours(nextTime.h, nextTime.m, 0, 0);
+      setCountdown(calculateCountdown(nextDate));
+    }
+
+    // Qaza time (Fajr → Shurooq)
+    let qazaTime24: string;
+    if (current === 'Fajr') qazaTime24 = convertTo24Hour(today.shurooq);
+    else {
+      const idx = prayers.findIndex(p => p.name === current);
+      const endIdx = idx + 1 < prayers.length ? idx + 1 : 0;
+      qazaTime24 = convertTo24Hour(prayers[endIdx].time);
+    }
+
+    const [qh, qm] = qazaTime24.split(':').map(Number);
+    const qazaDate = new Date();
+    qazaDate.setHours(qh, qm, 0, 0);
+    setQazaCountdown(calculateCountdown(qazaDate));
+
+    setCurrentPrayer(current);
+    setNextPrayer(next);
+  }, [prayerData, currentTime]);
 
   const handleRefresh = () => {
     fetchPrayerTimes(true); // Force refresh from API
@@ -237,80 +207,71 @@ export default function PrayerTimes() {
     { name: 'Isha', key: 'isha', icon: Moon, color: 'from-indigo-600 to-blue-800' }
   ];
 
+
+  const today = prayerData.items[0];
   const todayPrayers = prayerData.items[0];
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-background to-accent/20">
-      <Breadcrumbs/>
-      <div className="max-w-7xl mx-auto space-y-6">
-
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-4 sm:p-6">
+      <Breadcrumbs />
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-3 pt-4">
-          <div className="flex items-center justify-center gap-3">
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Prayer Times
-            </h1>
-            {isFromCache && (
-              <Badge variant="secondary" className="text-xs">
-                Cached
-              </Badge>
-            )}
-          </div>
-          <div className="flex items-center justify-center gap-2 text-sm sm:text-base text-muted-foreground">
+        <div className="text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Prayer Times
+          </h1>
+          <div className="flex justify-center items-center gap-2 mt-2 text-muted-foreground">
             <MapPin className="w-4 h-4" />
-            <span>{prayerData.city}, {prayerData.country}</span>
+            <span>
+              {prayerData.city}, {prayerData.country}
+            </span>
           </div>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <span>{todayPrayers.date_for}</span>
+          <div className="text-sm mt-2 flex flex-col sm:flex-row justify-center items-center gap-3">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-4 h-4" /> {today.date_for}
             </div>
-            <div className="text-lg sm:text-xl font-mono font-semibold">
-              {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            <div className="font-mono font-semibold text-lg">
+              {currentTime.toLocaleTimeString('en-US', { hour12: true })}
             </div>
           </div>
         </div>
 
-        {/* Current & Next Prayer Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Current Prayer Card */}
-          <Card className="border-2 border-primary/50 bg-gradient-to-br from-primary/10 to-primary/5 shadow-lg">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">Current Prayer</h3>
-                </div>
-                <Badge className="bg-primary">Active</Badge>
+        {/* Current & Next */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/40">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-primary" /> Current Prayer
+                </h3>
+                <Badge className="text-xs bg-primary">Active</Badge>
               </div>
-              <div className="space-y-2">
-                <p className="text-3xl font-bold">{currentPrayer}</p>
-                <p className="text-sm text-muted-foreground">
-                  {todayPrayers[currentPrayer.toLowerCase()]}
+              <p className="text-3xl font-bold">{currentPrayer}</p>
+              <p className="text-muted-foreground">{today[currentPrayer.toLowerCase()]}</p>
+              <div className="rounded-lg p-3 bg-background/60 border">
+                <p className="text-xs text-muted-foreground mb-1">
+                  Qaza Time Remaining
                 </p>
+                <p className="text-2xl font-mono font-bold text-primary">{qazaCountdown}</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Next Prayer Card with Countdown */}
-          <Card className="border-2 border-orange-500/50 bg-gradient-to-br from-orange-500/10 to-orange-500/5 shadow-lg">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Timer className="w-5 h-5 text-orange-600" />
-                  <h3 className="text-lg font-semibold">Next Prayer</h3>
-                </div>
+          <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-400/40">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Timer className="w-5 h-5 text-orange-600" /> Next Prayer
+                </h3>
                 <Badge variant="secondary">Upcoming</Badge>
               </div>
-              <div className="space-y-2">
-                <p className="text-3xl font-bold">{nextPrayer}</p>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {todayPrayers[nextPrayer.toLowerCase()]}
+              <p className="text-3xl font-bold">{nextPrayer}</p>
+              <p className="text-muted-foreground">{today[nextPrayer.toLowerCase()]}</p>
+              <div className="rounded-lg p-3 bg-background/60 border">
+                <p className="text-xs text-muted-foreground mb-1">
+                  Time Remaining for {nextPrayer}
                 </p>
-                <div className="bg-background/50 rounded-lg p-3 border">
-                  <p className="text-xs text-muted-foreground mb-1">Time Remaining</p>
-                  <p className="text-2xl font-mono font-bold text-orange-600">{countdown}</p>
-                </div>
+                <p className="text-2xl font-mono font-bold text-orange-600">{countdown}</p>
               </div>
             </CardContent>
           </Card>
@@ -393,8 +354,8 @@ export default function PrayerTimes() {
 
           <Card className="shadow-md hover:shadow-lg transition-shadow">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <div className="flex items-center  gap-4">
+                <div className="w-12 shrink-0  h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   <Settings className="w-6 h-6 text-white" />
                 </div>
                 <div>

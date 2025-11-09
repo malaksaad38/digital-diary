@@ -12,26 +12,47 @@ import { Badge } from "@/components/ui/badge";
 export default function DashboardClient({ user }: { user: any }) {
   const pathname = usePathname();
   const [prayerData, setPrayerData] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true); // <-- loading state
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [nextPrayer, setNextPrayer] = useState<string>("");
+  const [currentPrayer, setCurrentPrayer] = useState<string>("");
+  const [countdown, setCountdown] = useState<string>("");
 
   useEffect(() => {
-    // Fetch prayer times
     const fetchPrayerTimes = async () => {
       try {
-        setLoading(true); // start loading
+        setLoading(true);
+
+        // Check localStorage first
+        const cachedData = localStorage.getItem('prayerTimesData');
+        const cacheDate = localStorage.getItem('prayerTimesCacheDate');
+        const today = new Date().toDateString();
+
+        // If cached data exists and is from today, use it
+        if (cachedData && cacheDate === today) {
+          setPrayerData(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
+
+        // Otherwise, fetch from API
         const proxyUrl = 'https://api.allorigins.win/raw?url=';
         const apiUrl = 'https://muslimsalat.com/timergara.json?key=b2015473db5fff96e4d4f2fd2ad84e1c';
         const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
         const data = await response.json();
+
         if (data && data.items && data.items[0]) {
-          setPrayerData(data.items[0]);
+          const prayerInfo = data.items[0];
+          setPrayerData(prayerInfo);
+
+          // Store in localStorage
+          localStorage.setItem('prayerTimesData', JSON.stringify(prayerInfo));
+          localStorage.setItem('prayerTimesCacheDate', today);
         }
       } catch (error) {
         console.error('Error fetching prayer times:', error);
       } finally {
-        setLoading(false); // end loading
+        setLoading(false);
       }
     };
 
@@ -44,8 +65,12 @@ export default function DashboardClient({ user }: { user: any }) {
 
   useEffect(() => {
     if (prayerData) {
-      const getCurrentPrayer = () => {
-        const now = currentTime.toLocaleTimeString('en-US', { hour12: false });
+      const getCurrentAndNextPrayer = () => {
+        const now = currentTime;
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+        const currentSeconds = now.getSeconds();
+
         const prayers = [
           { name: 'Fajr', time: prayerData.fajr },
           { name: 'Dhuhr', time: prayerData.dhuhr },
@@ -54,16 +79,63 @@ export default function DashboardClient({ user }: { user: any }) {
           { name: 'Isha', time: prayerData.isha }
         ];
 
-        for (let prayer of prayers) {
-          const prayerTime24 = convertTo24Hour(prayer.time);
-          if (now < prayerTime24) {
-            return prayer.name;
+        let current = 'Isha';
+        let next = 'Fajr';
+        let nextPrayerTime = null;
+
+        for (let i = 0; i < prayers.length; i++) {
+          const prayerTime24 = convertTo24Hour(prayers[i].time);
+          const [prayerHour, prayerMinute] = prayerTime24.split(':').map(Number);
+
+          const currentTotalMinutes = currentHour * 60 + currentMinute;
+          const prayerTotalMinutes = prayerHour * 60 + prayerMinute;
+
+          if (currentTotalMinutes < prayerTotalMinutes) {
+            next = prayers[i].name;
+            nextPrayerTime = { hour: prayerHour, minute: prayerMinute };
+
+            if (i > 0) {
+              current = prayers[i - 1].name;
+            } else {
+              current = 'Isha';
+            }
+            break;
           }
         }
-        return 'Fajr';
+
+        // Calculate countdown
+        if (nextPrayerTime) {
+          const nextPrayerDate = new Date();
+          nextPrayerDate.setHours(nextPrayerTime.hour, nextPrayerTime.minute, 0, 0);
+
+          const diff = nextPrayerDate.getTime() - now.getTime();
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+          setCountdown(`${hours}h ${minutes}m ${seconds}s`);
+        } else {
+          // If no prayer found today, next is Fajr tomorrow
+          const fajrTime24 = convertTo24Hour(prayers[0].time);
+          const [fajrHour, fajrMinute] = fajrTime24.split(':').map(Number);
+
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          tomorrow.setHours(fajrHour, fajrMinute, 0, 0);
+
+          const diff = tomorrow.getTime() - now.getTime();
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+          setCountdown(`${hours}h ${minutes}m ${seconds}s`);
+        }
+
+        setCurrentPrayer(current);
+        setNextPrayer(next);
       };
 
-      setNextPrayer(getCurrentPrayer());
+      getCurrentAndNextPrayer();
     }
   }, [prayerData, currentTime]);
 
@@ -74,7 +146,7 @@ export default function DashboardClient({ user }: { user: any }) {
     if (hours === '12') hours = '00';
     if (modifier === 'pm') hours = (parseInt(hours, 10) + 12).toString();
 
-    return `${hours.padStart(2, '0')}:${minutes}:00`;
+    return `${hours.padStart(2, '0')}:${minutes}`;
   };
 
   const cards = [
@@ -99,26 +171,42 @@ export default function DashboardClient({ user }: { user: any }) {
           <p className="text-muted-foreground text-sm">{user?.email}</p>
         </div>
 
-        {/* Current Prayer Time Badge */}
+        {/* Current & Next Prayer Badge */}
         {loading ? (
-          <div className="animate-pulse px-4 py-2 bg-gray-200 rounded-md w-36 h-16" />
+          <div className="animate-pulse px-4 py-2 bg-gray-200 rounded-md w-48 h-20" />
         ) : (
           prayerData && (
             <Link href="/dashboard/prayer-times">
-              <CardContent className="px-2">
-                <div className="flex items-center gap-3">
-                  <Sunrise className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Next Prayer</p>
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <p className="text-lg font-bold">{nextPrayer}</p>
-                      <Badge variant="secondary" className="text-xs">
-                        {prayerData[nextPrayer.toLowerCase()]}
-                      </Badge>
+                      <Clock className="w-4 h-4 text-primary" />
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Current:</span>
+                        <Badge variant="outline" className="text-xs font-semibold">
+                          {currentPrayer}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Sunrise className="w-4 h-4 text-primary" />
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Next:</span>
+                        <Badge className="text-xs font-semibold">
+                          {nextPrayer}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {prayerData[nextPrayer.toLowerCase()]}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-center pt-1 border-t">
+                      <p className="text-lg font-mono font-bold text-primary">{countdown}</p>
                     </div>
                   </div>
-                </div>
-              </CardContent>
+                </CardContent>
+              </Card>
             </Link>
           )
         )}
@@ -142,14 +230,22 @@ export default function DashboardClient({ user }: { user: any }) {
                       <div
                         key={prayer}
                         className={cn(
-                          "text-center py-2 px-2 rounded-md transition-colors ",
-                          nextPrayer === prayer
-                            ? "bg-primary text-primary-foreground font-semibold"
-                            : "bg-background text-foreground"
+                          "text-center py-2 px-2 rounded-md transition-colors",
+                          currentPrayer === prayer
+                            ? "bg-primary/20 border-2 border-primary text-foreground font-semibold"
+                            : nextPrayer === prayer
+                              ? "bg-primary text-primary-foreground font-semibold"
+                              : "bg-muted text-foreground"
                         )}
                       >
                         <p className="text-xs">{prayer}</p>
                         <p className="text-sm font-mono">{prayerData[prayer.toLowerCase()]}</p>
+                        {currentPrayer === prayer && (
+                          <Badge variant="secondary" className="text-[10px] mt-1">Now</Badge>
+                        )}
+                        {nextPrayer === prayer && currentPrayer !== prayer && (
+                          <Badge variant="secondary" className="text-[10px] mt-1">Next</Badge>
+                        )}
                       </div>
                     ))}
                   </div>

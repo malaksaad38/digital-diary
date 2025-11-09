@@ -8,6 +8,7 @@ const PrayerSchema = new mongoose.Schema({
   asar: { type: String, required: false },
   maghrib: { type: String, required: false },
   esha: { type: String, required: false },
+  additionalNotes: { type: String, required: false },
   recite: { type: String },
   zikr: { type: String },
 }, { timestamps: true });

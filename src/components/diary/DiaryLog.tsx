@@ -3,6 +3,12 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { BookOpen, Edit2 } from "lucide-react";
 
 interface DiaryData {
@@ -44,56 +50,63 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
   ];
 
   return (
-    <div className="space-y-3 border-t pt-4">
-      <div className="flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-          <BookOpen className="h-4 w-4" />
-          Diary Entry
-        </h4>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onEdit(date)}
-          className="h-7 px-2 hover:bg-primary/10"
-        >
-          <Edit2 className="h-3 w-3 mr-1" />
-          Edit
-        </Button>
-      </div>
-
-      {/* Diary content */}
-      <div className="space-y-2">
-        {diary.summary && (
-          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-            <p className="text-xs font-medium text-primary mb-1">Day Summary</p>
-            <p className="text-sm text-foreground">{diary.summary}</p>
+    <div className="border-t pt-4">
+      <Accordion type="single" collapsible defaultValue="diary-entry">
+        <AccordionItem value="diary-entry" className="border-none">
+          <div className="flex items-center justify-between">
+            <AccordionTrigger className="hover:no-underline py-2 flex-1">
+              <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Diary Entry
+              </h4>
+            </AccordionTrigger>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(date)}
+              className="h-7 px-2 hover:bg-primary/10"
+            >
+              <Edit2 className="h-3 w-3 mr-1" />
+              Edit
+            </Button>
           </div>
-        )}
 
-        {periods.map((period) => (
-          period.value && (
-            <div key={period.label} className="p-3 rounded-lg bg-muted/30">
-              <p className="text-xs font-medium text-muted-foreground mb-1">
-                {period.label}
-              </p>
-              <p className="text-sm text-foreground whitespace-pre-wrap">
-                {period.value}
-              </p>
+          <AccordionContent>
+            <div className="space-y-2 pt-2">
+              {diary.summary && (
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <p className="text-xs font-medium text-primary mb-1">Day Summary</p>
+                  <p className="text-sm text-foreground">{diary.summary}</p>
+                </div>
+              )}
+
+              {periods.map((period) =>
+                  period.value && (
+                    <div key={period.label} className="p-3 rounded-lg bg-muted/30">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">
+                        {period.label}
+                      </p>
+                      <p className="text-sm text-foreground whitespace-pre-wrap">
+                        {period.value}
+                      </p>
+                    </div>
+                  )
+              )}
+
+              {diary.customNotes && (
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                    Additional Notes
+                  </p>
+                  <p className="text-sm text-foreground whitespace-pre-wrap">
+                    {diary.customNotes}
+                  </p>
+                </div>
+              )}
             </div>
-          )
-        ))}
-
-        {diary.customNotes && (
-          <div className="p-3 rounded-lg bg-muted/30">
-            <p className="text-xs font-medium text-muted-foreground mb-1">
-              Additional Notes
-            </p>
-            <p className="text-sm text-foreground whitespace-pre-wrap">
-              {diary.customNotes}
-            </p>
-          </div>
-        )}
-      </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }

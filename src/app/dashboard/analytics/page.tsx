@@ -253,17 +253,6 @@ export default function PrayerAnalyticsDashboard() {
     },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading analytics...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 pt-4 sm:pt-8 pb-8">
@@ -344,82 +333,100 @@ export default function PrayerAnalyticsDashboard() {
 
         {/* Overall Statistics Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 text-center">
-          {/* Missed (Qaza) */}
-          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-red-50/80 to-transparent dark:from-red-950/20 py-3 sm:py-5 border border-transparent hover:border-red-200/40 transition-all duration-300">
-            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
-              Missed (Qaza)
-            </p>
-            <p className="text-2xl sm:text-3xl font-semibold text-red-500 mt-1">
-              {overallStats.missed}
-            </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-              {overallStats.total > 0
-                ? ((overallStats.missed / overallStats.total) * 100).toFixed(1)
-                : 0}
-              % of total
-            </p>
-          </div>
+          {isLoading ? (
+            // Loading skeleton for stats cards
+            <>
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col items-center justify-center rounded-xl bg-muted/30 py-3 sm:py-5 border border-border/50 animate-pulse"
+                >
+                  <div className="h-3 w-20 bg-muted rounded mb-2" />
+                  <div className="h-8 w-12 bg-muted rounded mb-1" />
+                  <div className="h-2 w-16 bg-muted rounded" />
+                </div>
+              ))}
+            </>
+          ) : (
+            <>
+              {/* Missed (Qaza) */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-red-50/80 to-transparent dark:from-red-950/20 py-3 sm:py-5 border border-transparent hover:border-red-200/40 transition-all duration-300">
+                <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+                  Missed (Qaza)
+                </p>
+                <p className="text-2xl sm:text-3xl font-semibold text-red-500 mt-1">
+                  {overallStats.missed}
+                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                  {overallStats.total > 0
+                    ? ((overallStats.missed / overallStats.total) * 100).toFixed(1)
+                    : 0}
+                  % of total
+                </p>
+              </div>
 
-          {/* Alone */}
-          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-yellow-50/80 to-transparent dark:from-yellow-950/20 py-3 sm:py-5 border border-transparent hover:border-yellow-200/40 transition-all duration-300">
-            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
-              Alone
-            </p>
-            <p className="text-2xl sm:text-3xl font-semibold text-yellow-500 mt-1">
-              {overallStats.alone}
-            </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-              {overallStats.total > 0
-                ? ((overallStats.alone / overallStats.total) * 100).toFixed(1)
-                : 0}
-              % of total
-            </p>
-          </div>
+              {/* Alone */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-yellow-50/80 to-transparent dark:from-yellow-950/20 py-3 sm:py-5 border border-transparent hover:border-yellow-200/40 transition-all duration-300">
+                <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+                  Alone
+                </p>
+                <p className="text-2xl sm:text-3xl font-semibold text-yellow-500 mt-1">
+                  {overallStats.alone}
+                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                  {overallStats.total > 0
+                    ? ((overallStats.alone / overallStats.total) * 100).toFixed(1)
+                    : 0}
+                  % of total
+                </p>
+              </div>
 
-          {/* Jamaat */}
-          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-green-50/80 to-transparent dark:from-green-950/20 py-3 sm:py-5 border border-transparent hover:border-green-200/40 transition-all duration-300">
-            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
-              Jamaat
-            </p>
-            <p className="text-2xl sm:text-3xl font-semibold text-green-600 mt-1">
-              {overallStats.jamaat}
-            </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-              {overallStats.total > 0
-                ? ((overallStats.jamaat / overallStats.total) * 100).toFixed(1)
-                : 0}
-              % of total
-            </p>
-          </div>
+              {/* Jamaat */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-green-50/80 to-transparent dark:from-green-950/20 py-3 sm:py-5 border border-transparent hover:border-green-200/40 transition-all duration-300">
+                <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+                  Jamaat
+                </p>
+                <p className="text-2xl sm:text-3xl font-semibold text-green-600 mt-1">
+                  {overallStats.jamaat}
+                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                  {overallStats.total > 0
+                    ? ((overallStats.jamaat / overallStats.total) * 100).toFixed(1)
+                    : 0}
+                  % of total
+                </p>
+              </div>
 
-          {/* On Time */}
-          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-sky-50/80 to-transparent dark:from-sky-950/20 py-3 sm:py-5 border border-transparent hover:border-sky-200/40 transition-all duration-300">
-            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
-              On Time
-            </p>
-            <p className="text-2xl sm:text-3xl font-semibold text-sky-600 mt-1">
-              {overallStats.onTime}
-            </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-              {overallStats.total > 0
-                ? ((overallStats.onTime / overallStats.total) * 100).toFixed(1)
-                : 0}
-              % of total
-            </p>
-          </div>
+              {/* On Time */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-sky-50/80 to-transparent dark:from-sky-950/20 py-3 sm:py-5 border border-transparent hover:border-sky-200/40 transition-all duration-300">
+                <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+                  On Time
+                </p>
+                <p className="text-2xl sm:text-3xl font-semibold text-sky-600 mt-1">
+                  {overallStats.onTime}
+                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                  {overallStats.total > 0
+                    ? ((overallStats.onTime / overallStats.total) * 100).toFixed(1)
+                    : 0}
+                  % of total
+                </p>
+              </div>
 
-          {/* Success Rate */}
-          <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-primary/10 to-transparent dark:from-primary/20 py-3 sm:py-5 border border-transparent hover:border-primary/40 transition-all duration-300">
-            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
-              Success Rate
-            </p>
-            <p className="text-2xl sm:text-3xl font-semibold text-primary mt-1">
-              {successRate}%
-            </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-              Jamaat + On Time
-            </p>
-          </div>
+              {/* Success Rate */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-primary/10 to-transparent dark:from-primary/20 py-3 sm:py-5 border border-transparent hover:border-primary/40 transition-all duration-300">
+                <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+                  Success Rate
+                </p>
+                <p className="text-2xl sm:text-3xl font-semibold text-primary mt-1">
+                  {successRate}%
+                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                  Jamaat + On Time
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
 
@@ -460,22 +467,34 @@ export default function PrayerAnalyticsDashboard() {
           </CardHeader>
 
           <CardContent className="p-4 sm:p-6">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="flex flex-col items-center sm:items-start space-y-1"
-                >
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    {stat.icon}
-                    <span>{stat.label}</span>
+            {isLoading ? (
+              // Loading skeleton for monthly stats
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="flex flex-col items-center sm:items-start space-y-2 animate-pulse">
+                    <div className="h-4 w-20 bg-muted rounded" />
+                    <div className="h-6 w-12 bg-muted rounded" />
                   </div>
-                  <p className={`text-xl sm:text-2xl font-semibold ${stat.color}`}>
-                    {stat.value}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="flex flex-col items-center sm:items-start space-y-1"
+                  >
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      {stat.icon}
+                      <span>{stat.label}</span>
+                    </div>
+                    <p className={`text-xl sm:text-2xl font-semibold ${stat.color}`}>
+                      {stat.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -489,40 +508,46 @@ export default function PrayerAnalyticsDashboard() {
                 Overall Prayer Distribution
               </CardTitle>
               <CardDescription className="text-[9px] sm:text-[10px]">
-                Total prayers: {overallStats.total}
+                {isLoading ? "Loading..." : `Total prayers: ${overallStats.total}`}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center items-center p-1.5">
-              <ChartContainer
-                config={{
-                  missed: { label: "Missed", color: statusColors.missed },
-                  alone: { label: "Alone", color: statusColors.alone },
-                  jamaat: { label: "Jamaat", color: statusColors.jamaat },
-                  onTime: { label: "On Time", color: statusColors["on time"] },
-                  // notSelected: { label: "Not Selected", color: statusColors["not selected"] },
-                }}
-                className="w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[210px]"
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={overallChartData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={55}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {overallChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </ChartContainer>
+              {isLoading ? (
+                <div className="w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[210px] flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : (
+                <ChartContainer
+                  config={{
+                    missed: { label: "Missed", color: statusColors.missed },
+                    alone: { label: "Alone", color: statusColors.alone },
+                    jamaat: { label: "Jamaat", color: statusColors.jamaat },
+                    onTime: { label: "On Time", color: statusColors["on time"] },
+                    // notSelected: { label: "Not Selected", color: statusColors["not selected"] },
+                  }}
+                  className="w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[210px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={overallChartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={55}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {overallChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              )}
             </CardContent>
           </Card>
 
@@ -537,36 +562,42 @@ export default function PrayerAnalyticsDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-1.5">
-              <div className="w-full overflow-x-auto">
-                <div className="min-w-[250px] sm:min-w-[300px] max-w-full mx-auto">
-                  <ChartContainer
-                    config={{
-                      missed: { label: "Missed", color: statusColors.missed },
-                      alone: { label: "Alone", color: statusColors.alone },
-                      jamaat: { label: "Jamaat", color: statusColors.jamaat },
-                      onTime: { label: "On Time", color: statusColors["on time"] },
-                    }}
-                    className="h-[160px] sm:h-[210px]"
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={prayerWiseChartData}
-                        margin={{ top: 4, right: 6, left: -15, bottom: 3 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="prayer" tick={{ fontSize: 8 }} />
-                        <YAxis tick={{ fontSize: 8 }} />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Legend wrapperStyle={{ fontSize: 8 }} />
-                        <Bar dataKey="missed" stackId="a" fill={statusColors.missed} name="Missed" />
-                        <Bar dataKey="alone" stackId="a" fill={statusColors.alone} name="Alone" />
-                        <Bar dataKey="jamaat" stackId="a" fill={statusColors.jamaat} name="Jamaat" />
-                        <Bar dataKey="onTime" stackId="a" fill={statusColors["on time"]} name="On Time" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
+              {isLoading ? (
+                <div className="w-full h-[160px] sm:h-[210px] flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              </div>
+              ) : (
+                <div className="w-full overflow-x-auto">
+                  <div className="min-w-[250px] sm:min-w-[300px] max-w-full mx-auto">
+                    <ChartContainer
+                      config={{
+                        missed: { label: "Missed", color: statusColors.missed },
+                        alone: { label: "Alone", color: statusColors.alone },
+                        jamaat: { label: "Jamaat", color: statusColors.jamaat },
+                        onTime: { label: "On Time", color: statusColors["on time"] },
+                      }}
+                      className="h-[160px] sm:h-[210px]"
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={prayerWiseChartData}
+                          margin={{ top: 4, right: 6, left: -15, bottom: 3 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="prayer" tick={{ fontSize: 8 }} />
+                          <YAxis tick={{ fontSize: 8 }} />
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                          <Legend wrapperStyle={{ fontSize: 8 }} />
+                          <Bar dataKey="missed" stackId="a" fill={statusColors.missed} name="Missed" />
+                          <Bar dataKey="alone" stackId="a" fill={statusColors.alone} name="Alone" />
+                          <Bar dataKey="jamaat" stackId="a" fill={statusColors.jamaat} name="Jamaat" />
+                          <Bar dataKey="onTime" stackId="a" fill={statusColors["on time"]} name="On Time" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -575,74 +606,102 @@ export default function PrayerAnalyticsDashboard() {
 
         {/* Individual Prayer Performance Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {prayers.map((prayer) => {
-            const stats = prayerWiseStats[prayer];
-            const prayerSuccessRate = stats.total > 0
-              ? ((stats.jamaat + stats.onTime) / stats.total * 100).toFixed(1)
-              : 0;
+          {isLoading ? (
+            // Loading skeleton for prayer cards
+            <>
+              {prayers.map((prayer) => (
+                <Card key={prayer} className="overflow-hidden">
+                  <CardHeader className="px-1">
+                    <div className="flex items-center justify-between">
+                      <div className="h-5 w-16 bg-muted rounded animate-pulse" />
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="h-4 w-24 bg-muted rounded mt-2 animate-pulse" />
+                  </CardHeader>
+                  <CardContent className="pt-1 space-y-2 px-1">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                        <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                        <div className="h-4 w-8 bg-muted rounded animate-pulse" />
+                      </div>
+                    ))}
+                  </CardContent>
+                  <div className="mt-3 mx-4 mb-4 h-2 rounded-full bg-muted animate-pulse" />
+                </Card>
+              ))}
+            </>
+          ) : (
+            <>
+              {prayers.map((prayer) => {
+                const stats = prayerWiseStats[prayer];
+                const prayerSuccessRate = stats.total > 0
+                  ? ((stats.jamaat + stats.onTime) / stats.total * 100).toFixed(1)
+                  : 0;
 
-            return (
-              <Card
-                key={prayer}
-                className="group relative overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 px-6"
-              >
-                {/* Subtle gradient accent on hover */}
-                <div className=" inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                return (
+                  <Card
+                    key={prayer}
+                    className="group relative overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 px-6"
+                  >
+                    {/* Subtle gradient accent on hover */}
+                    <div className=" inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                <CardHeader className={"px-1"}>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base sm:text-lg font-semibold capitalize flex items-center gap-2">
-                      {prayerLabels[prayer as keyof typeof prayerLabels]}
-                    </CardTitle>
-                    <Clock className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                  <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
-                    Success Rate:{" "}
-                    <span className="font-medium text-foreground">{prayerSuccessRate}%</span>
-                  </CardDescription>
-                </CardHeader>
+                    <CardHeader className={"px-1"}>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base sm:text-lg font-semibold capitalize flex items-center gap-2">
+                          {prayerLabels[prayer as keyof typeof prayerLabels]}
+                        </CardTitle>
+                        <Clock className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
+                      <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
+                        Success Rate:{" "}
+                        <span className="font-medium text-foreground">{prayerSuccessRate}%</span>
+                      </CardDescription>
+                    </CardHeader>
 
-                <CardContent className="pt-1 space-y-2 text-sm px-1">
-                  <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
-      <span className="text-muted-foreground flex items-center gap-1">
-        <span className="w-2 h-2 bg-red-500 rounded-full" /> Missed
-      </span>
-                    <span className="font-semibold text-foreground">{stats.missed}</span>
-                  </div>
+                    <CardContent className="pt-1 space-y-2 text-sm px-1">
+                      <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+        <span className="text-muted-foreground flex items-center gap-1">
+          <span className="w-2 h-2 bg-red-500 rounded-full" /> Missed
+        </span>
+                        <span className="font-semibold text-foreground">{stats.missed}</span>
+                      </div>
 
-                  <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
-      <span className="text-muted-foreground flex items-center gap-1">
-        <span className="w-2 h-2 bg-yellow-500 rounded-full" /> Alone
-      </span>
-                    <span className="font-semibold text-foreground">{stats.alone}</span>
-                  </div>
+                      <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+        <span className="text-muted-foreground flex items-center gap-1">
+          <span className="w-2 h-2 bg-yellow-500 rounded-full" /> Alone
+        </span>
+                        <span className="font-semibold text-foreground">{stats.alone}</span>
+                      </div>
 
-                  <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
-      <span className="text-muted-foreground flex items-center gap-1">
-        <span className="w-2 h-2 bg-green-500 rounded-full" /> Jamaat
-      </span>
-                    <span className="font-semibold text-foreground">{stats.jamaat}</span>
-                  </div>
+                      <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+        <span className="text-muted-foreground flex items-center gap-1">
+          <span className="w-2 h-2 bg-green-500 rounded-full" /> Jamaat
+        </span>
+                        <span className="font-semibold text-foreground">{stats.jamaat}</span>
+                      </div>
 
-                  <div className="flex items-center justify-between">
-      <span className="text-muted-foreground flex items-center gap-1">
-        <span className="w-2 h-2 bg-sky-500 rounded-full" /> On Time
-      </span>
-                    <span className="font-semibold text-foreground">{stats.onTime}</span>
-                  </div>
-                </CardContent>
+                      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground flex items-center gap-1">
+          <span className="w-2 h-2 bg-sky-500 rounded-full" /> On Time
+        </span>
+                        <span className="font-semibold text-foreground">{stats.onTime}</span>
+                      </div>
+                    </CardContent>
 
-                {/* Optional Progress Bar */}
-                <div className="mt-3 mx-4 mb-4 h-2 rounded-full bg-muted overflow-hidden ">
-                  <div
-                    className="h-full bg-primary transition-all"
-                    style={{ width: `${prayerSuccessRate}%` }}
-                  />
-                </div>
-              </Card>
+                    {/* Optional Progress Bar */}
+                    <div className="mt-3 mx-4 mb-4 h-2 rounded-full bg-muted overflow-hidden ">
+                      <div
+                        className="h-full bg-primary transition-all"
+                        style={{ width: `${prayerSuccessRate}%` }}
+                      />
+                    </div>
+                  </Card>
 
-            );
-          })}
+                );
+              })}
+            </>
+          )}
         </div>
       </div>
     </div>

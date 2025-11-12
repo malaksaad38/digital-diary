@@ -355,7 +355,7 @@ export default function ModernDashboard({ user }: { user: any }) {
           <CardHeader className="bg-gradient-to-r from-purple-500/5 to-transparent border-b px-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="hidden md:flex w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                <div className="hidden md:flex w-10 h-10 rounded-lg bg-purple-500/10 items-center justify-center">
                   <Clock className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
@@ -403,8 +403,8 @@ export default function ModernDashboard({ user }: { user: any }) {
                       <div>
                         <p className="text-sm text-muted-foreground">Next Prayer</p>
                         <p className="text-xl font-bold">{nextPrayer}</p>
-                        <p className="text-sm font-mono text-emerald-600 font-semibold">
-                          {countdown}
+                        <p className="text-sm font-mono text-muted-foreground">
+                          {prayerData.items[0][nextPrayer?.toLowerCase()]}
                         </p>
                       </div>
                     </div>

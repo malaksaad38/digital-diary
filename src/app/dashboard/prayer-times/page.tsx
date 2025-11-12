@@ -12,7 +12,8 @@ import {
   CloudSun,
   Loader2,
   Timer,
-  Settings
+  Settings, Edit2,
+  EditIcon
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,15 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription, DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 export default function PrayerTimes() {
   const [prayerData, setPrayerData] = useState<any>(null);
@@ -31,13 +41,23 @@ export default function PrayerTimes() {
   const [countdown, setCountdown] = useState('');
   const [qazaCountdown, setQazaCountdown] = useState('');
   const [isFromCache, setIsFromCache] = useState(false);
+  const [city, setCity] = useState('timergara');
+  const [submittedCity, setSubmittedCity] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmittedCity(city);
+    fetchPrayerTimes(true); // Force refresh from API
+
+  };
+
 
   const fetchPrayerTimes = async (forceRefresh = false) => {
     setLoading(true);
     setError(null);
     try {
-      const cacheKey = 'prayerTimesWeeklyData';
-      const cacheDateKey = 'prayerTimesWeeklyCacheDate';
+      const cacheKey = 'prayerTimes';
+      const cacheDateKey = 'prayerDate';
       const today = new Date().toDateString();
 
       if (!forceRefresh) {
@@ -53,7 +73,7 @@ export default function PrayerTimes() {
 
       const proxy = 'https://api.allorigins.win/raw?url=';
       const apiUrl =
-        'https://muslimsalat.com/timergara/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c';
+        `https://muslimsalat.com/${city}/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c`;
       const res = await fetch(proxy + encodeURIComponent(apiUrl));
       const data = await res.json();
 
@@ -216,6 +236,8 @@ export default function PrayerTimes() {
       <Breadcrumbs />
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
+
+
         <div className="text-center">
           <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Prayer Times
@@ -225,6 +247,34 @@ export default function PrayerTimes() {
             <span>
               {prayerData.city}, {prayerData.country}
             </span>
+            <Dialog>
+              <DialogTrigger asChild>
+                <EditIcon/>
+              </DialogTrigger>
+
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Enter your city</DialogTitle>
+                  <DialogDescription>
+                    Please type your city name in lowercase letters.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <Input
+                    type="text"
+                    placeholder="e.g. lahore"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value.toLowerCase())}
+                    required
+                  />
+
+                  <DialogFooter>
+                    <Button type="submit">Submit</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
           <div className="text-sm mt-2 flex flex-col sm:flex-row justify-center items-center gap-3">
             <div className="flex items-center gap-1">
@@ -401,7 +451,7 @@ export default function PrayerTimes() {
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        {idx === 0 && (
+                        {idx === 0  && (
                           <Badge className="text-xs">
                             Today
                           </Badge>
@@ -430,13 +480,13 @@ export default function PrayerTimes() {
                   key={idx}
                   className={cn(
                     "transition-all hover:shadow-md",
-                    idx === 0 && "border-primary bg-primary/5"
+                    idx === 0  && "border-primary bg-primary/5"
                   )}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <span className="font-semibold">{day.date_for}</span>
-                      {idx === 0 && (
+                      {idx === 0  && (
                         <Badge className="text-xs">Today</Badge>
                       )}
                     </div>

@@ -71,6 +71,7 @@ export default function PrayerAnalyticsDashboard() {
       total: 0,
     };
 
+
     combinedEntries.forEach((entry: any) => {
       if (entry.prayer) {
         prayers.forEach((prayer) => {

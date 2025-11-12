@@ -51,7 +51,7 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
 
   return (
     <div className="border-t pt-4">
-      <Accordion type="single" collapsible defaultValue="diary-entry">
+      <Accordion type="single" collapsible defaultValue={false}>
         <AccordionItem value="diary-entry" className="border-none">
           <div className="flex items-center justify-between">
             <AccordionTrigger className="hover:no-underline py-2 flex-1">

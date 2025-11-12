@@ -302,10 +302,8 @@ export default function PrayerForm({ session }: any) {
                     <span className="inline-flex items-center gap-1.5">
                       <Circle className="h-3 w-3 text-red-500 fill-red-500" />
                       <strong>Missed</strong>
-                    </span>{" "}
-                                  — You <strong>missed the prayer time</strong> (Qaza), meaning you didn’t pray within its proper time.
+                    </span>{" "}  — You <strong>missed the prayer time</strong> (Qaza), meaning you didn’t pray within its proper time.
                                 </p>
-
                                 <p>
                     <span className="inline-flex items-center gap-1.5">
                       <Circle className="h-3 w-3 text-yellow-400 fill-yellow-400" />

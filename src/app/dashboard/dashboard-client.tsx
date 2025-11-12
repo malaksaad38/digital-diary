@@ -1,98 +1,92 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import React, { useEffect, useState, useMemo } from "react";
 import {
-  Notebook,
-  BarChart3,
-  Edit3,
-  Clock,
   Sunrise,
   Sunset,
-  RefreshCw,
+  Plus,
+  BookOpen,
+  TrendingUp,
+  Clock,
+  ArrowRight,
+  Calendar,
+  Target,
+  Moon,
+  Sun,
+  CloudSun,
+  Sparkles,
+  Activity,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useCombinedHistory } from "@/hooks/use-prayer-queries";
 
-export default function DashboardClient({ user }: { user: any }) {
-  const pathname = usePathname();
+export default function ModernDashboard({ user }: { user: any }) {
+  const { data: combinedEntries = [], isLoading } = useCombinedHistory();
   const [prayerData, setPrayerData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [nextPrayer, setNextPrayer] = useState("");
   const [currentPrayer, setCurrentPrayer] = useState("");
-  const [nextPrayerTime, setNextPrayerTime] = useState("");
-  const [currentPrayerTime, setCurrentPrayerTime] = useState("");
   const [countdown, setCountdown] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
-  const [todayDate, setTodayDate] = useState(new Date().toDateString());
 
-  // ✅ Function to fetch prayer times (used for both initial + refresh + midnight)
-  const fetchPrayerTimes = async (force = false) => {
-    try {
-      const today = new Date().toDateString();
-      const cachedData = localStorage.getItem("prayerTimesData");
-      const cacheDate = localStorage.getItem("prayerTimesCacheDate");
+  const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
 
-      // Use cache if valid and not forced
-      if (!force && cachedData && cacheDate === today) {
-        setPrayerData(JSON.parse(cachedData));
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      const proxy = "https://api.allorigins.win/raw?url=";
-      const api =
-        "https://muslimsalat.com/timergara.json?key=b2015473db5fff96e4d4f2fd2ad84e1c";
-      const response = await fetch(proxy + encodeURIComponent(api));
-      const data = await response.json();
-
-      if (data?.items?.[0]) {
-        const prayerInfo = data.items[0];
-        setPrayerData(prayerInfo);
-        localStorage.setItem("prayerTimesData", JSON.stringify(prayerInfo));
-        localStorage.setItem("prayerTimesCacheDate", today);
-        setTodayDate(today);
-      }
-    } catch (error) {
-      console.error("Prayer fetch failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ✅ Initial data load
+  // Load prayer data from localStorage
   useEffect(() => {
-    fetchPrayerTimes();
+    const loadPrayerData = () => {
+      try {
+        const cached = localStorage.getItem("prayerTimes");
+        if (cached) {
+          setPrayerData(JSON.parse(cached));
+        }
+      } catch (error) {
+        console.error("Error loading prayer data:", error);
+      }
+    };
+
+    loadPrayerData();
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // ✅ Auto-refresh at midnight
-  useEffect(() => {
-    const checkMidnight = setInterval(() => {
-      const now = new Date();
-      const currentDate = now.toDateString();
-      if (currentDate !== todayDate) {
-        console.log("🌙 New day detected — auto-refreshing prayer data...");
-        fetchPrayerTimes(true);
+  // Calculate overall stats
+  const overallStats = useMemo(() => {
+    const stats = {
+      missed: 0,
+      alone: 0,
+      jamaat: 0,
+      onTime: 0,
+      total: 0,
+    };
+
+    combinedEntries.forEach((entry: any) => {
+      if (entry.prayer) {
+        prayers.forEach((prayer) => {
+          const status = entry.prayer[prayer]?.toLowerCase();
+          stats.total++;
+
+          if (status === "missed") stats.missed++;
+          else if (status === "alone") stats.alone++;
+          else if (status === "jamaat") stats.jamaat++;
+          else if (status === "on time") stats.onTime++;
+        });
       }
-    }, 60 * 1000); // check every minute
+    });
 
-    return () => clearInterval(checkMidnight);
-  }, [todayDate]);
+    return stats;
+  }, [combinedEntries]);
 
-  // ✅ Manual refresh
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchPrayerTimes(true).finally(() => setRefreshing(false));
-  };
+  const successRate =
+    overallStats.total > 0
+      ? ((overallStats.jamaat + overallStats.onTime) / overallStats.total * 100).toFixed(1)
+      : 0;
 
+  // Convert time format
   const convertTo24Hour = (time12h: string) => {
+    if (!time12h) return "00:00";
     const [time, mod] = time12h.split(" ");
     let [h, m] = time.split(":");
     if (h === "12") h = "00";
@@ -100,7 +94,7 @@ export default function DashboardClient({ user }: { user: any }) {
     return `${h.padStart(2, "0")}:${m}`;
   };
 
-  // ✅ Determine current/next prayer
+  // Calculate next prayer and countdown
   useEffect(() => {
     if (!prayerData) return;
 
@@ -108,7 +102,7 @@ export default function DashboardClient({ user }: { user: any }) {
       const now = currentTime;
       const total = now.getHours() * 60 + now.getMinutes();
 
-      const prayers = [
+      const prayersList = [
         { name: "Fajr", time: prayerData.fajr },
         { name: "Dhuhr", time: prayerData.dhuhr },
         { name: "Asr", time: prayerData.asr },
@@ -116,18 +110,16 @@ export default function DashboardClient({ user }: { user: any }) {
         { name: "Isha", time: prayerData.isha },
       ];
 
-      let next = prayers[0].name;
-      let current = prayers[4].name;
+      let next = prayersList[0].name;
+      let current = prayersList[4].name;
       let nextT: any = null;
 
-      for (let i = 0; i < prayers.length; i++) {
-        const [h, m] = convertTo24Hour(prayers[i].time)
-          .split(":")
-          .map(Number);
+      for (let i = 0; i < prayersList.length; i++) {
+        const [h, m] = convertTo24Hour(prayersList[i].time).split(":").map(Number);
         if (total < h * 60 + m) {
-          next = prayers[i].name;
+          next = prayersList[i].name;
           nextT = { h, m };
-          current = i > 0 ? prayers[i - 1].name : "Isha";
+          current = i > 0 ? prayersList[i - 1].name : "Isha";
           break;
         }
       }
@@ -135,9 +127,7 @@ export default function DashboardClient({ user }: { user: any }) {
       const nextDate = new Date();
       if (nextT) nextDate.setHours(nextT.h, nextT.m, 0, 0);
       else {
-        const [fh, fm] = convertTo24Hour(prayers[0].time)
-          .split(":")
-          .map(Number);
+        const [fh, fm] = convertTo24Hour(prayersList[0].time).split(":").map(Number);
         nextDate.setDate(nextDate.getDate() + 1);
         nextDate.setHours(fh, fm, 0, 0);
       }
@@ -150,155 +140,320 @@ export default function DashboardClient({ user }: { user: any }) {
       setCountdown(`${h}h ${m}m ${s}s`);
       setCurrentPrayer(current);
       setNextPrayer(next);
-      setCurrentPrayerTime(prayerData[current.toLowerCase()]);
-      setNextPrayerTime(prayerData[next.toLowerCase()]);
     };
 
     calcNextPrayer();
   }, [prayerData, currentTime]);
 
-  const cards = [
-    { title: "Prayer Times", icon: Clock, href: "/dashboard/prayer-times" },
-    { title: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
-    { title: "My Entries", icon: Edit3, href: "/dashboard/entry" },
-    { title: "My Diaries", icon: Notebook, href: "/dashboard/diary" },
-  ];
+  const prayerIcons = {
+    Fajr: Sunrise,
+    Dhuhr: Sun,
+    Asr: CloudSun,
+    Maghrib: Sunset,
+    Isha: Moon,
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-gradient-to-b from-blue-50 via-emerald-50 to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 px-4 py-6 space-y-8"
-    >
-      {/* 🌅 Sunrise / Sunset */}
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 sm:p-6 lg:p-8">
       {prayerData && (
-        <div className="flex flex-wrap justify-between items-center bg-gradient-to-r from-amber-100 to-sky-100 dark:from-indigo-900 dark:to-emerald-900 p-4 rounded-2xl shadow-lg">
-          <div className="flex items-center gap-2 text-sm font-medium">
+        <div className="flex gap-4 mb-2 justify-between sm:gap-6">
+          <div className="flex justify-center items-center gap-1">
             <Sunrise className="w-5 h-5 text-orange-500" />
-            Sunrise: <span className="font-mono">{prayerData.shurooq}</span>
+            <span className="font-mono font-semibold text-sm">{prayerData.items[0].shurooq || "0:00 am"}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm font-medium">
+          <div className="flex justify-center items-center gap-1">
+            <span className="font-mono font-semibold text-sm">{prayerData.items[0].maghrib || "0:00 pm"}</span>
             <Sunset className="w-5 h-5 text-purple-500" />
-            Sunset: <span className="font-mono">{prayerData.maghrib}</span>
           </div>
         </div>
       )}
+      <div className="max-w-7xl mx-auto space-y-6">
 
-      {/* Header */}
-      <div className="text-center space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Assalamu Alaikum, {user?.name || "Dear User"}
-        </h1>
-        <p className="text-sm text-muted-foreground">{user?.email}</p>
-      </div>
 
-      {/* Current / Next Prayer */}
-      {prayerData && (
-        <Card className="rounded-2xl bg-gradient-to-r from-blue-100 to-emerald-100 dark:from-slate-800 dark:to-slate-700 shadow-xl border-none">
-          <CardContent className="p-5 text-center grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Current</p>
-              <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                {currentPrayer}
-              </h3>
-              <p className="font-mono text-sm">{currentPrayerTime}</p>
+        {/* Header Section */}
+        <div className="relative overflow-hidden sm:p-8">
+          <div className="absolute top-0 right-0 w-64 h-64 " />
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 className=" text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+                  Assalamu Alaikum, {user?.name || "Dear User"}
+                </h1>
+                <p className="text-muted-foreground mt-2 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  May your day be blessed with guidance
+                </p>
+              </div>
+
+              {/* Sunrise/Sunset */}
+
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Countdown</p>
-              <h3 className="text-2xl font-extrabold text-primary font-mono">
-                {countdown}
-              </h3>
+            {/* Current Time */}
+            {/*<div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">*/}
+            {/*  <Clock className="w-4 h-4" />*/}
+            {/*  <span>{currentTime.toLocaleString("en-US", {*/}
+            {/*    weekday: "long",*/}
+            {/*    year: "numeric",*/}
+            {/*    month: "long",*/}
+            {/*    day: "numeric",*/}
+            {/*    hour: "2-digit",*/}
+            {/*    minute: "2-digit"*/}
+            {/*  })}</span>*/}
+            {/*</div>*/}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Link href="/dashboard/entry">
+            <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardContent className="">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-3 flex gap-2">
+                    <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
+                      <Plus className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">Add New Entry</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Record today's prayer status
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <Button className="w-full mt-4" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Entry
+                </Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/diary">
+            <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardContent className="">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-3 flex gap-2">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                      <BookOpen className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">My Diaries</h3>
+                      <p className="text-sm text-muted-foreground">
+                        View all your journal entries
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <Button variant="outline" className="w-full mt-4" size="sm">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  View Diaries
+                </Button>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+
+        {/* Analytics Overview Card */}
+        <Card className="overflow-hidden border-2">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b px-4">
+            <div className="flex items-center gap-3 justify-between">
+              <div className="flex items-center gap-3">
+                <div className="hidden md:flex w-10 h-10 rounded-lg bg-primary/10 items-center justify-center">
+                  <Activity className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Prayer Analytics</CardTitle>
+                  <p className="text-sm text-muted-foreground">Your spiritual progress at a glance</p>
+                </div>
+              </div>
+              <Link href="/dashboard/analytics">
+                <Button variant="outline" size="sm">
+                  View Details
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Next</p>
-              <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                {nextPrayer}
-              </h3>
-              <p className="font-mono text-sm">{nextPrayerTime}</p>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {/* Jamaat */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-green-50/80 to-transparent dark:from-green-950/20 py-4 border border-green-200/40 hover:border-green-300/60 transition-all">
+                <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mb-2">
+                  <Target className="w-5 h-5 text-green-600" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium">Jamaat</p>
+                <p className="text-2xl font-bold text-green-600 mt-1">{overallStats.jamaat}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {overallStats.total > 0
+                    ? ((overallStats.jamaat / overallStats.total) * 100).toFixed(0)
+                    : 0}%
+                </p>
+              </div>
+
+              {/* On Time */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-sky-50/80 to-transparent dark:from-sky-950/20 py-4 border border-sky-200/40 hover:border-sky-300/60 transition-all">
+                <div className="w-10 h-10 rounded-full bg-sky-500/10 flex items-center justify-center mb-2">
+                  <Clock className="w-5 h-5 text-sky-600" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium">On Time</p>
+                <p className="text-2xl font-bold text-sky-600 mt-1">{overallStats.onTime}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {overallStats.total > 0
+                    ? ((overallStats.onTime / overallStats.total) * 100).toFixed(0)
+                    : 0}%
+                </p>
+              </div>
+
+              {/* Alone */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-yellow-50/80 to-transparent dark:from-yellow-950/20 py-4 border border-yellow-200/40 hover:border-yellow-300/60 transition-all">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center mb-2">
+                  <Calendar className="w-5 h-5 text-yellow-600" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium">Alone</p>
+                <p className="text-2xl font-bold text-yellow-600 mt-1">{overallStats.alone}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {overallStats.total > 0
+                    ? ((overallStats.alone / overallStats.total) * 100).toFixed(0)
+                    : 0}%
+                </p>
+              </div>
+
+              {/* Missed */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-red-50/80 to-transparent dark:from-red-950/20 py-4 border border-red-200/40 hover:border-red-300/60 transition-all">
+                <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center mb-2">
+                  <TrendingUp className="w-5 h-5 text-red-600" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium">Missed</p>
+                <p className="text-2xl font-bold text-red-600 mt-1">{overallStats.missed}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {overallStats.total > 0
+                    ? ((overallStats.missed / overallStats.total) * 100).toFixed(0)
+                    : 0}%
+                </p>
+              </div>
+
+              {/* Success Rate */}
+              <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-primary/10 to-transparent py-4 border border-primary/40 hover:border-primary/60 transition-all">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium">Success Rate</p>
+                <p className="text-2xl font-bold text-primary mt-1">{successRate}%</p>
+                <p className="text-xs text-muted-foreground mt-1">Overall</p>
+              </div>
             </div>
           </CardContent>
         </Card>
-      )}
 
-      {/* Prayer Times Grid */}
-      {prayerData && (
-        <Card className="rounded-2xl border-none shadow-md bg-gradient-to-r from-indigo-100 to-blue-100 dark:from-slate-800 dark:to-slate-700">
-          <CardHeader className="flex justify-between items-center px-5 pt-5">
-            <div>
-              <CardTitle className="text-lg font-semibold">
-                Today’s Prayer Times
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {prayerData.date_for}
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleRefresh}
-              disabled={refreshing}
-            >
-              <RefreshCw
-                className={cn("w-4 h-4", refreshing && "animate-spin")}
-              />
-            </Button>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
-              {["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map((p) => (
-                <div
-                  key={p}
-                  className={cn(
-                    "py-3 rounded-xl transition-all shadow-sm",
-                    currentPrayer === p
-                      ? "bg-blue-500 text-white font-semibold"
-                      : nextPrayer === p
-                        ? "bg-emerald-500 text-white font-semibold"
-                        : "bg-white/60 dark:bg-slate-800"
-                  )}
-                >
-                  <p className="text-sm">{p}</p>
-                  <p className="text-sm font-mono">
-                    {prayerData[p.toLowerCase()]}
+        {/* Prayer Times Card */}
+        <Card className="overflow-hidden border-2">
+          <CardHeader className="bg-gradient-to-r from-purple-500/5 to-transparent border-b px-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="hidden md:flex w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Prayer Times</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {prayerData?.items[0].date_for || "Loading..."}
                   </p>
                 </div>
-              ))}
+              </div>
+              <Link href="/dashboard/prayer-times">
+                <Button variant="outline" size="sm">
+                  View Details
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
             </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            {prayerData ? (
+              <>
+                {/* Current & Next Prayer */}
+                <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                  <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 p-4 border border-blue-500/20 hover:border-blue-500/40 transition-all">
+                    <Badge className="absolute top-2 right-2 bg-blue-500">Current</Badge>
+                    <div className="flex items-center gap-3 mt-2">
+                      {currentPrayer && React.createElement(prayerIcons[currentPrayer as keyof typeof prayerIcons] || Clock, {
+                        className: "w-8 h-8 text-blue-600"
+                      })}
+                      <div>
+                        <p className="text-sm text-muted-foreground">Current Prayer</p>
+                        <p className="text-xl font-bold">{currentPrayer}</p>
+                        <p className="text-sm font-mono text-muted-foreground">
+                          {prayerData.items[0][currentPrayer?.toLowerCase()]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 p-4 border border-emerald-500/20 hover:border-emerald-500/40 transition-all">
+                    <Badge className="absolute top-2 right-2 bg-emerald-500">Next</Badge>
+                    <div className="flex items-center gap-3 mt-2">
+                      {nextPrayer && React.createElement(prayerIcons[nextPrayer as keyof typeof prayerIcons] || Clock, {
+                        className: "w-8 h-8 text-emerald-600"
+                      })}
+                      <div>
+                        <p className="text-sm text-muted-foreground">Next Prayer</p>
+                        <p className="text-xl font-bold">{nextPrayer}</p>
+                        <p className="text-sm font-mono text-emerald-600 font-semibold">
+                          {countdown}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* All Prayer Times */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  {["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map((prayer) => {
+                    const Icon = prayerIcons[prayer as keyof typeof prayerIcons];
+                    const isCurrent = currentPrayer === prayer;
+                    const isNext = nextPrayer === prayer;
+
+                    return (
+                      <div
+                        key={prayer}
+                        className={cn(
+                          "relative p-3 rounded-xl transition-all text-center border",
+                          isCurrent && "bg-blue-500/10 border-blue-500/40 shadow-sm",
+                          isNext && !isCurrent && "bg-emerald-500/10 border-emerald-500/40 shadow-sm",
+                          !isCurrent && !isNext && "bg-muted/50 border-border hover:bg-muted/70"
+                        )}
+                      >
+                        <Icon className={cn(
+                          "w-6 h-6 mx-auto mb-2",
+                          isCurrent && "text-blue-600",
+                          isNext && !isCurrent && "text-emerald-600",
+                          !isCurrent && !isNext && "text-muted-foreground"
+                        )} />
+                        <p className="text-xs font-medium mb-1">{prayer}</p>
+                        <p className="text-sm font-mono font-semibold">
+                          {prayerData.items[0][prayer.toLowerCase()]}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Clock className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p>Prayer times not available</p>
+                <p className="text-sm mt-1">Please visit the Prayer Times page to load data</p>
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
 
-      {/* Dashboard Navigation */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {cards.map((item, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <Link href={item.href}>
-              <Card
-                className={cn(
-                  "rounded-2xl p-5 text-center shadow-md transition-all hover:shadow-xl hover:-translate-y-1",
-                  "bg-gradient-to-br from-white/70 to-blue-50 dark:from-slate-800 dark:to-slate-700",
-                  pathname === item.href && "border-primary border-2"
-                )}
-              >
-                <CardHeader className="flex flex-col items-center p-0">
-                  <item.icon className="w-8 h-8 text-primary mb-2" />
-                  <CardTitle className="text-base font-semibold">
-                    {item.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 text-xs text-muted-foreground">
-                  Manage {item.title.toLowerCase()}
-                </CardContent>
-              </Card>
-            </Link>
-          </motion.div>
-        ))}
       </div>
-    </motion.div>
+    </div>
   );
 }

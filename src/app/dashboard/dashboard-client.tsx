@@ -158,7 +158,7 @@ export default function ModernDashboard({ user }: { user: any }) {
     <div className=" bg-background p-4 md:p-0 flex flex-col space-y-5 max-w-lg mx-auto">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-1">
+        <h1 className="text-xl font-bold mb-1">
           Assalamu Alaikum, {user?.name || "User"}
         </h1>
         <p className="text-sm text-muted-foreground">

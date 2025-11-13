@@ -98,7 +98,7 @@ export default function Navbar({ user }: { user: any }) {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="sm:hidden fixed top-3 left-3 right-3 z-50"
       >
-        <div className="relative overflow-hidden rounded-3xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-sm shadow-2xl">
           {/* Gradient overlay for depth */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/30 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent pointer-events-none" />
 
@@ -161,7 +161,7 @@ export default function Navbar({ user }: { user: any }) {
         transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
         className="sm:hidden fixed bottom-4 left-4 right-4 z-50"
       >
-        <div className="relative overflow-hidden rounded-3xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-sm shadow-2xl">
           {/* Gradient overlay for depth */}
           <div className="absolute inset-0 bg-gradient-to-tr from-white/60 via-white/30 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent pointer-events-none" />
 
@@ -334,7 +334,7 @@ export function UserIcon({ user }: { user: any }) {
       <PopoverContent
         side="top"
         align="center"
-        className="w-64 bg-white/90 dark:bg-black/90 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-2xl p-5 mb-2"
+        className="w-64 bg-white/90 dark:bg-black/90 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-3xl shadow-2xl p-5 mb-2"
       >
         <div className="flex flex-col items-center text-center gap-3">
           <div className="relative w-16 h-16 rounded-full border-2 border-white/30 dark:border-white/20 overflow-hidden shadow-lg">

@@ -185,7 +185,7 @@ export default function ModernDashboard({ user }: { user: any }) {
       </div>
 
       {/* Prayer Analytics */}
-      <Card className="shadow-md py-4 pt-2">
+      <Card className="shadow-md py-2 pt-2">
         <CardContent className="p-3">
           <div className="flex justify-between items-center mb-2">
             <p className="font-semibold text-sm">Prayer Analytics</p>
@@ -218,7 +218,7 @@ export default function ModernDashboard({ user }: { user: any }) {
       </Card>
 
       {/* Prayer Times */}
-      <Card className="shadow-md py-4 pb-1">
+      <Card className="shadow-md py-2 pb-1">
         <CardContent className="p-3">
           <div className="flex justify-between items-center mb-2">
             <p className="font-semibold text-sm">Today's Prayer Times</p>
@@ -246,8 +246,8 @@ export default function ModernDashboard({ user }: { user: any }) {
               {prayerData?.city}, {prayerData?.country}
             </div>
             <div className="flex items-center gap-1">
-              <Badge variant="secondary" className="text-[10px] px-2 py-1">Now: {currentPrayer}</Badge>
-              <Badge variant="outline" className="text-[10px] px-2 py-1">Next: {nextPrayer} ({countdown})</Badge>
+              <Badge variant="secondary" className="text-[10px] px-2 py-1 bg-green-100  dark:bg-green-900/20 border border-green-400">Now: {currentPrayer}</Badge>
+              <Badge variant="outline" className="text-[10px] px-2 py-1  bg-blue-100 dark:bg-blue-900/20 border-blue-400">Next: {nextPrayer} ({countdown})</Badge>
             </div>
           </div>
 

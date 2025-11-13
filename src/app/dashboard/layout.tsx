@@ -16,7 +16,7 @@ export default async function LayoutPrivate({
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors">
       <Navbar user={user} />
-      <main className="max-w-7xl mx-auto md:px-6 py-6 pb-[65px] pt-10 md:pt-4">{children}</main>
+      <main className="max-w-7xl mx-auto md:px-6 py-6 pb-[65px] md:pb-4 pt-10 md:pt-4">{children}</main>
     </div>
   );
 }

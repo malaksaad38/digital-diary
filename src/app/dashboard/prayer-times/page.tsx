@@ -1,4 +1,3 @@
-// Converted to shadcn/ui version
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -15,18 +14,26 @@ import {
   Loader2,
   Timer,
   Sunset,
-  Edit2 as EditIcon, Edit2, Edit2Icon,
+  Edit2, Edit,
 } from "lucide-react";
 import {
   Card,
   CardHeader,
   CardContent,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogDescription
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export default function PrayerTimes() {
   const [prayerData, setPrayerData] = useState(null);
@@ -38,9 +45,17 @@ export default function PrayerTimes() {
   const [countdown, setCountdown] = useState('');
   const [qazaCountdown, setQazaCountdown] = useState('');
   const [isFromCache, setIsFromCache] = useState(false);
-  const [city, setCity] = useState("timergara");
+  const [city, setCity] = useState(() => {
+    try {
+      return localStorage.getItem('userCity') || "timergara";
+    } catch {
+      return "timergara";
+    }
+  });
+  const [tempCity, setTempCity] = useState(city);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const fetchPrayerTimes = async (forceRefresh = false) => {
+  const fetchPrayerTimes = async (forceRefresh = false, showToast = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -49,36 +64,76 @@ export default function PrayerTimes() {
       const today = new Date().toDateString();
 
       if (!forceRefresh) {
-        const cachedData = localStorage.getItem(cacheKey);
-        const cacheDate = localStorage.getItem(cacheDateKey);
-        if (cachedData && cacheDate === today) {
-          setPrayerData(JSON.parse(cachedData));
-          setIsFromCache(true);
-          setLoading(false);
-          return;
+        try {
+          const cachedData = localStorage.getItem(cacheKey);
+          const cacheDate = localStorage.getItem(cacheDateKey);
+          if (cachedData && cacheDate === today) {
+            const parsed = JSON.parse(cachedData);
+            // Check if cached city matches current city
+            if (parsed.city && parsed.city.toLowerCase() === city.toLowerCase()) {
+              setPrayerData(parsed);
+              setIsFromCache(true);
+              setLoading(false);
+              return;
+            }
+          }
+        } catch (cacheError) {
+          console.warn("Cache read error:", cacheError);
         }
       }
 
       const proxy = 'https://api.allorigins.win/raw?url=';
-      const apiUrl = `https://muslimsalat.com/${city}/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c`;
-      const res = await fetch(proxy + encodeURIComponent(apiUrl));
+      const apiUrl = `https://muslimsalat.com/${encodeURIComponent(city)}/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c`;
+      const res = await fetch(proxy + encodeURIComponent(apiUrl), {
+        signal: AbortSignal.timeout(10000)
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch prayer times for ${city}`);
+      }
+
       const data = await res.json();
 
-      if (!res.ok || data.error) throw new Error(data.error || 'Failed to fetch');
+      if (data.status_code === 404 || data.error || !data.items || data.items.length === 0) {
+        throw new Error(`City "${city}" not found. Please check the spelling.`);
+      }
 
-      localStorage.setItem(cacheKey, JSON.stringify(data));
-      localStorage.setItem(cacheDateKey, today);
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(cacheDateKey, today);
+      } catch (storageError) {
+        console.warn("Failed to save to cache:", storageError);
+      }
 
       setPrayerData(data);
       setIsFromCache(false);
+
+      if (showToast) {
+        toast.success(`Prayer times updated for ${data.city}`);
+      }
     } catch (err) {
-      setError(err.message);
+      const errorMessage = err.message || 'Failed to fetch prayer times';
+      setError(errorMessage);
+
+      if (showToast) {
+        toast.error(errorMessage);
+      }
+
+      try {
+        const cacheKey = 'prayerTimes';
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          const parsed = JSON.parse(cachedData);
+          setPrayerData(parsed);
+          setIsFromCache(true);
+        }
+      } catch (fallbackError) {
+        console.error("Fallback cache load failed:", fallbackError);
+      }
     } finally {
       setLoading(false);
     }
   };
-
-
 
   useEffect(() => {
     fetchPrayerTimes();
@@ -91,7 +146,11 @@ export default function PrayerTimes() {
 
       if (!lastRefresh || lastRefresh !== today) {
         fetchPrayerTimes(true);
-        localStorage.setItem('lastApiRefresh', today);
+        try {
+          localStorage.setItem('lastApiRefresh', today);
+        } catch (err) {
+          console.warn("Failed to save refresh timestamp:", err);
+        }
       }
     };
 
@@ -102,7 +161,7 @@ export default function PrayerTimes() {
       clearInterval(timer);
       clearInterval(refreshTimer);
     };
-  }, []);
+  }, [city]);
 
   const convertTo24Hour = (time12h) => {
     if (!time12h || typeof time12h !== 'string') return null;
@@ -121,10 +180,59 @@ export default function PrayerTimes() {
     return `${hours}:${minutes}`;
   };
 
+  const handleCityChange = async () => {
+    const trimmedCity = tempCity.trim().toLowerCase();
+
+    if (!trimmedCity) {
+      toast.error("City name cannot be empty");
+      return;
+    }
+
+    if (trimmedCity === city) {
+      setIsDialogOpen(false);
+      return;
+    }
+
+    setIsDialogOpen(false);
+    setLoading(true);
+
+    try {
+      // Test if city is valid by fetching data
+      const proxy = 'https://api.allorigins.win/raw?url=';
+      const apiUrl = `https://muslimsalat.com/${encodeURIComponent(trimmedCity)}/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c`;
+      const res = await fetch(proxy + encodeURIComponent(apiUrl), {
+        signal: AbortSignal.timeout(10000)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.status_code === 404 || data.error || !data.items || data.items.length === 0) {
+        throw new Error(`City "${trimmedCity}" not found. Please check the spelling.`);
+      }
+
+      // If valid, save and update
+      localStorage.setItem('userCity', trimmedCity);
+      localStorage.setItem('prayerTimes', JSON.stringify(data));
+      localStorage.setItem('prayerDate', new Date().toDateString());
+
+      setCity(trimmedCity);
+      setPrayerData(data);
+      setIsFromCache(false);
+      setLoading(false);
+
+      toast.success(`City updated to ${data.city}`);
+    } catch (err) {
+      setLoading(false);
+      const errorMessage = err.message || `Failed to fetch prayer times for ${trimmedCity}`;
+      toast.error(errorMessage);
+      console.error(err);
+    }
+  };
+
   const calculateCountdown = (target) => {
     const now = new Date();
     const diff = target.getTime() - now.getTime();
-    if (diff <= 0) return 'Expired';
+    if (diff <= 0) return 'Time Over';
     const h = Math.floor(diff / (1000 * 60 * 60));
     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const s = Math.floor((diff % (1000 * 60)) / 1000);
@@ -153,7 +261,6 @@ export default function PrayerTimes() {
     let nextTime = null;
     let nextIsNextDay = false;
 
-    // Check if we're between Fajr and Shurooq (sunrise)
     const fajrConv = convertTo24Hour(today.fajr);
     const shurooqConv = convertTo24Hour(today.shurooq);
     let isBetweenFajrAndShurooq = false;
@@ -207,14 +314,11 @@ export default function PrayerTimes() {
       setCountdown('00h 00m 00s');
     }
 
-    // Determine Qaza time
     let qazaTimeStr;
     let qazaHasPassed = false;
 
     if (current === 'Fajr') {
-      // For Fajr, Qaza ends at Shurooq
       qazaTimeStr = today.shurooq;
-      // Check if we're past Shurooq
       if (!isBetweenFajrAndShurooq && shurooqConv) {
         const [sh, sm] = shurooqConv.split(':').map(Number);
         const shurooqMins = sh * 60 + sm;
@@ -223,14 +327,13 @@ export default function PrayerTimes() {
         }
       }
     } else {
-      // For other prayers, Qaza ends at next prayer time
       qazaTimeStr = next === 'Fajr' && nextIsNextDay
         ? (prayerData.items[1] ? prayerData.items[1].fajr : prayers[0].time)
         : today[next.toLowerCase()];
     }
 
     if (qazaHasPassed) {
-      setQazaCountdown('Expired');
+      setQazaCountdown('Time Over');
     } else {
       const qConv = convertTo24Hour(qazaTimeStr);
       if (qConv) {
@@ -239,19 +342,18 @@ export default function PrayerTimes() {
         qazaDate.setHours(qh, qm, 0, 0);
 
         if (qazaDate.getTime() <= now.getTime()) {
-          setQazaCountdown('Expired');
+          setQazaCountdown('Time Over');
         } else {
           setQazaCountdown(calculateCountdown(qazaDate));
         }
       } else {
-        setQazaCountdown('Expired');
+        setQazaCountdown('Time Over');
       }
     }
 
     setCurrentPrayer(current);
     setNextPrayer(next);
   }, [prayerData, currentTime]);
-
 
   const prayers = [
     { name: 'Fajr', key: 'fajr', icon: Sunrise },
@@ -265,12 +367,11 @@ export default function PrayerTimes() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin" />
-        <p className={"text-xl text-bold"} >Prayer times Loading...</p>
-
+        <p className="text-xl">Prayer times Loading...</p>
       </div>
     );
 
-  if (error)
+  if (error && !prayerData)
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
@@ -281,7 +382,7 @@ export default function PrayerTimes() {
           </CardHeader>
           <CardContent>
             <p className="mb-4">{error}</p>
-            <Button className="w-full" onClick={() => fetchPrayerTimes(true)}>
+            <Button className="w-full" onClick={() => fetchPrayerTimes(true, true)}>
               <RefreshCw className="w-4 h-4 mr-2" /> Retry
             </Button>
           </CardContent>
@@ -300,6 +401,44 @@ export default function PrayerTimes() {
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <MapPin className="w-4 h-4" />
             {prayerData.city}, {prayerData.country}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2"
+                  onClick={() => setTempCity(city)}
+                >
+                  <Edit className="w-3 h-3" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Change City</DialogTitle>
+                  <DialogDescription>
+                    Enter a city name to get prayer times. Use English names (e.g., lahore, karachi, islamabad).
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <Input
+                    placeholder="Enter city name"
+                    value={tempCity}
+                    onChange={(e) => setTempCity(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleCityChange();
+                    }}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleCityChange}>
+                    Save Changes
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm">
@@ -312,7 +451,6 @@ export default function PrayerTimes() {
           </div>
         </div>
 
-        {/* Current & Next */}
         <div className="grid md:grid-cols-2 gap-4">
           <Card className="border-blue-400 bg-blue-50/50 dark:bg-blue-900/20">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -353,7 +491,6 @@ export default function PrayerTimes() {
           </Card>
         </div>
 
-        {/* Today's Schedule */}
         <Card>
           <CardHeader>
             <CardTitle>Today's Schedule</CardTitle>
@@ -403,7 +540,6 @@ export default function PrayerTimes() {
           </CardContent>
         </Card>
 
-        {/* Weekly */}
         <Card>
           <CardHeader>
             <CardTitle>7-Day Schedule</CardTitle>
@@ -438,7 +574,7 @@ export default function PrayerTimes() {
         </Card>
 
         <div className="flex flex-col items-center gap-3 pb-8">
-          <Button variant="outline" onClick={() => fetchPrayerTimes(true)}>
+          <Button variant="outline" onClick={() => fetchPrayerTimes(true, true)}>
             <RefreshCw className="w-4 h-4 mr-2" /> Refresh from API
           </Button>
           {isFromCache && (
@@ -446,7 +582,6 @@ export default function PrayerTimes() {
           )}
         </div>
       </div>
-
     </div>
   );
 }

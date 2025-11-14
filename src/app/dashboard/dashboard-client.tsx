@@ -34,7 +34,14 @@ export default function ModernDashboard({ user }: { user: any }) {
   const [nextPrayer, setNextPrayer] = useState("");
   const [currentPrayer, setCurrentPrayer] = useState("");
   const [countdown, setCountdown] = useState("");
-  const [city, setCity] = useState("timergara");
+  const [city, setCity] = useState(() => {
+    try {
+      return localStorage.getItem('userCity') || "timergara";
+    } catch {
+      return "timergara";
+    }
+  });
+
 
   const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
 
@@ -58,9 +65,11 @@ export default function ModernDashboard({ user }: { user: any }) {
         }
       }
 
-      const proxy = "https://api.allorigins.win/raw?url=";
-      const apiUrl = `https://muslimsalat.com/${city}/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c`;
-      const res = await fetch(proxy + encodeURIComponent(apiUrl));
+      const proxy = 'https://api.allorigins.win/raw?url=';
+      const apiUrl = `https://muslimsalat.com/${encodeURIComponent(city)}/weekly.json?key=b2015473db5fff96e4d4f2fd2ad84e1c`;
+      const res = await fetch(proxy + encodeURIComponent(apiUrl), {
+        signal: AbortSignal.timeout(10000)
+      });
       const data = await res.json();
 
       if (!res.ok || data.error) throw new Error(data.error || "Failed to fetch");
@@ -249,7 +258,7 @@ export default function ModernDashboard({ user }: { user: any }) {
             </div>
             <div className="flex items-center gap-1 md:gap-4">
               <Badge variant="secondary" className="text-[10px] md:text-base px-2 py-1 bg-green-100  dark:bg-green-900/20 border border-green-400">Now: {currentPrayer}</Badge>
-              <Badge variant="outline" className="text-[10px] md:text-base px-2 py-1  bg-blue-100 dark:bg-blue-900/20 border-blue-400">Next: {nextPrayer} ({countdown})</Badge>
+              <Badge variant="outline" className="text-[10px] md:text-base px-2 py-1  bg-blue-100 dark:bg-blue-900/20 border-blue-400">Next: {nextPrayer} {countdown}</Badge>
             </div>
           </div>
 

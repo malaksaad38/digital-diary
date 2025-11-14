@@ -99,7 +99,7 @@ export default function Navbar({ user }: { user: any }) {
         transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
         className="sm:hidden fixed top-2 left-2 right-2 z-50"
       >
-        <div className="relative overflow-hidden rounded-[22px] border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl shadow-lg shadow-black/5">
+        <div className="relative overflow-hidden rounded-[22px] border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xs shadow-lg shadow-black/5">
           {/* Subtle inner glow */}
           <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-white/40 dark:from-white/5 dark:to-transparent pointer-events-none" />
 
@@ -166,7 +166,7 @@ export default function Navbar({ user }: { user: any }) {
                 <PopoverContent
                   side="bottom"
                   align="end"
-                  className="w-72 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[22px] shadow-xl shadow-black/10 p-4 mt-1"
+                  className="w-72 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xs border border-black/5 dark:border-white/10 rounded-[22px] shadow-xl shadow-black/10 p-4 mt-1"
                 >
                   <div className="flex flex-col items-center text-center gap-3">
                     <div className="relative w-16 h-16 rounded-full border-2 border-black/5 dark:border-white/10 overflow-hidden">
@@ -206,7 +206,7 @@ export default function Navbar({ user }: { user: any }) {
         transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1], delay: 0.05 }}
         className="sm:hidden fixed bottom-2 left-2 right-2 z-50"
       >
-        <div className="relative overflow-hidden rounded-[28px] border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl shadow-lg shadow-black/5">
+        <div className="relative overflow-hidden rounded-[28px] border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xs shadow-lg shadow-black/5">
           {/* Subtle inner glow */}
           <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-white/40 dark:from-white/5 dark:to-transparent pointer-events-none" />
 

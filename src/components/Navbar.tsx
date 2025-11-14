@@ -13,7 +13,7 @@ import {
   User,
   Moon,
   Sun,
-  LogOut,
+  LogOut, PieChartIcon, PenLine, Clock8, Notebook,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import ButtonLogout from "@/components/ButtonLogout";
+import {PieChart} from "recharts";
 
 export default function Navbar({ user }: { user: any }) {
   const [time, setTime] = useState(new Date());
@@ -91,100 +92,154 @@ export default function Navbar({ user }: { user: any }) {
         </div>
       </motion.nav>
 
-      {/* 📱 Mobile Top Bar - Glassmorphic Capsule */}
+      {/* 📱 Mobile Top Bar - iPhone Style */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="sm:hidden fixed top-3 left-3 right-3 z-50"
+        transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+        className="sm:hidden fixed top-2 left-2 right-2 z-50"
       >
-        <div className="relative overflow-hidden rounded-3xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-sm shadow-2xl">
-          {/* Gradient overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/30 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent pointer-events-none" />
+        <div className="relative overflow-hidden rounded-[22px] border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl shadow-lg shadow-black/5">
+          {/* Subtle inner glow */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-white/40 dark:from-white/5 dark:to-transparent pointer-events-none" />
 
-          <div className="relative grid grid-cols-3 items-center h-16 px-4 gap-3">
+          <div className="relative grid grid-cols-3 items-center h-[52px] px-3.5 gap-2">
             {/* LEFT — Page + Date */}
-            <div className="flex flex-col justify-center items-start space-y-0.5">
-              <span className="text-[13px] font-bold text-foreground tracking-wide drop-shadow-sm">
+            <div className="flex flex-col justify-center items-start space-y-px gap-1">
+              <span className="text-[11px] font-semibold text-foreground/90 tracking-tight leading-none">
                 {currentPage}
               </span>
-              <span className="text-[10px] text-foreground/60 font-medium">
-                {time?.toLocaleDateString("en-GB")}
+              <span className="text-[9px] text-foreground/50 font-medium leading-none">
+                {time?.toLocaleDateString("en-GB", { day: '2-digit', month: 'short' , year: "numeric" })}
               </span>
             </div>
 
             {/* CENTER — Time + Day */}
-            <div className="flex flex-col justify-center items-center space-y-0.5">
-              <span className="text-[14px] font-mono text-foreground font-bold tracking-tight drop-shadow-sm">
+            <div className="flex flex-col justify-center items-center space-y-px gap-1">
+              <span className="text-[13px] font-semibold text-foreground/95 tracking-tight tabular-nums leading-none">
                 {time?.toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
-                  second: "2-digit",
                 })}
               </span>
-              <span className="text-[10px] text-foreground/60 capitalize font-medium">
+              <span className="text-[9px] text-foreground/50 font-medium capitalize leading-none">
                 {time?.toLocaleDateString("en-US", { weekday: "long" })}
               </span>
             </div>
 
-            {/* RIGHT — Theme + Hijri */}
-            <div className="flex flex-col justify-center items-end space-y-1">
+            {/* RIGHT — Profile + Theme + Hijri */}
+            <div className="flex items-center justify-end gap-2">
+              {/* User Profile */}
+
+
+              {/* Theme Toggle */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                className="h-7 w-7 p-0 rounded-full bg-white/50 dark:bg-white/10 hover:bg-white/70 dark:hover:bg-white/20 border border-white/30 dark:border-white/10 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110"
+                className="h-6 w-6 p-0 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 border-0 transition-all duration-200 active:scale-90"
                 aria-label="Toggle theme"
               >
                 {theme === "light" ? (
-                  <Moon size={14} className="text-foreground" />
+                  <Moon size={12} className="text-foreground/70" strokeWidth={2.5} />
                 ) : (
-                  <Sun size={14} className="text-foreground" />
+                  <Sun size={12} className="text-foreground/70" strokeWidth={2.5} />
                 )}
               </Button>
-              {/*<span className="text-[10px] text-foreground/60 font-medium">*/}
-              {/*  {new Intl.DateTimeFormat("en-SA-u-ca-islamic", {*/}
-              {/*    day: "2-digit",*/}
-              {/*    month: "numeric",*/}
-              {/*    year: "numeric",*/}
-              {/*  }).format(time)}*/}
-              {/*</span>*/}
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="flex items-center justify-center h-6 w-6 rounded-full overflow-hidden border border-foreground/10 transition-all duration-200 active:scale-90">
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={user?.image || "/default-avatar.png"}
+                        alt="User"
+                        fill
+                        sizes="24px"
+                        className="object-cover"
+                      />
+                    </div>
+                  </button>
+                </PopoverTrigger>
+
+                <PopoverContent
+                  side="bottom"
+                  align="end"
+                  className="w-72 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[22px] shadow-xl shadow-black/10 p-4 mt-1"
+                >
+                  <div className="flex flex-col items-center text-center gap-3">
+                    <div className="relative w-16 h-16 rounded-full border-2 border-black/5 dark:border-white/10 overflow-hidden">
+                      <Image
+                        src={user?.image || "/default-avatar.png"}
+                        alt="User Avatar"
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    </div>
+
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-semibold text-foreground/90">
+                        {user?.name || "User"}
+                      </p>
+                      <p className="text-xs text-foreground/50 truncate max-w-[90%] mx-auto">
+                        {user?.email || "No email available"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center items-center border-t border-black/5 dark:border-white/10 mt-3.5 pt-3">
+                    <ButtonLogout />
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* 📱 Mobile Bottom Bar - Glassmorphic Capsule */}
+      {/* 📱 Mobile Bottom Bar - iPhone Style Dock */}
       <motion.nav
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-        className="sm:hidden fixed bottom-4 left-4 right-4 z-50"
+        transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1], delay: 0.05 }}
+        className="sm:hidden fixed bottom-2 left-2 right-2 z-50"
       >
-        <div className="relative overflow-hidden rounded-3xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-sm shadow-2xl">
-          {/* Gradient overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/60 via-white/30 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent pointer-events-none" />
+        <div className="relative overflow-hidden rounded-[28px] border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl shadow-lg shadow-black/5">
+          {/* Subtle inner glow */}
+          <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-white/40 dark:from-white/5 dark:to-transparent pointer-events-none" />
 
-          <div className="relative flex items-center justify-around px-6 py-3">
+          <div className="relative flex items-center justify-around px-3 py-2.5">
             <NavIcon
               href="/dashboard"
-              icon={<Home className="w-5 h-5" />}
+              icon={<Home size={20} />}
               label="Home"
               active={pathname === "/dashboard"}
             />
             <NavIcon
+              href="/dashboard/analytics"
+              icon={<PieChartIcon size={20} />}
+              label="Analytics"
+              active={pathname === "/dashboard/analytics"}
+            />
+            <NavIcon
               href="/dashboard/entry"
-              icon={<Edit3 className="w-5 h-5" />}
+              icon={<PenLine size={20} />}
               label="Entry"
               active={pathname === "/dashboard/entry"}
             />
             <NavIcon
+              href="/dashboard/prayer-times"
+              icon={<Clock8 size={20} />}
+              label="Times"
+              active={pathname === "/dashboard/prayer-times"}
+            />
+            <NavIcon
               href="/dashboard/diary"
-              icon={<BookOpen className="w-5 h-5" />}
+              icon={<Notebook size={20} />}
               label="Diary"
               active={pathname === "/dashboard/diary"}
             />
-            <UserIcon user={user} />
           </div>
         </div>
       </motion.nav>
@@ -275,28 +330,30 @@ function UserPopover({ user }: { user: any }) {
   );
 }
 
-// Mobile bottom icons with glassmorphic active state
+// Mobile bottom icons - iPhone style
 export function NavIcon({ href, icon, label, active }: any) {
   return (
     <Link
       href={href}
-      className="flex flex-col items-center justify-center gap-1.5 text-xs transition-all duration-300"
+      className="flex flex-col items-center justify-center gap-1 min-w-[52px] transition-all duration-200 active:scale-95"
     >
       <motion.div
-        whileTap={{ scale: 0.9 }}
+        animate={{
+          scale: active ? 1 : 1,
+        }}
         className={cn(
-          "flex items-center justify-center rounded-2xl p-2.5 transition-all duration-300",
+          "flex items-center justify-center rounded-full p-2 transition-all duration-200",
           active
-            ? "bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 scale-110"
-            : "bg-white/30 dark:bg-white/5 text-foreground/70 hover:bg-white/50 dark:hover:bg-white/10 hover:text-foreground"
+            ? "bg-primary/95 text-background shadow-md shadow-primary/30"
+            : "text-foreground/60"
         )}
       >
         {icon}
       </motion.div>
       <span
         className={cn(
-          "font-medium transition-all duration-300 drop-shadow-sm",
-          active ? "text-foreground text-[11px]" : "text-foreground/60 text-[10px]"
+          "text-[9px] font-medium transition-all duration-200 tracking-tight",
+          active ? "text-foreground/90" : "text-foreground/50"
         )}
       >
         {label}
@@ -305,62 +362,4 @@ export function NavIcon({ href, icon, label, active }: any) {
   );
 }
 
-// User icon (Mobile) with glassmorphic styling
-export function UserIcon({ user }: { user: any }) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          className="flex flex-col items-center justify-center gap-1.5 text-xs transition-all duration-300"
-        >
-          <div className="relative flex items-center justify-center rounded-2xl p-2.5 bg-white/30 dark:bg-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-all duration-300">
-            <div className="relative w-5 h-5 rounded-full border-2 border-white/50 dark:border-white/20 overflow-hidden shadow-md">
-              <Image
-                src={user?.image || "/default-avatar.png"}
-                alt="User"
-                fill
-                sizes="20px"
-                className="object-cover"
-              />
-            </div>
-          </div>
-          <span className="font-medium text-[10px] text-foreground/60 drop-shadow-sm">
-            Profile
-          </span>
-        </motion.button>
-      </PopoverTrigger>
-
-      <PopoverContent
-        side="top"
-        align="center"
-        className="w-64 bg-white/90 dark:bg-black/90 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-3xl shadow-2xl p-5 mb-2"
-      >
-        <div className="flex flex-col items-center text-center gap-3">
-          <div className="relative w-16 h-16 rounded-full border-2 border-white/30 dark:border-white/20 overflow-hidden shadow-lg">
-            <Image
-              src={user?.image || "/default-avatar.png"}
-              alt="User Avatar"
-              fill
-              sizes="64px"
-              className="object-cover"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-sm font-bold text-foreground">
-              {user?.name || "User"}
-            </p>
-            <p className="text-xs text-foreground/60 truncate max-w-[90%] mx-auto">
-              {user?.email || "No email available"}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex justify-center items-center border-t border-white/20 dark:border-white/10 mt-4 pt-4">
-          <ButtonLogout />
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
+// Remove UserIcon component as it's no longer needed

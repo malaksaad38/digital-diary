@@ -155,40 +155,42 @@ export default function ModernDashboard({ user }: { user: any }) {
   const icons = { Fajr: Sunrise, Dhuhr: Sun, Asr: CloudSun, Maghrib: Sunset, Isha: Moon };
 
   return (
-    <div className=" bg-background p-4 md:p-0 flex flex-col space-y-5 max-w-lg mx-auto">
+    <div className="bg-background px-4 py-6 md:px-10 md:py-10 max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-xl font-bold mb-1">
-          Assalamu Alaikum, {user?.name || "User"}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {currentTime.toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
-      </div>
+      <div className="flex flex-col gap-2 md:flex-row justify-between">
+        <div className="">
+          <h1 className="text-xl md:text-3xl font-bold mb-1">
+            Assalamu Alaikum, {user?.name || "User"}
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground">
+            {currentTime.toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-2">
-        <Link href="/dashboard/entry">
-          <Button className="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-4 flex items-center justify-center gap-1">
-            <Plus className="w-4 h-4" /> Add Entry
-          </Button>
-        </Link>
-        <Link href="/dashboard/diary">
-          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-4 flex items-center justify-center gap-1">
-            <BookOpen className="w-4 h-4" /> My Diary
-          </Button>
-        </Link>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-2">
+          <Link href="/dashboard/entry">
+            <Button className="w-full bg-green-600 hover:bg-green-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-4">
+              <Plus className="w-4 h-4" /> Add Entry
+            </Button>
+          </Link>
+          <Link href="/dashboard/diary">
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-4">
+              <BookOpen className="w-4 h-4" /> My Diary
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Prayer Analytics */}
-      <Card className="shadow-md py-2 pt-2">
-        <CardContent className="p-3">
+      <Card className="shadow-md py-2 md:py-6 pt-2">
+        <CardContent className="p-3 md:p-6">
           <div className="flex justify-between items-center mb-2">
-            <p className="font-semibold text-sm">Prayer Analytics</p>
+            <p className="font-semibold text-sm md:text-base">Prayer Analytics</p>
             <Link href="/dashboard/analytics">
               <Button size="sm" variant="ghost" className="text-xs">
                 Details <ArrowRight className="w-3 h-3 ml-1" />
@@ -196,7 +198,7 @@ export default function ModernDashboard({ user }: { user: any }) {
             </Link>
           </div>
 
-          <div className="flex justify-between text-xs">
+          <div className="flex justify-between text-xs md:text-base md:gap-4">
             {[
               { label: "Jamaat", value: overallStats.jamaat, icon: Target, bg: "bg-green-100 dark:bg-green-900/20", color: "text-green-600" },
               { label: "On Time", value: overallStats.onTime, icon: Clock, bg: "bg-blue-100 dark:bg-blue-900/20", color: "text-blue-600" },
@@ -206,10 +208,10 @@ export default function ModernDashboard({ user }: { user: any }) {
             ].map((stat) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.label} className={cn(stat.bg, "flex-1 mx-0.5 rounded p-2 text-center")}>
+                <div key={stat.label} className={cn(stat.bg, "flex-1 mx-0.5 rounded p-2 md:p-4 text-center")}>
                   <Icon className={cn("mx-auto w-4 h-4 mb-1", stat.color)} />
                   <p className="font-bold">{stat.value}</p>
-                  <p className="text-[10px] text-muted-foreground">{stat.label}</p>
+                  <p className="text-[10px] md:text-base text-muted-foreground">{stat.label}</p>
                 </div>
               );
             })}
@@ -218,11 +220,11 @@ export default function ModernDashboard({ user }: { user: any }) {
       </Card>
 
       {/* Prayer Times */}
-      <Card className="shadow-md py-2 pb-1">
-        <CardContent className="p-3">
+      <Card className="shadow-md py-2 md:py-6 pb-1">
+        <CardContent className="p-3 md:p-6">
           <div className="flex justify-between items-center mb-2">
-            <p className="font-semibold text-sm">Today's Prayer Times</p>
-            <div className="flex items-center gap-1">
+            <p className="font-semibold text-sm md:text-base">Today's Prayer Times</p>
+            <div className="flex items-center gap-1 md:gap-4">
               <Button
                 size="sm"
                 variant="ghost"
@@ -240,18 +242,18 @@ export default function ModernDashboard({ user }: { user: any }) {
             </div>
           </div>
 
-          <div className="flex justify-between items-center text-[10px] text-muted-foreground mb-2">
-            <div className="flex items-center gap-1">
+          <div className="flex justify-between items-center text-[10px] md:text-base text-muted-foreground mb-2 md:mb-4">
+            <div className="flex items-center gap-1 md:gap-4">
               <MapPin className="w-3 h-3" />
               {prayerData?.city}, {prayerData?.country}
             </div>
-            <div className="flex items-center gap-1">
-              <Badge variant="secondary" className="text-[10px] px-2 py-1 bg-green-100  dark:bg-green-900/20 border border-green-400">Now: {currentPrayer}</Badge>
-              <Badge variant="outline" className="text-[10px] px-2 py-1  bg-blue-100 dark:bg-blue-900/20 border-blue-400">Next: {nextPrayer} ({countdown})</Badge>
+            <div className="flex items-center gap-1 md:gap-4">
+              <Badge variant="secondary" className="text-[10px] md:text-base px-2 py-1 bg-green-100  dark:bg-green-900/20 border border-green-400">Now: {currentPrayer}</Badge>
+              <Badge variant="outline" className="text-[10px] md:text-base px-2 py-1  bg-blue-100 dark:bg-blue-900/20 border-blue-400">Next: {nextPrayer} ({countdown})</Badge>
             </div>
           </div>
 
-          <div className="grid grid-cols-5 gap-1 text-[10px]">
+          <div className="grid grid-cols-5 gap-1 md:gap-4 text-[10px] md:text-base">
             {["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map((p) => {
               const Icon = icons[p as keyof typeof icons];
               const time = prayerData?.items?.[0]?.[p.toLowerCase()];
@@ -277,7 +279,7 @@ export default function ModernDashboard({ user }: { user: any }) {
             })}
           </div>
           {prayerData?.items[0].shurooq && (
-            <div className="flex justify-between mt-4 pt-4 border-t text-[10px]">
+            <div className="flex justify-between mt-4 pt-4 border-t text-[10px] md:text-base">
               <div className="flex items-center gap-2">
                 <Sunrise className="w-4 h-4 text-orange-500" />
                 <span className="text-muted-foreground">Sunrise:</span>

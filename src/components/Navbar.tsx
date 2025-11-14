@@ -106,7 +106,7 @@ export default function Navbar({ user }: { user: any }) {
           <div className="relative grid grid-cols-3 items-center h-[52px] px-3.5 gap-2">
             {/* LEFT — Page + Date */}
             <div className="flex flex-col justify-center items-start space-y-px gap-1">
-              <span className="text-[11px] font-semibold text-foreground/90 tracking-tight leading-none">
+              <span className="text-[11px] font-semibold text-foreground/80 tracking-tight leading-none">
                 {currentPage}
               </span>
               <span className="text-[9px] text-foreground/50 font-medium leading-none">
@@ -116,10 +116,11 @@ export default function Navbar({ user }: { user: any }) {
 
             {/* CENTER — Time + Day */}
             <div className="flex flex-col justify-center items-center space-y-px gap-1">
-              <span className="text-[13px] font-semibold text-foreground/95 tracking-tight tabular-nums leading-none">
+              <span className="text-[13px] font-mono text-foreground/80 tracking-tight tabular-nums leading-none">
                 {time?.toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
+                  second: "2-digit",
                 })}
               </span>
               <span className="text-[9px] text-foreground/50 font-medium capitalize leading-none">

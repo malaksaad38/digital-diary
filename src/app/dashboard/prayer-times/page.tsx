@@ -1,5 +1,7 @@
-"use client"
-import React, { useState, useEffect } from 'react';
+// Converted to shadcn/ui version
+"use client";
+
+import React, { useState, useEffect } from "react";
 import {
   Clock,
   Calendar,
@@ -10,10 +12,21 @@ import {
   Moon,
   Sun,
   CloudSun,
+  Loader2,
   Timer,
   Sunset,
-  Edit2,
-} from 'lucide-react';
+  Edit2 as EditIcon, Edit2, Edit2Icon,
+} from "lucide-react";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 
 export default function PrayerTimes() {
   const [prayerData, setPrayerData] = useState(null);
@@ -25,9 +38,7 @@ export default function PrayerTimes() {
   const [countdown, setCountdown] = useState('');
   const [qazaCountdown, setQazaCountdown] = useState('');
   const [isFromCache, setIsFromCache] = useState(false);
-  const [city, setCity] = useState('timergara');
-  const [showCityDialog, setShowCityDialog] = useState(false);
-  const [tempCity, setTempCity] = useState('timergara');
+  const [city, setCity] = useState("timergara");
 
   const fetchPrayerTimes = async (forceRefresh = false) => {
     setLoading(true);
@@ -89,7 +100,7 @@ export default function PrayerTimes() {
       clearInterval(timer);
       clearInterval(refreshTimer);
     };
-  }, [city]);
+  }, []);
 
   const convertTo24Hour = (time12h) => {
     if (!time12h || typeof time12h !== 'string') return null;
@@ -111,7 +122,7 @@ export default function PrayerTimes() {
   const calculateCountdown = (target) => {
     const now = new Date();
     const diff = target.getTime() - now.getTime();
-    if (diff <= 0) return 'Time Over';
+    if (diff <= 0) return 'Expired';
     const h = Math.floor(diff / (1000 * 60 * 60));
     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const s = Math.floor((diff % (1000 * 60)) / 1000);
@@ -217,7 +228,7 @@ export default function PrayerTimes() {
     }
 
     if (qazaHasPassed) {
-      setQazaCountdown('Time Over');
+      setQazaCountdown('Expired');
     } else {
       const qConv = convertTo24Hour(qazaTimeStr);
       if (qConv) {
@@ -226,12 +237,12 @@ export default function PrayerTimes() {
         qazaDate.setHours(qh, qm, 0, 0);
 
         if (qazaDate.getTime() <= now.getTime()) {
-          setQazaCountdown('Time Over');
+          setQazaCountdown('Expired');
         } else {
           setQazaCountdown(calculateCountdown(qazaDate));
         }
       } else {
-        setQazaCountdown('Time Over');
+        setQazaCountdown('Expired');
       }
     }
 
@@ -239,13 +250,6 @@ export default function PrayerTimes() {
     setNextPrayer(next);
   }, [prayerData, currentTime]);
 
-  const handleCitySubmit = () => {
-    if (tempCity.trim()) {
-      setCity(tempCity.toLowerCase().trim());
-      setShowCityDialog(false);
-      fetchPrayerTimes(true);
-    }
-  };
 
   const prayers = [
     { name: 'Fajr', key: 'fajr', icon: Sunrise },
@@ -255,306 +259,192 @@ export default function PrayerTimes() {
     { name: 'Isha', key: 'isha', icon: Moon }
   ];
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-blue-200 dark:border-blue-900 rounded-full"></div>
-            <div className="w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-          </div>
-          <p className="text-lg font-medium text-muted-foreground">Loading Prayer times...</p>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
+        <p className={"text-xl text-bold"} >Prayer times Loading...</p>
+
       </div>
     );
-  }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border-2 border-red-200 dark:border-red-800">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="p-3 bg-red-100 dark:bg-red-900/50 rounded-full">
-              <AlertCircle className="h-8 w-8 text-red-600" />
-            </div>
-          </div>
-          <h3 className="font-bold text-xl text-center mb-2">Error Loading Data</h3>
-          <p className="text-sm text-muted-foreground text-center mb-6">{error}</p>
-          <button
-            onClick={() => fetchPrayerTimes(true)}
-            className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transition-all"
-          >
-            <RefreshCw className="w-5 h-5" />
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!prayerData || !prayerData.items || prayerData.items.length === 0) {
+  if (error)
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <p className="text-center text-muted-foreground">No prayer times available</p>
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" /> Error
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">{error}</p>
+            <Button className="w-full" onClick={() => fetchPrayerTimes(true)}>
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
-  }
 
   const today = prayerData.items[0];
 
   return (
-    <div className="min-h-screen  p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="text-center space-y-4 pt-4">
+    <div className="min-h-screen p-4 sm:p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold">Prayer Times</h1>
 
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-            Prayer Times
-          </h1>
-          <div className="flex justify-center items-center gap-3 text-muted-foreground">
-            <div className="flex items-center gap-2 bg-white/60 dark:bg-gray-800/60 px-4 py-2 rounded-full backdrop-blur-sm border border-gray-200 dark:border-gray-700">
-              <MapPin className="w-4 h-4 text-blue-600" />
-              <span className="font-medium">{prayerData.city}, {prayerData.country}</span>
-              <button
-                onClick={() => {
-                  setTempCity(city);
-                  setShowCityDialog(true);
-                }}
-                className="ml-1 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
-                title="Change city"
-              >
-                <Edit2 className="w-4 h-4" />
-              </button>
-            </div>
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <MapPin className="w-4 h-4" />
+            {prayerData.city}, {prayerData.country}
           </div>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
-            <div className="flex items-center gap-2 bg-white/60 dark:bg-gray-800/60 px-4 py-2 rounded-full backdrop-blur-sm border border-gray-200 dark:border-gray-700">
-              <Calendar className="w-4 h-4 text-indigo-600" />
-              <span className="font-medium">{today.date_for}</span>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-4 h-4" /> {today.date_for}
             </div>
-            <div className="font-mono text-2xl font-bold bg-white/80 dark:bg-gray-800/80 px-6 py-2 rounded-full backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-sm">
-              {currentTime.toLocaleTimeString('en-US', { hour12: true })}
+            <div className="font-mono text-lg font-semibold">
+              {currentTime.toLocaleTimeString("en-US", { hour12: true })}
             </div>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-800 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg flex items-center gap-2">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                </div>
-                Current Prayer
-              </h3>
-              <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-full shadow-sm">
-                Active
-              </span>
-            </div>
-            <p className="text-4xl font-bold mb-2 text-blue-600 dark:text-blue-400">{currentPrayer}</p>
-            <p className="text-lg text-muted-foreground mb-6 font-medium">{today[currentPrayer.toLowerCase()]}</p>
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-muted-foreground mb-2 font-medium">Qaza Time Remaining</p>
-              <p className={`text-2xl font-mono font-bold ${qazaCountdown === 'Time Over' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`}>
-                {qazaCountdown}
+        {/* Current & Next */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card className="border-blue-400 bg-blue-50/50 dark:bg-blue-900/20">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-blue-700">
+                <Clock className="w-5 h-5" /> Current Prayer
+              </CardTitle>
+              <span className="px-2 py-1 bg-blue-600 text-white text-xs rounded">Active</span>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{currentPrayer}</p>
+              <p className="text-muted-foreground mb-4">
+                {today[currentPrayer.toLowerCase()]}
               </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                {currentPrayer === 'Fajr' ? 'Ends at Sunrise (Shurooq)' : `Ends at ${nextPrayer} time`}
-              </p>
-            </div>
-          </div>
+              <div className="p-3 border rounded-md">
+                <p className="text-xs text-muted-foreground">Qaza Time Remaining</p>
+                <p className="text-xl font-mono font-bold text-blue-700">{qazaCountdown}</p>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-green-200 dark:border-green-800 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg flex items-center gap-2">
-                <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-lg">
-                  <Timer className="w-5 h-5 text-green-600" />
-                </div>
-                Next Prayer
-              </h3>
-              <span className="px-3 py-1 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-semibold rounded-full shadow-sm">
-                Upcoming
-              </span>
-            </div>
-            <p className="text-4xl font-bold mb-2 text-green-600 dark:text-green-400">{nextPrayer}</p>
-            <p className="text-lg text-muted-foreground mb-6 font-medium">{today[nextPrayer.toLowerCase()]}</p>
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
-              <p className="text-sm text-muted-foreground mb-2 font-medium">Time Remaining</p>
-              <p className="text-2xl font-mono font-bold text-green-600 dark:text-green-400">{countdown || "00h 00m 00s"}</p>
-            </div>
-          </div>
+          <Card className="border-green-400 bg-green-50/50 dark:bg-green-900/20">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-green-700">
+                <Timer className="w-5 h-5" /> Next Prayer
+              </CardTitle>
+              <span className="px-2 py-1 bg-green-600 text-white text-xs rounded">Upcoming</span>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{nextPrayer}</p>
+              <p className="text-muted-foreground mb-4">
+                {today[nextPrayer.toLowerCase()]}
+              </p>
+              <div className="p-3 border rounded-md">
+                <p className="text-xs text-muted-foreground">Time Remaining</p>
+                <p className="text-xl font-mono font-bold text-green-700">{countdown}</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 lg:p-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></div>
-            Today's Schedule
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {prayers.map((prayer) => {
-              const Icon = prayer.icon;
-              const isCurrent = currentPrayer === prayer.name;
-              const isNext = nextPrayer === prayer.name;
+        {/* Today's Schedule */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Today's Schedule</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {prayers.map((p) => {
+                const Icon = p.icon;
+                const isCurrent = currentPrayer === p.name;
+                const isNext = nextPrayer === p.name;
 
-              return (
-                <div
-                  key={prayer.key}
-                  className={`py-4 px-2 rounded-xl text-center border-2 transition-all duration-300 hover:scale-105 ${
-                    isCurrent
-                      ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-blue-400 shadow-lg shadow-blue-200 dark:shadow-blue-900/50'
-                      : isNext
-                        ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-green-400 shadow-lg shadow-green-200 dark:shadow-green-900/50'
-                        : 'bg-gray-50/50 dark:bg-gray-700/30 border-gray-200 dark:border-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <div className={`inline-flex p-3 rounded-lg mb-3 ${
-                    isCurrent ? 'bg-blue-100 dark:bg-blue-900/50' :
-                      isNext ? 'bg-green-100 dark:bg-green-900/50' :
-                        'bg-gray-100 dark:bg-gray-800'
-                  }`}>
-                    <Icon className={`w-7 h-7 ${
-                      isCurrent ? 'text-blue-600' : isNext ? 'text-green-600' : 'text-gray-600'
-                    }`} />
+                return (
+                  <div
+                    key={p.key}
+                    className={`p-4 border rounded-lg text-center transition ${
+                      isCurrent
+                        ? "bg-background border border-blue-400"
+                        : isNext
+                          ? "bg-background border border-green-400"
+                          : "bg-background border border-border"
+                    }`}
+                  >
+                    <Icon
+                      className={`w-8 h-8 mx-auto mb-2 ${
+                        isCurrent
+                          ? "text-blue-600"
+                          : isNext
+                            ? "text-green-600"
+                            : "text-gray-600"
+                      }`}
+                    />
+                    <p className="font-semibold">{p.name}</p>
+                    <p className="text-xl font-mono font-bold">{today[p.key]}</p>
+                    {isCurrent && <p className="text-xs text-blue-600">Now</p>}
+                    {isNext && <p className="text-xs text-green-600">Next</p>}
                   </div>
-                  <p className="font-bold mb-2 text-lg">{prayer.name}</p>
-                  <p className="text-xl font-mono font-bold">{today[prayer.key]}</p>
-                  {isCurrent && (
-                    <span className="inline-block mt-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full">
-                      Now
-                    </span>
-                  )}
-                  {isNext && (
-                    <span className="inline-block mt-2 px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded-full">
-                      Next
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
 
-          <div className="mt-8 pt-6 border-t border-border">
-            <div className="flex justify-center">
-              <div className="flex items-center gap-3 px-5 py-3 rounded-full border bg-gradient-to-r
-      from-orange-50 to-amber-50
-      dark:from-orange-900/20 dark:to-amber-900/20
-      border-orange-200 dark:border-orange-800 shadow-sm">
-
-                <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center">
-                  <Sunrise className="w-5 h-5 text-orange-600" />
-                </div>
-
-                <span className="text-sm text-muted-foreground font-medium whitespace-nowrap">
-        Sunrise (Shurooq):
-      </span>
-
-                <span className="font-mono font-semibold text-orange-600 text-sm">
-        {today.shurooq}
-      </span>
-
+            <div className="mt-6 pt-4 border-t flex justify-center">
+              <div className="flex items-center gap-2 text-sm">
+                <Sunrise className="w-4 h-4 text-orange-500" /> Sunrise (Shurooq):
+                <span className="font-mono font-semibold">{today.shurooq}</span>
               </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-        </div>
-
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 lg:p-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            <div className="w-1 h-8 bg-gradient-to-b from-indigo-500 to-purple-600 rounded-full"></div>
-            7-Day Schedule
-          </h2>
-          <div className="space-y-4">
+        {/* Weekly */}
+        <Card>
+          <CardHeader>
+            <CardTitle>7-Day Schedule</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
             {prayerData.items.map((day, idx) => (
               <div
                 key={idx}
-                className={`p-5 rounded-xl border-2 transition-all hover:shadow-md ${
-                  idx === 0
-                    ? 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-300 dark:border-indigo-700 shadow-md'
-                    : 'bg-gray-50/50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-700'
+                className={`p-4 rounded-lg border ${
+                  idx === 0 ? "bg-primary/5 border-primary/40" : "bg-muted"
                 }`}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-bold text-lg">{day.date_for}</span>
+                <div className="flex justify-between mb-3">
+                  <span className="font-semibold">{day.date_for}</span>
                   {idx === 0 && (
-                    <span className="px-3 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold rounded-full shadow-sm">
+                    <span className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded">
                       Today
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
-                  {prayers.map(prayer => (
-                    <div key={prayer.key} className="space-y-1">
-                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{prayer.name}</p>
-                      <p className="font-mono font-bold text-base">{day[prayer.key]}</p>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 text-center text-sm">
+                  {prayers.map((p) => (
+                    <div key={p.key}>
+                      <p className="text-xs text-muted-foreground">{p.name}</p>
+                      <p className="font-mono font-semibold">{day[p.key]}</p>
                     </div>
                   ))}
                 </div>
               </div>
             ))}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="flex flex-col items-center gap-4 pb-4">
-          <button
-            onClick={() => fetchPrayerTimes(true)}
-            className="px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:shadow-lg flex items-center gap-2 font-medium"
-          >
-            <RefreshCw className="w-5 h-5" />
-            Refresh from API
-          </button>
+        <div className="flex flex-col items-center gap-3 pb-8">
+          <Button variant="outline" onClick={() => fetchPrayerTimes(true)}>
+            <RefreshCw className="w-4 h-4 mr-2" /> Refresh from API
+          </Button>
           {isFromCache && (
-            <p className="text-sm text-muted-foreground text-center  px-4 py-2 ">
-              📦 Data loaded from cache • Auto-refreshes daily
-            </p>
+            <p className="text-xs text-muted-foreground">Loaded from cache</p>
           )}
         </div>
       </div>
 
-      {showCityDialog && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-8 border-2 border-gray-200 dark:border-gray-700">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white mb-4">
-                <MapPin className="w-7 h-7" />
-              </div>
-              <h3 className="text-2xl font-bold mb-2">Enter Your City</h3>
-              <p className="text-sm text-muted-foreground">
-                Please type your city name in lowercase letters.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="e.g. lahore, karachi, islamabad"
-                value={tempCity}
-                onChange={(e) => setTempCity(e.target.value.toLowerCase())}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleCitySubmit();
-                  }
-                }}
-                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 transition-all"
-                autoFocus
-              />
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCityDialog(false)}
-                  className="flex-1 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCitySubmit}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 font-medium shadow-lg hover:shadow-xl transition-all"
-                >
-                  Submit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

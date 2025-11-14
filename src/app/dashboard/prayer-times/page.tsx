@@ -78,9 +78,7 @@ export default function PrayerTimes() {
     }
   };
 
-  useEffect(() => {
-    localStorage.clear()
-  }, []);
+
 
   useEffect(() => {
     fetchPrayerTimes();

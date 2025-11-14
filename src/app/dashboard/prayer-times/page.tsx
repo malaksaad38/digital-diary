@@ -79,6 +79,10 @@ export default function PrayerTimes() {
   };
 
   useEffect(() => {
+    localStorage.clear()
+  }, []);
+
+  useEffect(() => {
     fetchPrayerTimes();
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
 

@@ -1,389 +1,347 @@
-"use client"
-import React, { useState, useEffect } from 'react';
-import { BookOpen, Lock, Cloud, Sparkles, Calendar, Search, Heart, TrendingUp, Menu, X, ChevronRight } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ModeToggle } from '@/components/mode-toggle';
-import {useRouter} from "next/navigation";
+"use client";
 
-export default function DiaryLanding() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const heroScale = useTransform(scrollY, [0, 300], [1, 0.95]);
+import React, { useState, useEffect } from "react";
+import {
+    BookOpen,
+    Lock,
+    Cloud,
+    Sparkles,
+    Clock,
+    Search,
+    Heart,
+    Menu,
+    X,
+    ChevronRight,
+    BarChart3,
+    Star,
+    HouseHeartIcon,
+} from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ModeToggle } from "@/components/mode-toggle";
+import { useRouter } from "next/navigation";
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+export default function PrayerDiaryLanding() {
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { scrollY } = useScroll();
+    const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+    const heroScale = useTransform(scrollY, [0, 300], [1, 0.95]);
+    const router = useRouter();
+    const handleSubmit = () => router.push("/login");
 
-  const fadeInUp = {
-    initial: { opacity: 0, y: 60 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
-    transition: { duration: 0.6 }
-  };
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 50);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
-  const staggerChildren = {
-    initial: { opacity: 0 },
-    whileInView: { opacity: 1 },
-    viewport: { once: true },
-    transition: { staggerChildren: 0.2 }
-  };
+    const fadeInUp = {
+        initial: { opacity: 0, y: 60 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true },
+        transition: { duration: 0.6 },
+    };
 
-  const features = [
-    { icon: Lock, title: "Private & Secure", desc: "End-to-end encryption keeps your thoughts safe" },
-    { icon: Cloud, title: "Cloud Sync", desc: "Access your diary anywhere, anytime" },
-    { icon: Search, title: "Smart Search", desc: "Find any memory in seconds" },
-    { icon: Calendar, title: "Daily Reminders", desc: "Never miss a day of journaling" },
-    { icon: Sparkles, title: "AI Insights", desc: "Discover patterns in your emotions" },
-    { icon: TrendingUp, title: "Track Progress", desc: "Visualize your personal growth" }
-  ];
+    const staggerChildren = {
+        initial: { opacity: 0 },
+        whileInView: { opacity: 1 },
+        viewport: { once: true },
+        transition: { staggerChildren: 0.2 },
+    };
 
-  const testimonials = [
-    { name: "Sarah Chen", role: "Writer", text: "This app transformed my journaling habit. The interface is so beautiful, I actually look forward to writing every day." },
-    { name: "Marcus Johnson", role: "Entrepreneur", text: "The AI insights helped me identify stress patterns I never noticed. Game-changing for mental health." },
-    { name: "Emma Rodriguez", role: "Student", text: "Finally, a diary that syncs everywhere and keeps my thoughts completely private. Love it!" }
-  ];
+    const features = [
+        {
+            icon: HouseHeartIcon,
+            title: "Accurate Prayer Times",
+            desc: "Auto-detected Salah timings based on your city Fajr to Isha with Athan alerts.",
+        },
+        {
+            icon: Clock,
+            title: "Prayer Tracking",
+            desc: "Mark prayers as Prayed, Missed, Delayed, or Jama'ah. Build consistency with ease.",
+        },
+        {
+            icon: BarChart3,
+            title: "Spiritual Analytics",
+            desc: "Monthly and weekly Salah insights that reveal patterns and growth.",
+        },
+        {
+            icon: BookOpen,
+            title: "Prayer-Focused Diary",
+            desc: "Write reflections tied to each Salah deepen your spiritual awareness.",
+        },
+        {
+            icon: Search,
+            title: "Reflection Search",
+            desc: "Find past journal entries by emotion, keywords, or prayer type.",
+        },
+        {
+            icon: Cloud,
+            title: "Cloud Sync & Security",
+            desc: "Encrypted, safe, and accessible across all devices your privacy stays protected.",
+        },
+    ];
 
-  const router = useRouter()
-  const handleSubmit = () => {
-    router.push("/login")
-  }
+    const testimonials = [
+        { name: "Aisha Siddiqui", role: "Teacher", text: "This app feels peaceful. The diary after each Salah helped strengthen my focus and gratitude." },
+        { name: "Mohammed Arqam", role: "Engineer", text: "Seeing my Salah analytics was a turning point. It motivated me like never before." },
+        { name: "Hafsa M.", role: "Student", text: "Finally an app that blends faith, journaling, and beautiful design. 10/10 experience." },
+    ];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 dark:from-primary/10 dark:via-background dark:to-secondary/10 transition-colors">
-      {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className={`fixed w-full z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-background/80 backdrop-blur-lg shadow-lg border-b' : 'bg-transparent'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <motion.div
-              className="flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
+    const faq = [
+        { q: "Is my data private?", a: "Yes. Your reflections and prayer habits are fully encrypted and never shared." },
+        { q: "Is the app free?", a: "Yes. Core features like tracking, prayer times, and journaling are free forever." },
+        { q: "Does it work worldwide?", a: "Yes. Prayer times support almost every country and calculation method." },
+    ];
+
+    return (
+        <div className="min-h-screen bg-background text-foreground transition-colors relative">
+
+            {/* Decorative pattern */}
+            <div className="absolute inset-0 bg-[url('/patterns/islamic-geo.svg')] opacity-10 dark:opacity-5 pointer-events-none"></div>
+
+            {/* Navigation */}
+            <motion.nav
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                className={`fixed w-full z-50 transition-all duration-300 ${
+                    isScrolled ? "bg-background/90 backdrop-blur-lg shadow-lg border-b" : "bg-transparent"
+                }`}
             >
-              <img src="/logo.png" alt="Digital Diary Logo" className="w-8 h-8 rounded-full object-contain" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Digital Diary
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <motion.div className="flex items-center gap-2" whileHover={{ scale: 1.05 }}>
+                        <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-full object-contain" />
+                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-blue-500 dark:from-green-400 dark:to-blue-400">
+              Digital Diary
+            </span>
+                    </motion.div>
+
+                    <div className="hidden md:flex items-center gap-6">
+                        <a href="#features" className="text-muted-foreground hover:text-green-600 dark:hover:text-blue-400 transition">Features</a>
+                        <a href="#testimonials" className="text-muted-foreground hover:text-green-600 dark:hover:text-blue-400 transition">Testimonials</a>
+                        <a href="#faq" className="text-muted-foreground hover:text-green-600 dark:hover:text-blue-400 transition">FAQ</a>
+
+                        <ModeToggle />
+
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Button onClick={()=> router.push("/login")} className="rounded-full shadow-lg bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-400 text-white">
+                                Get Started
+                            </Button>
+                        </motion.div>
+                    </div>
+
+                    <div className="flex md:hidden items-center gap-2">
+                        <ModeToggle />
+                        <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        </Button>
+                    </div>
+                </div>
+
+                {mobileMenuOpen && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="md:hidden bg-background border-t">
+                        <div className="px-6 py-4 space-y-4">
+                            <a href="#features" className="block text-muted-foreground hover:text-green-600 dark:hover:text-blue-400">Features</a>
+                            <a href="#testimonials" className="block text-muted-foreground hover:text-green-600 dark:hover:text-blue-400">Testimonials</a>
+                            <a href="#faq" className="block text-muted-foreground hover:text-green-600 dark:hover:text-blue-400">FAQ</a>
+                            <Button onClick={()=> router.push("/login")} className="w-full rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white">Get Started</Button>
+                        </div>
+                    </motion.div>
+                )}
+            </motion.nav>
+
+            {/* Hero Section */}
+            <motion.section className="pt-36 pb-20 px-6">
+                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                    <motion.div initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+                        <Badge variant="secondary" className="gap-2 py-2 px-4 w-fit mb-6 bg-gradient-to-r from-green-400 to-blue-500 text-white shadow-lg">
+                            <Sparkles className="w-4 h-4" /> Advanced Salah Analytics
+                        </Badge>
+
+                        <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6">
+                            Your spiritual journey,{" "}
+                            <span className="bg-gradient-to-r from-green-600 to-blue-500 bg-clip-text text-transparent dark:from-green-400 dark:to-blue-400">
+                beautifully guided
               </span>
-            </motion.div>
+                        </h1>
 
-            <div className="hidden md:flex items-center gap-6">
-              <a href="#features" className="text-muted-foreground hover:text-foreground transition">Features</a>
-              <a href="#testimonials" className="text-muted-foreground hover:text-foreground transition">Testimonials</a>
-              {/*<a href="#pricing" className="text-muted-foreground hover:text-foreground transition">Pricing</a>*/}
+                        <p className="text-xl text-muted-foreground mb-8 max-w-xl">
+                            Track prayers, write meaningful reflections, and analyze your spiritual progress all in one peaceful Islamic-themed digital diary.
+                        </p>
 
-              <ModeToggle />
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <Button size="lg" className="rounded-full shadow-2xl text-lg bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-400 text-white" onClick={handleSubmit}>
+                                Start Your Journey <ChevronRight className="w-5 h-5 ml-2" />
+                            </Button>
+                            <Button size="lg" variant="outline" className="rounded-full text-lg border-blue-500 dark:border-green-400 text-blue-500 dark:text-white hover:bg-blue-500 dark:hover:bg-green-400 hover:text-white transition">
+                                Watch Demo
+                            </Button>
+                        </div>
 
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button className="rounded-full shadow-lg" onClick={handleSubmit} >
-                  Get Started
-                </Button>
-              </motion.div>
-            </div>
+                        <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                                <Star className="w-4 h-4 text-yellow-400" />
+                                <span>Trusted by 90,000+ Muslims worldwide</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Lock className="w-4 h-4 text-green-500" />
+                                <span>Private & Encrypted</span>
+                            </div>
+                        </div>
+                    </motion.div>
 
-            <div className="flex md:hidden items-center gap-2">
-              <ModeToggle />
+                    {/* Hero Mockup */}
+                    <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.3 }} className="relative">
+                        <div className="relative bg-gradient-to-br from-green-400 to-blue-500 rounded-3xl p-8 shadow-2xl">
+                            <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity }}>
+                                <Card className="shadow-lg rounded-xl bg-background border border-transparent dark:border-gray-700">
+                                    <CardHeader>
+                                        <div className="flex items-center gap-3">
+                                            <HouseHeartIcon className="w-6 h-6 text-foreground" />
+                                            <CardTitle className="text-foreground">Today's Prayers</CardTitle>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="space-y-3 text-foreground">
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <p className="text-sm opacity-70">Fajr</p>
+                                                <p className="text-lg font-medium">05:02</p>
+                                            </div>
+                                            <Badge variant="secondary" className="bg-background/30 text-foreground">Prayed</Badge>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <p className="text-sm opacity-70">Dhuhr</p>
+                                                <p className="text-lg font-medium">12:15</p>
+                                            </div>
+                                            <Badge variant="secondary" className="bg-background/30 text-foreground">Upcoming</Badge>
+                                        </div>
+                                        <div className="mt-4 flex gap-2">
+                                            <Badge variant="secondary" className="bg-background/30 text-foreground">Fajr</Badge>
+                                            <Badge variant="secondary" className="bg-background/30 text-foreground">Dhuhr</Badge>
+                                            <Badge variant="secondary" className="bg-background/30 text-foreground">Asr</Badge>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="md:hidden bg-background border-t"
-          >
-            <div className="px-6 py-4 space-y-4">
-              <a href="#features" className="block text-muted-foreground hover:text-foreground">Features</a>
-              <a href="#testimonials" className="block text-muted-foreground hover:text-foreground">Testimonials</a>
-              <a href="#pricing" className="block text-muted-foreground hover:text-foreground">Pricing</a>
-              <Button className="w-full rounded-full" onClick={handleSubmit}>Get Started</Button>
-            </div>
-          </motion.div>
-        )}
-      </motion.nav>
-
-      {/* Hero Section */}
-      <motion.section
-        className="pt-32 pb-20 px-6"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -60 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="mb-6"
-              >
-                <Badge variant="secondary" className="gap-2 py-2 px-4">
-                  <Sparkles className="w-4 h-4" />
-                  Now with AI-powered insights
-                </Badge>
-              </motion.div>
-
-              <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-                Your thoughts,
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> beautifully organized</span>
-              </h1>
-
-              <p className="text-xl text-muted-foreground mb-8">
-                The modern diary app that helps you reflect, grow, and discover insights about yourself. Private, secure, and beautifully designed.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button size="lg" className="rounded-full shadow-2xl text-lg w-full sm:w-auto" onClick={handleSubmit}>
-                    Start Writing Free
-                    <ChevronRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </motion.div>
-
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button size="lg" variant="outline" className="rounded-full text-lg w-full sm:w-auto">
-                    Watch Demo
-                  </Button>
-                </motion.div>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1 }}
-                className="mt-8 flex flex-wrap items-center gap-6 text-sm text-muted-foreground"
-              >
-                <div className="flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-red-500" />
-                  <span>50K+ happy journalers</span>
+                            <div className="absolute -top-6 -right-6 bg-green-400 rounded-full p-4 shadow-lg">
+                                <Sparkles className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="absolute -bottom-6 -left-6 bg-blue-400 rounded-full p-4 shadow-lg">
+                                <Heart className="w-8 h-8 text-white" />
+                            </div>
+                        </div>
+                    </motion.div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-green-500" />
-                  <span>Bank-level security</span>
+            </motion.section>
+
+            {/* Features Section */}
+            <section id="features" className="py-20 px-6">
+                <div className="max-w-7xl mx-auto">
+                    <motion.div {...fadeInUp} className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Everything you need for consistent worship</h2>
+                        <p className="text-xl text-muted-foreground">Powerful, secure, and designed to keep your heart aligned with your practice.</p>
+                    </motion.div>
+
+                    <motion.div variants={staggerChildren} initial="initial" whileInView="whileInView" className="grid md:grid-cols-3 gap-8">
+                        {features.map((feature, idx) => (
+                            <motion.div key={idx} variants={fadeInUp} whileHover={{ y: -10, scale: 1.02 }}>
+                                <Card className="h-full hover:shadow-2xl transition-shadow rounded-xl border border-transparent dark:border-gray-700 bg-background">
+                                    <CardHeader>
+                                        <div className="bg-gradient-to-br from-green-400 to-blue-500 w-14 h-14 rounded-xl flex items-center justify-center mb-4 shadow-md">
+                                            <feature.icon className="w-7 h-7 text-white" />
+                                        </div>
+                                        <CardTitle className="text-foreground">{feature.title}</CardTitle>
+                                        <CardDescription className="text-muted-foreground">{feature.desc}</CardDescription>
+                                    </CardHeader>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </motion.div>
                 </div>
-              </motion.div>
-            </motion.div>
+            </section>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="relative"
-            >
-              <div className="relative bg-gradient-to-br from-primary to-secondary rounded-3xl p-8 shadow-2xl">
-                <motion.div
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                >
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <Calendar className="w-6 h-6 text-primary" />
-                        <CardTitle>Today's Entry</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="h-3 bg-muted rounded w-full"></div>
-                      <div className="h-3 bg-muted rounded w-5/6"></div>
-                      <div className="h-3 bg-muted rounded w-4/6"></div>
-                      <div className="mt-6 flex gap-2">
-                        <Badge variant="secondary">Grateful</Badge>
-                        <Badge variant="secondary">Productive</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+            {/* Testimonials Section */}
+            <section id="testimonials" className="py-20 px-6 bg-background">
+                <div className="max-w-7xl mx-auto">
+                    <motion.div {...fadeInUp} className="text-center mb-12">
+                        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Loved by communities worldwide</h2>
+                        <p className="text-xl text-muted-foreground">Real stories from people who found more presence in prayer.</p>
+                    </motion.div>
 
-                <motion.div
-                  animate={{ rotate: [0, 5, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="absolute -top-6 -right-6 bg-yellow-400 rounded-full p-4 shadow-lg"
-                >
-                  <Sparkles className="w-8 h-8 text-white" />
-                </motion.div>
+                    <motion.div variants={staggerChildren} initial="initial" whileInView="whileInView" className="grid md:grid-cols-3 gap-8">
+                        {testimonials.map((t, i) => (
+                            <motion.div key={i} variants={fadeInUp} whileHover={{ scale: 1.03, y: -5 }}>
+                                <Card className="h-full bg-background rounded-2xl shadow-lg border border-transparent dark:border-gray-700 transition-transform duration-300">
+                                    <CardHeader>
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="rounded-full bg-gradient-to-br from-green-400 to-blue-500 w-12 h-12 flex items-center justify-center text-white font-semibold">{t.name[0]}</div>
+                                            <div>
+                                                <CardTitle className="text-base text-foreground">{t.name}</CardTitle>
+                                                <p className="text-sm text-muted-foreground">{t.role}</p>
+                                            </div>
+                                        </div>
+                                        <CardDescription className="italic text-base mb-4">{`"${t.text}"`}</CardDescription>
+                                        <div className="flex gap-1">
+                                            {[...Array(5)].map((_, k) => (
+                                                <Star key={k} className="w-4 h-4 text-yellow-400" />
+                                            ))}
+                                        </div>
+                                    </CardHeader>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                </div>
+            </section>
 
-                <motion.div
-                  animate={{ rotate: [0, -5, 0] }}
-                  transition={{ duration: 5, repeat: Infinity }}
-                  className="absolute -bottom-6 -left-6 bg-pink-400 rounded-full p-4 shadow-lg"
-                >
-                  <Heart className="w-8 h-8 text-white" />
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </motion.section>
+            {/* FAQ Section */}
+            <section id="faq" className="py-20 px-6 bg-background">
+                <div className="max-w-7xl mx-auto">
+                    <motion.div {...fadeInUp} className="text-center mb-12">
+                        <h2 className="text-3xl font-bold text-foreground">Frequently Asked Questions</h2>
+                        <p className="text-muted-foreground mt-2">Short answers to common questions about privacy, pricing, and features.</p>
+                    </motion.div>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-6 bg-muted/30">
-        <div className="max-w-7xl mx-auto">
-          <motion.div {...fadeInUp} className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Everything you need to journal better
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Powerful features designed for your daily reflection
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={staggerChildren}
-            initial="initial"
-            whileInView="whileInView"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {features.map((feature, idx) => (
-              <motion.div
-                key={idx}
-                variants={fadeInUp}
-                whileHover={{ y: -10, scale: 1.02 }}
-              >
-                <Card className="h-full hover:shadow-xl transition-shadow">
-                  <CardHeader>
-                    <div className="bg-gradient-to-br from-primary to-secondary w-14 h-14 rounded-xl flex items-center justify-center mb-4">
-                      <feature.icon className="w-7 h-7 text-primary-foreground" />
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {faq.map((f, i) => (
+                            <div key={i} className="p-6 bg-background rounded-2xl shadow-md border border-transparent dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+                                <p className="font-semibold text-foreground mb-2">{f.q}</p>
+                                <p className="text-sm text-muted-foreground">{f.a}</p>
+                            </div>
+                        ))}
                     </div>
-                    <CardTitle>{feature.title}</CardTitle>
-                    <CardDescription className="text-base">{feature.desc}</CardDescription>
-                  </CardHeader>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+                </div>
+            </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div {...fadeInUp} className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Loved by journalers worldwide
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Join thousands who've transformed their journaling habit
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={staggerChildren}
-            initial="initial"
-            whileInView="whileInView"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {testimonials.map((testimonial, idx) => (
-              <motion.div
-                key={idx}
-                variants={fadeInUp}
-                whileHover={{ scale: 1.05 }}
-              >
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Heart key={i} className="w-5 h-5 fill-red-500 text-red-500" />
-                      ))}
+            {/* CTA Section */}
+            <section className="py-20 px-6">
+                <div className="max-w-4xl mx-auto bg-gradient-to-r from-green-400 to-blue-500 dark:from-green-600 dark:to-blue-600 rounded-3xl p-12 text-center shadow-2xl">
+                    <h2 className="text-4xl font-bold text-white mb-4">Start your spiritual habit today</h2>
+                    <p className="text-lg text-white/90 mb-8">Join 90,000+ people who trust Digital Diary to keep their prayers consistent and their reflections safe.</p>
+                    <div className="flex justify-center gap-4 flex-wrap">
+                        <Button size="lg" className="rounded-full shadow-xl text-lg bg-white text-green-600 hover:bg-green-50 transition">
+                            Get Started — Free
+                        </Button>
                     </div>
-                    <CardDescription className="text-base italic mb-4">
-                      "{testimonial.text}"
-                    </CardDescription>
-                    <div>
-                      <CardTitle className="text-base">{testimonial.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="bg-background border-t border-gray-200 dark:border-gray-700 py-10 px-6">
+                <div className="max-w-7xl mx-auto text-center text-muted-foreground">
+                    <p>© {new Date().getFullYear()} Digital Diary. All rights reserved.</p>
+                    <div className="flex justify-center gap-4 mt-4">
+                        <a href="#" className="hover:text-green-500 transition">Privacy</a>
+                        <a href="#" className="hover:text-green-500 transition">Terms</a>
+                        <a href="#" className="hover:text-green-500 transition">Contact</a>
                     </div>
-                  </CardHeader>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
+                </div>
+            </footer>
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-6">
-        <motion.div
-          {...fadeInUp}
-          className="max-w-4xl mx-auto bg-gradient-to-r from-primary to-secondary rounded-3xl p-12 text-center shadow-2xl"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-primary-foreground mb-6">
-            Start your journey today
-          </h2>
-          <p className="text-xl text-primary-foreground/90 mb-8">
-            Join 50,000+ people who trust Digital Diary with their thoughts
-          </p>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button size="lg" variant="secondary" className="rounded-full shadow-xl text-lg" onClick={handleSubmit}>
-              Get Started Free
-            </Button>
-          </motion.div>
-          <p className="text-primary-foreground/80 mt-4 text-sm">No credit card required • Free forever</p>
-        </motion.div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-muted py-12 px-6 border-t">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <img src="/logo.png" alt="Digital Diary Logo" className="w-6 h-6 rounded-full" />
-              <span className="text-xl font-bold">Digital Diary</span>
-            </div>
-            <p className="text-muted-foreground text-sm">Your private space for thoughts and reflections.</p>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Product</h4>
-            <div className="space-y-2 text-muted-foreground text-sm">
-              <p className="hover:text-foreground cursor-pointer transition">Features</p>
-              <p className="hover:text-foreground cursor-pointer transition">Pricing</p>
-              <p className="hover:text-foreground cursor-pointer transition">Security</p>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Company</h4>
-            <div className="space-y-2 text-muted-foreground text-sm">
-              <p className="hover:text-foreground cursor-pointer transition">About</p>
-              <p className="hover:text-foreground cursor-pointer transition">Blog</p>
-              <p className="hover:text-foreground cursor-pointer transition">Careers</p>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Support</h4>
-            <div className="space-y-2 text-muted-foreground text-sm">
-              <p className="hover:text-foreground cursor-pointer transition">Help Center</p>
-              <p className="hover:text-foreground cursor-pointer transition">Contact</p>
-              <p className="hover:text-foreground cursor-pointer transition">Privacy</p>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t text-center text-muted-foreground text-sm">
-          <p>© 2025 Digital Diary. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
-  );
+    );
 }

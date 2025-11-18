@@ -209,8 +209,8 @@ export default function ModernDashboard({ user }: { user: any }) {
 
           <div className="flex justify-between text-xs md:text-base md:gap-4">
             {[
+                { label: "On Time", value: overallStats.onTime, icon: Clock, bg: "bg-blue-100 dark:bg-blue-900/20", color: "text-blue-600" },
               { label: "Jamaat", value: overallStats.jamaat, icon: Target, bg: "bg-green-100 dark:bg-green-900/20", color: "text-green-600" },
-              { label: "On Time", value: overallStats.onTime, icon: Clock, bg: "bg-blue-100 dark:bg-blue-900/20", color: "text-blue-600" },
               { label: "Alone", value: overallStats.alone, icon: Activity, bg: "bg-yellow-100 dark:bg-yellow-900/20", color: "text-yellow-600" },
               { label: "Missed", value: overallStats.missed, icon: Sunset, bg: "bg-red-100 dark:bg-red-900/20", color: "text-red-600" },
               { label: "Success", value: successRate.toFixed(0) + "%", icon: Percent, bg: "bg-indigo-100 dark:bg-indigo-900/20", color: "text-indigo-600" },
@@ -257,8 +257,8 @@ export default function ModernDashboard({ user }: { user: any }) {
               {prayerData?.city}, {prayerData?.country}
             </div>
             <div className="flex items-center gap-1 md:gap-4">
-              <Badge variant="secondary" className="text-[10px] md:text-base px-2 py-1 bg-green-100  dark:bg-green-900/20 border border-green-400">Now: {currentPrayer}</Badge>
-              <Badge variant="outline" className="text-[10px] md:text-base px-2 py-1  bg-blue-100 dark:bg-blue-900/20 border-blue-400">Next: {nextPrayer} {countdown}</Badge>
+              <Badge variant="secondary" className="text-[10px] md:text-base px-2 py-1 bg-blue-100  dark:bg-blue-900/20 border border-blue-400">Now: {currentPrayer}</Badge>
+              <Badge variant="outline" className="text-[10px] md:text-base px-2 py-1  bg-green-100 dark:bg-green-900/20 border-green-400">Next: {nextPrayer} {countdown}</Badge>
             </div>
           </div>
 

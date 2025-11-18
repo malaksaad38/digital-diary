@@ -342,12 +342,10 @@ export default function PrayerTimes() {
         qazaDate.setHours(qh, qm, 0, 0);
 
         if (qazaDate.getTime() <= now.getTime()) {
-          setQazaCountdown('Time Over');
+          setQazaCountdown(countdown);
         } else {
           setQazaCountdown(calculateCountdown(qazaDate));
         }
-      } else {
-        setQazaCountdown('Time Over');
       }
     }
 
@@ -465,7 +463,7 @@ export default function PrayerTimes() {
                 {today[currentPrayer.toLowerCase()]}
               </p>
               <div className="p-3 border rounded-md">
-                <p className="text-xs text-muted-foreground">Qaza Time Remaining</p>
+                <p className="text-xs text-muted-foreground">Last Time (Intihaye Waqt)</p>
                 <p className="text-xl font-mono font-bold text-blue-700">{qazaCountdown}</p>
               </div>
             </CardContent>
@@ -484,7 +482,7 @@ export default function PrayerTimes() {
                 {today[nextPrayer.toLowerCase()]}
               </p>
               <div className="p-3 border rounded-md">
-                <p className="text-xs text-muted-foreground">Time Remaining</p>
+                <p className="text-xs text-muted-foreground">Time Remaining to {nextPrayer}</p>
                 <p className="text-xl font-mono font-bold text-green-700">{countdown}</p>
               </div>
             </CardContent>

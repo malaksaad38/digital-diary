@@ -101,7 +101,7 @@ export default function PrayerDiaryLanding() {
         <div className="min-h-screen bg-background text-foreground transition-colors relative">
 
             {/* Decorative pattern */}
-            <div className="absolute inset-0 bg-[url('/patterns/islamic-geo.svg')] opacity-10 dark:opacity-5 pointer-events-none"></div>
+            <div className="absolute inset-0 opacity-10 dark:opacity-5 pointer-events-none"></div>
 
             {/* Navigation */}
             <motion.nav

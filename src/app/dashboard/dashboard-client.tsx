@@ -217,9 +217,9 @@ export default function ModernDashboard({ user }: { user: any }) {
             ].map((stat) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.label} className={cn(stat.bg, "flex-1 mx-0.5 rounded p-2 md:p-4 text-center")}>
-                  <Icon className={cn("mx-auto w-4 h-4 mb-1", stat.color)} />
-                  <p className="font-bold">{stat.value}</p>
+                <div key={stat.label} className={cn(stat.bg, "relative flex-1 ga1 mx-0.5 rounded p-2 md:p-4")}>
+                  <Icon className={cn("mx-auto size-8 mb-1 absolute top-1 right-0 opacity-30", stat.color)} />
+                  <p className="font-bold text-xl">{stat.value}</p>
                   <p className="text-[10px] md:text-base text-muted-foreground">{stat.label}</p>
                 </div>
               );
@@ -272,7 +272,7 @@ export default function ModernDashboard({ user }: { user: any }) {
                 <div
                   key={p}
                   className={cn(
-                    "rounded p-2 text-center border transition",
+                    "rounded p-2 relative border transition",
                     isCurrent
                       ? "bg-blue-100 dark:bg-blue-900/20 border-blue-400"
                       : isNext
@@ -280,8 +280,8 @@ export default function ModernDashboard({ user }: { user: any }) {
                         : "bg-muted/40 border-transparent"
                   )}
                 >
-                  <Icon className={cn("mx-auto w-4 h-4 mb-1", isCurrent ? "text-blue-600" : isNext ? "text-green-600" : "text-muted-foreground")} />
-                  <p className="font-mono font-semibold">{time}</p>
+                  <Icon className={cn("mx-auto mb-1 absolute size-8 opacity-30 bottom-0 right-0", isCurrent ? "text-blue-600" : isNext ? "text-green-600" : "text-muted-foreground")} />
+                  <p className="font-mono font-semibold leading-tight tracking-tighter text-sm">{time}</p>
                   <p>{p}</p>
                 </div>
               );

@@ -73,13 +73,14 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch(() => {
                     // Try to get from cache
-                    return caches.match(request).then((cachedResponse) => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        }
-                        // Fallback to offline page
-                        return caches.match('/offline');
-                    });
+                    return caches.match('/offline');
+                    // return caches.match(request).then((cachedResponse) => {
+                    //     if (cachedResponse) {
+                    //         return cachedResponse;
+                    //     }
+                    //     // Fallback to offline page
+                    //     return caches.match('/offline');
+                    // });
                 })
         );
         return;

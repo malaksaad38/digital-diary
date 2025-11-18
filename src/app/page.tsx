@@ -124,7 +124,6 @@ export default function DiaryLanding() {
 
       {/* Hero Section */}
       <motion.section
-        style={{ opacity: heroOpacity, scale: heroScale }}
         className="pt-32 pb-20 px-6"
       >
         <div className="max-w-7xl mx-auto">

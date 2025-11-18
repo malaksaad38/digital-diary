@@ -31,7 +31,7 @@ export default function Navbar({ user }: { user: any }) {
   const pathname = usePathname();
 
   const pageNameMap: Record<string, string> = {
-    "/dashboard": "Dashboard",
+    "/dashboard": "Home",
     "/dashboard/entry": "Entry",
     "/dashboard/diary": "Diary",
     "/dashboard/analytics": "Analytics",
@@ -130,15 +130,12 @@ export default function Navbar({ user }: { user: any }) {
 
             {/* RIGHT — Profile + Theme + Hijri */}
             <div className="flex items-center justify-end gap-2">
-              {/* User Profile */}
-
-
               {/* Theme Toggle */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                className="h-6 w-6 p-0 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 border-0 transition-all duration-200 active:scale-90"
+                className="h-7 w-7 p-0 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 border-0 transition-all duration-200 active:scale-90"
                 aria-label="Toggle theme"
               >
                 {theme === "light" ? (
@@ -150,7 +147,7 @@ export default function Navbar({ user }: { user: any }) {
 
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className="flex items-center justify-center h-6 w-6 rounded-full overflow-hidden border border-foreground/10 transition-all duration-200 active:scale-90">
+                  <button className="flex items-center justify-center h-7 w-7 rounded-full overflow-hidden border border-foreground/10 transition-all duration-200 active:scale-90">
                     <div className="relative w-full h-full">
                       <Image
                         src={user?.image || "/default-avatar.png"}

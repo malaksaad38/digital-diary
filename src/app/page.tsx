@@ -176,9 +176,6 @@ export default function PrayerDiaryLanding() {
                             <Button size="lg" className="rounded-full shadow-2xl text-lg bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-400 text-white" onClick={handleSubmit}>
                                 Start Your Journey <ChevronRight className="w-5 h-5 ml-2" />
                             </Button>
-                            <Button size="lg" variant="outline" className="rounded-full text-lg border-blue-500 dark:border-green-400 text-blue-500 dark:text-white hover:bg-blue-500 dark:hover:bg-green-400 hover:text-white transition">
-                                Watch Demo
-                            </Button>
                         </div>
 
                         <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">

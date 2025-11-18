@@ -1,13 +1,21 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import PWAInstallPrompt from '@/components/pwa-install-prompt';
 import {Toaster} from "sonner";
 import QueryProvider from "@/providers/query-provider";
 import {ThemeProvider} from "next-themes";
+import { Geist, Geist_Mono } from "next/font/google";
 import PWAStatus from "@/components/pwa-status";
 
-const inter = Inter({ subsets: ['latin'] });
+const geistSans = Geist({
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
     title: 'Digital Diary - Prayer Tracker & Spiritual Journal',
@@ -72,7 +80,7 @@ export default function RootLayout({
             <meta name="apple-mobile-web-app-title" content="Digital Diary" />
             <meta name="mobile-web-app-capable" content="yes" />
         </head>
-        <body className={inter.className}>
+        <body  className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"

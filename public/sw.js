@@ -1,122 +1,122 @@
-const CACHE_NAME = 'digital-diary-v1';
-const RUNTIME_CACHE = 'digital-diary-runtime';
+const CACHE_NAME = "digital-diary-v1";
+const RUNTIME_CACHE = "digital-diary-runtime";
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
-    '/',
-    '/login',
-    '/dashboard',
-    '/offline',
-    '/manifest.json',
-    '/icons/icon-192x192.png',
-    '/icons/icon-512x512.png',
+    "/",
+    "/login",
+    "/dashboard",
+    "/offline",
+    "/manifest.json",
+    "/icons/icon-192x192.png",
+    "/icons/icon-512x512.png"
 ];
 
-// Install event - cache essential assets
-self.addEventListener('install', (event) => {
+
+// ------------------------
+// INSTALL
+// ------------------------
+self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(PRECACHE_ASSETS);
-        })
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
     );
     self.skipWaiting();
 });
 
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+
+// ------------------------
+// ACTIVATE
+// ------------------------
+self.addEventListener("activate", (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames
-                    .filter((name) => name !== CACHE_NAME && name !== RUNTIME_CACHE)
-                    .map((name) => caches.delete(name))
-            );
-        })
+        caches.keys().then((keys) =>
+            Promise.all(
+                keys
+                    .filter((k) => k !== CACHE_NAME && k !== RUNTIME_CACHE)
+                    .map((k) => caches.delete(k))
+            )
+        )
     );
     self.clients.claim();
 });
 
-// Fetch event - network first, fallback to cache
-self.addEventListener('fetch', (event) => {
+
+// ------------------------
+// FETCH HANDLING
+// MOST IMPORTANT PART
+// ------------------------
+self.addEventListener("fetch", (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // Skip cross-origin requests
-    if (url.origin !== self.location.origin) {
-        return;
-    }
+    // Ignore cross-origin
+    if (url.origin !== self.location.origin) return;
 
-    // API requests - network only
-    if (url.pathname.startsWith('/api/')) {
+    // API → network only
+    if (url.pathname.startsWith("/api/")) {
         event.respondWith(
             fetch(request).catch(() => {
                 return new Response(
-                    JSON.stringify({ error: 'Offline', offline: true }),
-                    { headers: { 'Content-Type': 'application/json' } }
+                    JSON.stringify({ error: "Offline", offline: true }),
+                    { headers: { "Content-Type": "application/json" } }
                 );
             })
         );
         return;
     }
 
-    // For navigation requests
-    if (request.mode === 'navigate') {
+    // ------------------------------------------------------------
+    // NAVIGATION REQUESTS (Fixes Next.js Server Error when offline)
+    // ------------------------------------------------------------
+    if (request.mode === "navigate") {
         event.respondWith(
-            fetch(request)
-                .then((response) => {
-                    // Clone and cache the response
-                    const responseClone = response.clone();
-                    caches.open(RUNTIME_CACHE).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
-                    return response;
-                })
-                .catch(() => {
-                    // Try to get from cache
-                   return  caches.match('/offline');
-                    // return caches.match(request).then((cachedResponse) => {
-                    //     if (cachedResponse) {
-                    //         return cachedResponse;
-                    //     }
-                    //     // Fallback to offline page
-                    //     return caches.match('/offline');
-                    // });
-                })
+            (async () => {
+                try {
+                    // Try network first
+                    const networkResponse = await fetch(request);
+
+                    // Save fresh version in background
+                    const cache = await caches.open(RUNTIME_CACHE);
+                    cache.put(request, networkResponse.clone());
+
+                    return networkResponse;
+                } catch (err) {
+                    // If offline → return offline page
+                    const offlinePage = await caches.match("/offline");
+                    if (offlinePage) return offlinePage;
+
+                    // Safety fallback
+                    return new Response(
+                        "<h1>You Are Offline</h1><p>No cached version available.</p>",
+                        { headers: { "Content-Type": "text/html" } }
+                    );
+                }
+            })()
         );
         return;
     }
 
-    // For all other requests - cache first, then network
+    // ------------------------------------------------------------
+    // OTHER STATIC FILES → Cache First
+    // ------------------------------------------------------------
     event.respondWith(
-        caches.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-                // Return cached version and update in background
-                event.waitUntil(
-                    fetch(request).then((response) => {
-                        caches.open(RUNTIME_CACHE).then((cache) => {
-                            cache.put(request, response);
-                        });
-                    })
-                );
-                return cachedResponse;
-            }
+        caches.match(request).then((cached) => {
+            if (cached) return cached;
 
-            // Not in cache, fetch from network
             return fetch(request)
                 .then((response) => {
-                    // Cache the new response
-                    const responseClone = response.clone();
-                    caches.open(RUNTIME_CACHE).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
+                    const clone = response.clone();
+                    caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
                     return response;
                 })
                 .catch(() => {
-                    // If it's an image, return a placeholder
-                    if (request.destination === 'image') {
+                    // Image placeholder if offline
+                    if (request.destination === "image") {
                         return new Response(
-                            '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#e5e7eb"/></svg>',
-                            { headers: { 'Content-Type': 'image/svg+xml' } }
+                            `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+                                <rect width="200" height="200" fill="#e5e7eb"/>
+                             </svg>`,
+                            { headers: { "Content-Type": "image/svg+xml" } }
                         );
                     }
                 });
@@ -124,59 +124,64 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-// Background sync for prayer entries
-self.addEventListener('sync', (event) => {
-    if (event.tag === 'sync-prayers') {
+
+
+// ------------------------
+// BACKGROUND SYNC
+// ------------------------
+self.addEventListener("sync", (event) => {
+    if (event.tag === "sync-prayers") {
         event.waitUntil(syncPrayers());
     }
 });
 
 async function syncPrayers() {
     try {
-        // Get pending prayers from IndexedDB and sync
-        const response = await fetch('/api/prayers/sync', {
-            method: 'POST',
-        });
+        const response = await fetch("/api/prayers/sync", { method: "POST" });
         return response;
-    } catch (error) {
-        console.error('Sync failed:', error);
-        throw error;
+    } catch (err) {
+        console.error("Sync failed:", err);
+        throw err;
     }
 }
 
-// Push notifications
-self.addEventListener('push', (event) => {
+
+
+// ------------------------
+// PUSH NOTIFICATIONS
+// ------------------------
+self.addEventListener("push", (event) => {
     const data = event.data ? event.data.json() : {};
+
     const options = {
-        body: data.body || 'Time for prayer',
-        icon: '/icons/icon-192x192.png',
-        badge: '/icons/icon-72x72.png',
+        body: data.body || "Time for prayer",
+        icon: "/icons/icon-192x192.png",
+        badge: "/icons/icon-72x72.png",
         vibrate: [200, 100, 200],
-        data: data,
+        data,
         actions: [
-            { action: 'mark-prayed', title: 'Mark as Prayed' },
-            { action: 'snooze', title: 'Remind Later' },
-        ],
+            { action: "mark-prayed", title: "Mark as Prayed" },
+            { action: "snooze", title: "Remind Later" }
+        ]
     };
 
     event.waitUntil(
-        self.registration.showNotification(data.title || 'Prayer Time', options)
+        self.registration.showNotification(data.title || "Prayer Time", options)
     );
 });
 
-// Notification click handler
-self.addEventListener('notificationclick', (event) => {
+
+// ------------------------
+// NOTIFICATION CLICK
+// ------------------------
+self.addEventListener("notificationclick", (event) => {
     event.notification.close();
 
-    if (event.action === 'mark-prayed') {
-        event.waitUntil(
-            clients.openWindow('/dashboard?action=mark-prayed')
-        );
-    } else if (event.action === 'snooze') {
-        // Handle snooze
+    if (event.action === "mark-prayed") {
+        event.waitUntil(clients.openWindow("/dashboard?action=mark-prayed"));
+    } else if (event.action === "snooze") {
+        // handle snooze later
     } else {
-        event.waitUntil(
-            clients.openWindow('/dashboard')
-        );
+        event.waitUntil(clients.openWindow("/dashboard"));
     }
 });

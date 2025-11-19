@@ -73,7 +73,7 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch(() => {
                     // Try to get from cache
-                    caches.match('/offline');
+                   return  caches.match('/offline');
                     // return caches.match(request).then((cachedResponse) => {
                     //     if (cachedResponse) {
                     //         return cachedResponse;

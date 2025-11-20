@@ -34,6 +34,7 @@ import {
   DialogDescription
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import FallbackLoading from "@/components/LoadingStates";
 
 export default function PrayerTimes() {
   const [prayerData, setPrayerData] = useState(null);
@@ -363,9 +364,8 @@ export default function PrayerTimes() {
 
   if (loading)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" />
-        <p className="text-xl">Prayer times Loading...</p>
+      <div>
+          <FallbackLoading />
       </div>
     );
 

@@ -238,7 +238,7 @@ export default function DiaryForm({ session }: any) {
   };
 
   return (
-    <Card id={"diary"} className="max-w-4xl mx-auto mt-4 sm:mt-8 shadow-lg border-border/50">
+    <Card id={"diary"} className="max-w-4xl mx-auto shadow-lg border-border/50">
       <CardHeader className="space-y-1 pb-4">
         <CardTitle className="text-center text-xl sm:text-2xl font-bold flex items-center justify-center gap-2">
           <BookOpen className="h-6 w-6" />

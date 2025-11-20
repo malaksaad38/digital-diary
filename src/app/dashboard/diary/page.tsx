@@ -1,4 +1,4 @@
-// app/dashboard/diary/page.tsx
+// app/dashboard/diary/landing-client.tsx
 import DiaryListClient from "@/components/diary/DiaryListClient";
 
 export default function PrayerDiaryPage() {

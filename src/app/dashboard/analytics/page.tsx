@@ -1,4 +1,4 @@
-// app/dashboard/analytics/page.tsx
+// app/dashboard/analytics/landing-client.tsx
 "use client";
 
 import React from "react";

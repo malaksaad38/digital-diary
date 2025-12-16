@@ -7,9 +7,8 @@ import {Separator} from "@/components/ui/separator";
 const EntryForm = async () => {
     const session = await auth();
   return (
-    <div className={"p-4 space-y-4"}>
+    <div className={"flex flex-col md:flex-row px-4 gap-6 mb-3"}>
       <PrayerForm session={session} />
-        <Separator/>
       <DiaryForm session={session} />
     </div>
   )

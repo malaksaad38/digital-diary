@@ -11,7 +11,7 @@ export default function LoginPage() {
     signIn("google", { callbackUrl: "/dashboard" });
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted/40 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted/40 px-4 backdrop-blur-2xl">
 
       <motion.div
         initial={{ opacity: 0, y: 25 }}

@@ -164,7 +164,7 @@ export default function ModernDashboard({ user }: { user: any }) {
   const icons = { Fajr: Sunrise, Dhuhr: Sun, Asr: CloudSun, Maghrib: Sunset, Isha: Moon };
 
   return (
-    <div className="bg-background px-4 py-4 md:px-10 md:py-10 max-w-5xl mx-auto space-y-6">
+    <div className="bg-background px-4 py-4  md:py-10 max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-2 md:flex-row justify-between">
         <div className="">
@@ -219,7 +219,7 @@ export default function ModernDashboard({ user }: { user: any }) {
               return (
                 <div key={stat.label} className={cn(stat.bg, "relative flex-1 ga1 mx-0.5 rounded p-2 md:p-4")}>
                   <Icon className={cn("mx-auto size-8 mb-1 absolute top-1 right-0 opacity-10", stat.color)} />
-                  <p className="font-bold text-xl">{stat.value}</p>
+                  <p className="font-bold text-base">{stat.value}</p>
                   <p className="text-[10px] md:text-base text-muted-foreground">{stat.label}</p>
                 </div>
               );

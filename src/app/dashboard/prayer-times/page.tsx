@@ -356,6 +356,7 @@ export default function PrayerTimes() {
 
   const prayers = [
     { name: 'Fajr', key: 'fajr', icon: Sunrise },
+    { name: 'Ishraq', key: 'shurooq', icon: Sunrise },
     { name: 'Dhuhr', key: 'dhuhr', icon: Sun },
     { name: 'Asr', key: 'asr', icon: CloudSun },
     { name: 'Maghrib', key: 'maghrib', icon: Sunset },
@@ -494,7 +495,7 @@ export default function PrayerTimes() {
             <CardTitle>Today's Schedule</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {prayers.map((p) => {
                 const Icon = p.icon;
                 const isCurrent = currentPrayer === p.name;
@@ -528,13 +529,6 @@ export default function PrayerTimes() {
                 );
               })}
             </div>
-
-            <div className="mt-6 pt-4 border-t flex justify-center">
-              <div className="flex items-center gap-2 text-sm">
-                <Sunrise className="w-4 h-4 text-orange-500" /> Sunrise (Shurooq):
-                <span className="font-mono font-semibold">{today.shurooq}</span>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
@@ -558,9 +552,9 @@ export default function PrayerTimes() {
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 text-center text-sm">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-sm">
                   {prayers.map((p) => (
-                    <div key={p.key}>
+                    <div className={'space-y-1'} key={p.key}>
                       <p className="text-xs text-muted-foreground">{p.name}</p>
                       <p className="font-mono font-semibold">{day[p.key]}</p>
                     </div>
@@ -571,13 +565,11 @@ export default function PrayerTimes() {
           </CardContent>
         </Card>
 
-        <div className="flex flex-col items-center gap-3 pb-8">
+        <div className="flex flex-col items-center gap-3">
           <Button variant="outline" onClick={() => fetchPrayerTimes(true, true)}>
-            <RefreshCw className="w-4 h-4 mr-2" /> Refresh from API
+            <RefreshCw className="w-4 h-4 mr-2" /> Refresh
           </Button>
-          {isFromCache && (
-            <p className="text-xs text-muted-foreground">Loaded from cache</p>
-          )}
+
         </div>
       </div>
     </div>

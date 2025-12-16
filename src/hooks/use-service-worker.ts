@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 
 interface ServiceWorkerState {
     isSupported: boolean;
@@ -20,7 +20,7 @@ export function useServiceWorker() {
     useEffect(() => {
         // Check if service workers are supported
         if ('serviceWorker' in navigator) {
-            setState((prev) => ({ ...prev, isSupported: true }));
+            setState((prev) => ({...prev, isSupported: true}));
 
             // Register service worker
             navigator.serviceWorker
@@ -42,7 +42,7 @@ export function useServiceWorker() {
                                     newWorker.state === 'installed' &&
                                     navigator.serviceWorker.controller
                                 ) {
-                                    setState((prev) => ({ ...prev, needsUpdate: true }));
+                                    setState((prev) => ({...prev, needsUpdate: true}));
                                 }
                             });
                         }
@@ -64,8 +64,8 @@ export function useServiceWorker() {
         }
 
         // Monitor online/offline status
-        const handleOnline = () => setState((prev) => ({ ...prev, isOnline: true }));
-        const handleOffline = () => setState((prev) => ({ ...prev, isOnline: false }));
+        const handleOnline = () => setState((prev) => ({...prev, isOnline: true}));
+        const handleOffline = () => setState((prev) => ({...prev, isOnline: false}));
 
         window.addEventListener('online', handleOnline);
         window.addEventListener('offline', handleOffline);
@@ -78,37 +78,13 @@ export function useServiceWorker() {
 
     const updateServiceWorker = () => {
         if (state.registration) {
-            state.registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+            state.registration.waiting?.postMessage({type: 'SKIP_WAITING'});
         }
     };
 
-    const requestNotificationPermission = async () => {
-        if ('Notification' in window) {
-            const permission = await Notification.requestPermission();
-            return permission === 'granted';
-        }
-        return false;
-    };
-
-    const subscribeToPushNotifications = async () => {
-        if (!state.registration) return null;
-
-        try {
-            const subscription = await state.registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-            });
-            return subscription;
-        } catch (error) {
-            console.error('Failed to subscribe to push notifications:', error);
-            return null;
-        }
-    };
 
     return {
         ...state,
         updateServiceWorker,
-        requestNotificationPermission,
-        subscribeToPushNotifications,
     };
 }

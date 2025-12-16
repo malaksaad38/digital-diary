@@ -65,7 +65,7 @@ const nextConfig = {
     turbopack: {},
 
     // Keep webpack config for production builds
-    webpack: (config, { isServer }) => {
+    webpack: (config:any, { isServer }:any) => {
         if (!isServer) {
             config.resolve.fallback = {
                 ...config.resolve.fallback,

@@ -42,9 +42,6 @@ self.addEventListener("activate", (event) => {
 
 
 // ------------------------
-// FETCH HANDLING
-// MOST IMPORTANT PART
-// ------------------------
 self.addEventListener("fetch", (event) => {
     const {request} = event;
     const url = new URL(request.url);
@@ -98,52 +95,3 @@ self.addEventListener("fetch", (event) => {
 
 });
 
-async function syncPrayers() {
-    try {
-        const response = await fetch("/api/prayers/sync", {method: "POST"});
-        return response;
-    } catch (err) {
-        console.error("Sync failed:", err);
-        throw err;
-    }
-}
-
-
-// ------------------------
-// PUSH NOTIFICATIONS
-// ------------------------
-self.addEventListener("push", (event) => {
-    const data = event.data ? event.data.json() : {};
-
-    const options = {
-        body: data.body || "Time for prayer",
-        icon: "/icons/icon-192x192.png",
-        badge: "/icons/icon-72x72.png",
-        vibrate: [200, 100, 200],
-        data,
-        actions: [
-            {action: "mark-prayed", title: "Mark as Prayed"},
-            {action: "snooze", title: "Remind Later"}
-        ]
-    };
-
-    event.waitUntil(
-        self.registration.showNotification(data.title || "Prayer Time", options)
-    );
-});
-
-
-// ------------------------
-// NOTIFICATION CLICK
-// ------------------------
-self.addEventListener("notificationclick", (event) => {
-    event.notification.close();
-
-    if (event.action === "mark-prayed") {
-        event.waitUntil(clients.openWindow("/dashboard?action=mark-prayed"));
-    } else if (event.action === "snooze") {
-        // handle snooze later
-    } else {
-        event.waitUntil(clients.openWindow("/dashboard"));
-    }
-});

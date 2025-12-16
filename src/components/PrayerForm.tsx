@@ -20,7 +20,6 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {useCreatePrayer, usePrayerByDate, useUpdatePrayer} from "@/hooks/use-prayer-queries";
-import {MobileFallbackLoading} from "@/components/LoadingStates";
 import {motion} from "framer-motion";
 
 export default function PrayerForm({session}: any) {
@@ -296,16 +295,16 @@ export default function PrayerForm({session}: any) {
                     {isLoading ? (
                         <div className="text-center py-8 text-muted-foreground">
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                                initial={{opacity: 0, scale: 0.95}}
+                                animate={{opacity: 1, scale: 1}}
+                                transition={{duration: 0.3, ease: [0.25, 0.1, 0.25, 1]}}
                                 className="flex flex-col items-center gap-4 p-8"
                             >
                                 {/* iPhone-style minimal spinner */}
                                 <div className="relative w-16 h-16">
                                     <motion.div
-                                        animate={{ rotate: 360 }}
-                                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                        animate={{rotate: 360}}
+                                        transition={{duration: 1, repeat: Infinity, ease: "linear"}}
                                         className="absolute inset-0"
                                     >
                                         <svg
@@ -335,9 +334,9 @@ export default function PrayerForm({session}: any) {
                                 </div>
 
                                 <motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
+                                    initial={{opacity: 0}}
+                                    animate={{opacity: 1}}
+                                    transition={{delay: 0.2}}
                                     className="text-sm font-medium text-muted-foreground"
                                 >
                                     Loading prayer data...

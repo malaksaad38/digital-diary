@@ -4,16 +4,12 @@ import PWAInstallPrompt from '@/components/pwa-install-prompt';
 import {Toaster} from "sonner";
 import QueryProvider from "@/providers/query-provider";
 import {ThemeProvider} from "next-themes";
-import {Geist, Geist_Mono} from "next/font/google";
+import {Inter} from "next/font/google";
 import PWAStatus from "@/components/pwa-status";
 
-const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
+const inter = Inter({
+    variable: "--font-inter",
     subsets: ["latin"],
 });
 
@@ -34,7 +30,6 @@ export const metadata: Metadata = {
     icons: {
         icon: [
             {url: '/icons/icon-192x192.png'},
-            {url: '/icons/icon-512x512.png', sizes: '512x512'},
         ],
     },
 };
@@ -63,7 +58,7 @@ export default function RootLayout({
             <meta name="apple-mobile-web-app-title" content="Digital Diary"/>
             <meta name="mobile-web-app-capable" content="yes"/>
         </head>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body className={`${inter.variable} font-inter antialiased`}>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"

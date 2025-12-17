@@ -93,18 +93,3 @@ self.addEventListener("fetch", (event) => {
 
 });
 
-self.addEventListener("sync", (event) => {
-    if (event.tag === "sync-prayers") {
-        event.waitUntil(syncPrayers());
-    }
-});
-
-async function syncPrayers() {
-    try {
-        const response = await fetch("/api/prayers/sync", { method: "POST" });
-        return response;
-    } catch (err) {
-        console.error("Sync failed:", err);
-        throw err;
-    }
-}

@@ -61,8 +61,10 @@ export default function OfflinePage() {
                         disabled={!isOnline}
                         className="w-full bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-400 text-white"
                     >
-                        <RefreshCw className={`w-4 h-4 mr-2 ${!isOnline ? 'animate-spin' : ''}`} />
-                        {isOnline ? 'Reload Page' : 'Waiting for Connection...'}
+                        {/*<RefreshCw className={`w-4 h-4 mr-2 ${!isOnline ? 'animate-spin' : ''}`} />*/}
+                        <RefreshCw className={`w-4 h-4 mr-2 `} />
+                        {/*{isOnline ? 'Reload Page' : 'Waiting for Connection...'}*/}
+                        Refresh
                     </Button>
 
                     <div className="text-xs text-muted-foreground">

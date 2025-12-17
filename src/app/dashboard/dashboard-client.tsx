@@ -2,20 +2,20 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Sunrise,
-  Sunset,
-  Plus,
-  BookOpen,
-  Clock,
-  ArrowRight,
-  Target,
-  Moon,
-  Sun,
-  CloudSun,
-  Activity,
-  RefreshCw,
-  MapPin,
-  Percent,
+    Sunrise,
+    Sunset,
+    Plus,
+    BookOpen,
+    Clock,
+    ArrowRight,
+    Target,
+    Moon,
+    Sun,
+    CloudSun,
+    Activity,
+    RefreshCw,
+    MapPin,
+    Percent, Calendar, Calendar1, CalendarDays,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -221,10 +221,24 @@ export default function ModernDashboard({ user }: { user: any }) {
                   <Icon className={cn("mx-auto size-8 mb-1 absolute top-1 right-0 opacity-10", stat.color)} />
                   <p className="font-bold text-base">{stat.value}</p>
                   <p className="text-[10px] md:text-base text-muted-foreground">{stat.label}</p>
+
                 </div>
               );
             })}
           </div>
+            <div className="flex justify-between mt-4 pt-4 border-t text-[10px]  md:text-base">
+                <div className="flex items-center gap-2">
+                    <CalendarDays className="w-4 h-4 text-blue-500" />
+                    <span className="text-muted-foreground">Total Days</span>
+                    <span className="font-mono font-semibold">{overallStats.total/5}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-cyan-500" />
+                    <span className="text-muted-foreground">Total Prayers</span>
+                    <span className="font-mono font-semibold">{overallStats.total}</span>
+                </div>
+            </div>
+
         </CardContent>
       </Card>
 
@@ -232,7 +246,7 @@ export default function ModernDashboard({ user }: { user: any }) {
       <Card className="shadow-md py-2 md:py-6 pb-1">
         <CardContent className="p-3 md:p-6">
           <div className="flex justify-between items-center mb-2">
-            <p className="font-semibold text-sm md:text-base">Today's Prayer Times</p>
+            <p className="font-semibold text-sm md:text-base">Prayer Times</p>
             <div className="flex items-center gap-1 md:gap-4">
               <Button
                 size="sm"

@@ -26,7 +26,6 @@ export function useServiceWorker() {
             navigator.serviceWorker
                 .register('/sw.js')
                 .then((registration) => {
-                    console.log('Service Worker registered:', registration);
                     setState((prev) => ({
                         ...prev,
                         isRegistered: true,

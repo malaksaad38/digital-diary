@@ -164,7 +164,7 @@ export default function ModernDashboard({ user }: { user: any }) {
   const icons = { Fajr: Sunrise, Dhuhr: Sun, Asr: CloudSun, Maghrib: Sunset, Isha: Moon };
 
   return (
-    <div className="bg-background px-4 py-4  md:py-10 max-w-4xl mx-auto space-y-6">
+    <div className="bg-background px-4 md:py-10 max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-2 md:flex-row justify-between">
         <div className="">

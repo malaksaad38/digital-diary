@@ -1,16 +1,13 @@
 const CACHE_NAME = "digital-diary-v1";
-const RUNTIME_CACHE = "digital-diary-runtime";
 
-// Assets to cache on install
+// Files to cache
 const PRECACHE_ASSETS = [
     "/",
     "/login",
     "/dashboard",
-    "/offline",
     "/manifest.json",
-    "/icons/icon-192x192.png"
+    "/icons/icon-192x192.png",
 ];
-
 
 // ------------------------
 // INSTALL
@@ -22,7 +19,6 @@ self.addEventListener("install", (event) => {
     self.skipWaiting();
 });
 
-
 // ------------------------
 // ACTIVATE
 // ------------------------
@@ -30,66 +26,56 @@ self.addEventListener("activate", (event) => {
     event.waitUntil(
         caches.keys().then((keys) =>
             Promise.all(
-                keys
-                    .filter((k) => k !== CACHE_NAME && k !== RUNTIME_CACHE)
-                    .map((k) => caches.delete(k))
+                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
             )
         )
     );
     self.clients.claim();
 });
 
-
+// ------------------------
+// FETCH
 // ------------------------
 self.addEventListener("fetch", (event) => {
-    const {request} = event;
-    const url = new URL(request.url);
+    const { request } = event;
+
+    // Ignore non-GET requests
+    if (request.method !== "GET") return;
 
     // Ignore cross-origin
-    if (url.origin !== self.location.origin) return;
+    if (!request.url.startsWith(self.location.origin)) return;
 
-    // API → network only
-    if (url.pathname.startsWith("/api/")) {
+    // ------------------------
+    // NAVIGATION (pages)
+    // Network → Cache → Fallback
+    // ------------------------
+    if (request.mode === "navigate") {
         event.respondWith(
-            fetch(request).catch(() => {
-                return new Response(
-                    JSON.stringify({error: "Offline", offline: true}),
-                    {headers: {"Content-Type": "application/json"}}
-                );
-            })
+            fetch(request)
+                .then((response) => {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+                    return response;
+                })
+                .catch(() => caches.match(request) || caches.match("/"))
         );
         return;
     }
 
-    // ------------------------------------------------------------
-    // NAVIGATION REQUESTS (Fixes Next.js Server Error when offline)
-    // ------------------------------------------------------------
-    if (request.mode === "navigate") {
-        event.respondWith(
-            (async () => {
-                try {
-                    // Try network first
-                    const networkResponse = await fetch(request);
-
-                    // Save fresh version in background
-                    const cache = await caches.open(RUNTIME_CACHE);
-                    cache.put(request, networkResponse.clone());
-
-                    return networkResponse;
-                } catch (err) {
-                    // If offline → return offline page
-                    const offlinePage = await caches.match("/offline");
-                    if (offlinePage) return offlinePage;
-
-                    // Safety fallback
-                    return new Response(
-                        "<h1>You Are Offline</h1><p>No cached version available.</p>",
-                        {headers: {"Content-Type": "text/html"}}
-                    );
-                }
-            })()
-        );
-    }
-
+    // ------------------------
+    // STATIC FILES
+    // Cache → Network
+    // ------------------------
+    event.respondWith(
+        caches.match(request).then((cached) => {
+            return (
+                cached ||
+                fetch(request).then((response) => {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+                    return response;
+                })
+            );
+        })
+    );
 });
-

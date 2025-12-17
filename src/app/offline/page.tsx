@@ -58,7 +58,6 @@ export default function OfflinePage() {
 
                     <Button
                         onClick={handleRetry}
-                        disabled={!isOnline}
                         className="w-full bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-400 text-white"
                     >
                         {/*<RefreshCw className={`w-4 h-4 mr-2 ${!isOnline ? 'animate-spin' : ''}`} />*/}

@@ -1,6 +1,6 @@
-const CACHE_NAME = "digital-diary-v1";
+const CACHE_NAME = "digital-diary-v2"; // Increment version to update old caches
 
-// Files to cache
+// Files to pre-cache
 const PRECACHE_ASSETS = [
     "/",
     "/login",
@@ -26,7 +26,9 @@ self.addEventListener("activate", (event) => {
     event.waitUntil(
         caches.keys().then((keys) =>
             Promise.all(
-                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+                keys
+                    .filter((key) => key !== CACHE_NAME)
+                    .map((key) => caches.delete(key))
             )
         )
     );
@@ -39,15 +41,35 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
     const { request } = event;
 
-    // Ignore non-GET requests
+    // Only handle GET requests
     if (request.method !== "GET") return;
 
-    // Ignore cross-origin
+    // Only handle same-origin requests
     if (!request.url.startsWith(self.location.origin)) return;
 
+    const url = new URL(request.url);
+
     // ------------------------
-    // NAVIGATION (pages)
-    // Network → Cache → Fallback
+    // API requests (dynamic data)
+    // Network first → update cache → fallback
+    // ------------------------
+    if (url.pathname.startsWith("/api/")) {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    // Update cache
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+                    return response;
+                })
+                .catch(() => caches.match(request))
+        );
+        return;
+    }
+
+    // ------------------------
+    // Navigation requests (HTML pages)
+    // Network first → cache → fallback to home page
     // ------------------------
     if (request.mode === "navigate") {
         event.respondWith(
@@ -63,8 +85,8 @@ self.addEventListener("fetch", (event) => {
     }
 
     // ------------------------
-    // STATIC FILES
-    // Cache → Network
+    // Static assets
+    // Cache first → network fallback → update cache
     // ------------------------
     event.respondWith(
         caches.match(request).then((cached) => {

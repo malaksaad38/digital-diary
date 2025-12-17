@@ -26,7 +26,7 @@ import ButtonLogout from "@/components/ButtonLogout";
 import {PieChart} from "recharts";
 
 export default function Navbar({ user }: { user: any }) {
-  const [time, setTime] = useState(new Date());
+    const [time, setTime] = useState<Date | null>(null)
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
@@ -41,10 +41,12 @@ export default function Navbar({ user }: { user: any }) {
   const currentPage =
     pageNameMap[pathname] || pathname.split("/").pop()?.toUpperCase();
 
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+    useEffect(() => {
+        setTime(new Date()) // runs only on client
+        const timer = setInterval(() => setTime(new Date()), 1000)
+        return () => clearInterval(timer)
+    }, [])
+    if (!time) return null
 
   return (
     <>

@@ -92,36 +92,7 @@ self.addEventListener("fetch", (event) => {
     }
 
 });
-// ------------------------------------------------------------
-// OTHER STATIC FILES → Cache First
-// ------------------------------------------------------------
-event.respondWith(
-    caches.match(request).then((cached) => {
-        if (cached) return cached;
 
-        return fetch(request)
-            .then((response) => {
-                const clone = response.clone();
-                caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
-                return response;
-            })
-            .catch(() => {
-                // Image placeholder if offline
-                if (request.destination === "image") {
-                    return new Response(
-                        `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
-                                <rect width="200" height="200" fill="#e5e7eb"/>
-                             </svg>`,
-                        { headers: { "Content-Type": "image/svg+xml" } }
-                    );
-                }
-            });
-    })
-)
-
-// ------------------------
-// BACKGROUND SYNC
-// ------------------------
 self.addEventListener("sync", (event) => {
     if (event.tag === "sync-prayers") {
         event.waitUntil(syncPrayers());

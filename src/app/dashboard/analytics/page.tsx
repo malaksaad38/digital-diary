@@ -532,7 +532,7 @@ export default function PrayerAnalyticsDashboard() {
                         <CardContent className="flex justify-center items-center p-1.5">
                             {isLoading ? (
                                 <div
-                                    className="w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[210px] flex items-center justify-center">
+                                    className="w-full max-w-[300px] sm:max-w-[320px] h-[180px] sm:h-[210px] flex items-center justify-center">
                                     <Loader2 className="h-8 w-8 animate-spin text-primary"/>
                                 </div>
                             ) : (
@@ -544,9 +544,8 @@ export default function PrayerAnalyticsDashboard() {
                                         onTime: {label: "On Time", color: statusColors["on time"]},
                                         // notSelected: { label: "Not Selected", color: statusColors["not selected"] },
                                     }}
-                                    className="w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[210px]"
+                                    className="w-full max-w-[300px] sm:max-w-[320px] h-[180px] sm:h-[210px]"
                                 >
-                                    <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
                                                 data={overallChartData}
@@ -564,7 +563,6 @@ export default function PrayerAnalyticsDashboard() {
                                             </Pie>
                                             <ChartTooltip content={<ChartTooltipContent/>}/>
                                         </PieChart>
-                                    </ResponsiveContainer>
                                 </ChartContainer>
                             )}
                         </CardContent>
@@ -597,7 +595,6 @@ export default function PrayerAnalyticsDashboard() {
                                             }}
                                             className="h-[160px] sm:h-[210px]"
                                         >
-                                            <ResponsiveContainer width="100%" height="100%">
                                                 <BarChart
                                                     data={prayerWiseChartData}
                                                     margin={{top: 4, right: 6, left: -15, bottom: 3}}
@@ -616,7 +613,6 @@ export default function PrayerAnalyticsDashboard() {
                                                     <Bar dataKey="onTime" stackId="a" fill={statusColors["on time"]}
                                                          name="On Time"/>
                                                 </BarChart>
-                                            </ResponsiveContainer>
                                         </ChartContainer>
                                     </div>
                                 </div>

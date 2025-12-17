@@ -44,16 +44,16 @@ export default function OfflinePage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                        <p className="text-sm text-green-800 dark:text-green-200">
-                            <strong>Good news!</strong> You can still:
-                        </p>
-                        <ul className="text-sm text-green-700 dark:text-green-300 mt-2 space-y-1 text-left">
-                            <li>• View cached prayers and reflections</li>
-                            <li>• Add new prayer entries (will sync later)</li>
-                            <li>• Access prayer times</li>
-                        </ul>
-                    </div>
+                    {/*<div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">*/}
+                    {/*    <p className="text-sm text-green-800 dark:text-green-200">*/}
+                    {/*        <strong>Good news!</strong> You can still:*/}
+                    {/*    </p>*/}
+                    {/*    <ul className="text-sm text-green-700 dark:text-green-300 mt-2 space-y-1 text-left">*/}
+                    {/*        <li>• View cached prayers and reflections</li>*/}
+                    {/*        <li>• Add new prayer entries (will sync later)</li>*/}
+                    {/*        <li>• Access prayer times</li>*/}
+                    {/*    </ul>*/}
+                    {/*</div>*/}
 
                     <Button
                         onClick={handleRetry}

@@ -18,7 +18,8 @@ export default async function LayoutPrivate({
             <Navbar user={user}/>
             <PWAStatus/>
             <main className="max-w-7xl mx-auto md:px-6 py-6 pb-20 md:pb-4 pt-[70px] md:pt-4">
-                {children}</main>
+                {children}
+            </main>
         </div>
     );
 }

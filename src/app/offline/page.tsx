@@ -24,6 +24,7 @@ export default function OfflinePage() {
     }, []);
 
     const handleRetry = () => {
+        setIsOnline(navigator.onLine);
         if (navigator.onLine) {
             window.location.href = '/dashboard';
         }

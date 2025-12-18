@@ -1,6 +1,10 @@
-const CACHE_NAME = "digital-diary-v2"; // Increment version to update old caches
+const CACHE_VERSION = "v3";
+const STATIC_CACHE = `digital-diary-static-${CACHE_VERSION}`;
+const RUNTIME_CACHE = `digital-diary-runtime-${CACHE_VERSION}`;
 
-// Files to pre-cache
+// ------------------------
+// PRECACHE (only app shell)
+// ------------------------
 const PRECACHE_ASSETS = [
     "/",
     "/login",
@@ -14,7 +18,7 @@ const PRECACHE_ASSETS = [
 // ------------------------
 self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
+        caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE_ASSETS))
     );
     self.skipWaiting();
 });
@@ -27,7 +31,9 @@ self.addEventListener("activate", (event) => {
         caches.keys().then((keys) =>
             Promise.all(
                 keys
-                    .filter((key) => key !== CACHE_NAME)
+                    .filter(
+                        (key) => key !== STATIC_CACHE && key !== RUNTIME_CACHE
+                    )
                     .map((key) => caches.delete(key))
             )
         )
@@ -41,63 +47,76 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
     const { request } = event;
 
-    // Only handle GET requests
     if (request.method !== "GET") return;
-
-    // Only handle same-origin requests
     if (!request.url.startsWith(self.location.origin)) return;
 
     const url = new URL(request.url);
 
     // ------------------------
-    // API requests (dynamic data)
-    // Network first → update cache → fallback
+    // API → STALE WHILE REVALIDATE
     // ------------------------
     if (url.pathname.startsWith("/api/")) {
-        event.respondWith(
-            fetch(request)
-                .then((response) => {
-                    // Update cache
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-                    return response;
-                })
-                .catch(() => caches.match(request))
-        );
+        event.respondWith(staleWhileRevalidate(request));
         return;
     }
 
     // ------------------------
-    // Navigation requests (HTML pages)
-    // Network first → cache → fallback to home page
+    // Navigation → NETWORK FIRST
     // ------------------------
     if (request.mode === "navigate") {
-        event.respondWith(
-            fetch(request)
-                .then((response) => {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-                    return response;
-                })
-                .catch(() => caches.match(request) || caches.match("/"))
-        );
+        event.respondWith(networkFirst(request));
         return;
     }
 
     // ------------------------
-    // Static assets
-    // Cache first → network fallback → update cache
+    // Static Assets → CACHE FIRST
     // ------------------------
-    event.respondWith(
-        caches.match(request).then((cached) => {
-            return (
-                cached ||
-                fetch(request).then((response) => {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-                    return response;
-                })
-            );
-        })
-    );
+    event.respondWith(cacheFirst(request));
 });
+
+// ========================
+// STRATEGIES
+// ========================
+
+// 🔁 Stale While Revalidate (BEST for prayer times & diary)
+async function staleWhileRevalidate(request) {
+    const cache = await caches.open(RUNTIME_CACHE);
+    const cached = await cache.match(request);
+
+    const networkFetch = fetch(request)
+        .then((response) => {
+            // Only update cache if response is valid
+            if (response && response.status === 200) {
+                cache.put(request, response.clone());
+            }
+            return response;
+        })
+        .catch(() => cached);
+
+    return cached || networkFetch;
+}
+
+// 🌐 Network First (HTML pages)
+async function networkFirst(request) {
+    const cache = await caches.open(RUNTIME_CACHE);
+
+    try {
+        const response = await fetch(request);
+        cache.put(request, response.clone());
+        return response;
+    } catch {
+        return cache.match(request) || cache.match("/");
+    }
+}
+
+// 📦 Cache First (CSS, JS, Images)
+async function cacheFirst(request) {
+    const cache = await caches.open(STATIC_CACHE);
+    const cached = await cache.match(request);
+
+    if (cached) return cached;
+
+    const response = await fetch(request);
+    cache.put(request, response.clone());
+    return response;
+}

@@ -47,8 +47,9 @@ export default function LatestEntryCard() {
     if (isLoading) {
         return (
             <Card>
-                <CardContent className="flex justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                <CardContent className="flex flex-col items-center gap-4 justify-center">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                    <p>Loading Data...</p>
                 </CardContent>
             </Card>
         );
@@ -57,7 +58,7 @@ export default function LatestEntryCard() {
     /* ---------------- Empty ---------------- */
     if (!latestEntry) {
         return (
-            <Card className="text-center">
+            <Card className="text-center gap-0">
                 <CardContent className=" space-y-4">
                     <Calendar className="h-12 w-12 mx-auto text-muted-foreground/60" />
                     <p className="text-sm text-muted-foreground">
@@ -74,7 +75,7 @@ export default function LatestEntryCard() {
 
     /* ---------------- Latest Entry ---------------- */
     return (
-        <Card className="shadow-sm">
+        <Card className="shadow-sm gap-0">
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-base sm:text-lg flex items-center gap-2">

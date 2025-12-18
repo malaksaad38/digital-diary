@@ -200,8 +200,7 @@ export default function ModernDashboard({user}: { user: any }) {
                 </div>
             </div>
 
-            {/* Dashboard Diary */}
-            {/*<LatestDiaryCard />*/}
+
             
             {/* Prayer Analytics */}
             <Card className="shadow-md py-2 md:py-6 pt-2">
@@ -365,6 +364,8 @@ export default function ModernDashboard({user}: { user: any }) {
 
                 </CardContent>
             </Card>
+            {/* Dashboard Diary */}
+            <LatestDiaryCard />
         </div>
     );
 }

@@ -301,7 +301,7 @@ export default function DiaryForm({session}: any) {
                                     placeholder="Summarize your day in a few words..."
                                     value={formData.summary}
                                     onChange={(e) => handleChange("summary", e.target.value)}
-                                    disabled={isFormDisabled}
+                                    disabled={true}
                                     className="min-h-[80px] resize-none"
                                 />
                             </div>

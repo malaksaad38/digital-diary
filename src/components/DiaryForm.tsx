@@ -10,14 +10,14 @@ import {Textarea} from "@/components/ui/textarea";
 import {Label} from "@/components/ui/label";
 import {BookOpen, CalendarIcon, Edit2, Save} from "lucide-react";
 import {format, parse} from "date-fns";
-import {toast} from "sonner";
 import {motion} from "framer-motion";
+import {useCreateDiary, useDiaryByDate, useUpdateDiary} from "@/hooks/use-prayer-queries";
 
 export default function DiaryForm({session}: any) {
     const searchParams = useSearchParams();
     const dateParam = searchParams.get("date");
+    const router = useRouter();
 
-    // Initialize selectedDate from URL parameter if it exists
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
         if (dateParam) {
             try {
@@ -30,12 +30,7 @@ export default function DiaryForm({session}: any) {
     });
 
     const [isEditMode, setIsEditMode] = useState(false);
-    const [existingDiaryId, setExistingDiaryId] = useState<string | null>(null);
     const [isFormDisabled, setIsFormDisabled] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
-
-    const router = useRouter();
 
     const [formData, setFormData] = useState({
         fajrToZuhr: "",
@@ -46,8 +41,6 @@ export default function DiaryForm({session}: any) {
         customNotes: "",
         summary: "",
     });
-
-    const userId = session?.user?.id;
 
     const timeFields = [
         {key: "fajrToZuhr", label: "Fajr to Zuhr", placeholder: "What happened between Fajr and Zuhr prayers..."},
@@ -65,49 +58,37 @@ export default function DiaryForm({session}: any) {
         {key: "eshaToFajr", label: "Esha to Fajr", placeholder: "What happened between Esha and next Fajr..."},
     ];
 
-    // Check if diary exists for selected date
+    const userId = session?.user?.id;
+    const dateStr = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
+
+    // Use React Query hooks
+    const {data: diaryData, isLoading} = useDiaryByDate(dateStr, !!selectedDate && !!userId);
+    const createDiary = useCreateDiary();
+    const updateDiary = useUpdateDiary();
+
+    const existingDiary = diaryData?.success && diaryData?.data ? diaryData.data : null;
+    const existingDiaryId = existingDiary?._id || null;
+
+    // Update form when diary data changes
     useEffect(() => {
-        const checkExistingDiary = async () => {
-            if (!selectedDate || !userId) return;
-
-            const dateStr = format(selectedDate, "yyyy-MM-dd");
-            setIsLoading(true);
-
-            try {
-                const res = await fetch(`/api/diary?date=${dateStr}`);
-                const data = await res.json();
-
-                if (data.success && data.data) {
-                    // Diary exists for this date
-                    setExistingDiaryId(data.data._id);
-                    setFormData({
-                        fajrToZuhr: data.data.fajrToZuhr || "",
-                        zuhrToAsar: data.data.zuhrToAsar || "",
-                        asarToMaghrib: data.data.asarToMaghrib || "",
-                        maghribToEsha: data.data.maghribToEsha || "",
-                        eshaToFajr: data.data.eshaToFajr || "",
-                        customNotes: data.data.customNotes || "",
-                        summary: data.data.summary || "",
-                    });
-                    setIsFormDisabled(true);
-                    setIsEditMode(false);
-                } else {
-                    // No diary for this date
-                    resetForm();
-                    setExistingDiaryId(null);
-                    setIsFormDisabled(false);
-                    setIsEditMode(false);
-                }
-            } catch (error) {
-                console.error("Error checking diary:", error);
-                resetForm();
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        checkExistingDiary();
-    }, [selectedDate, userId]);
+        if (existingDiary) {
+            setFormData({
+                fajrToZuhr: existingDiary.fajrToZuhr || "",
+                zuhrToAsar: existingDiary.zuhrToAsar || "",
+                asarToMaghrib: existingDiary.asarToMaghrib || "",
+                maghribToEsha: existingDiary.maghribToEsha || "",
+                eshaToFajr: existingDiary.eshaToFajr || "",
+                customNotes: existingDiary.customNotes || "",
+                summary: existingDiary.summary || "",
+            });
+            setIsFormDisabled(true);
+            setIsEditMode(false);
+        } else {
+            resetForm();
+            setIsFormDisabled(false);
+            setIsEditMode(false);
+        }
+    }, [existingDiary]);
 
     const resetForm = () => {
         setFormData({
@@ -130,54 +111,30 @@ export default function DiaryForm({session}: any) {
             setIsEditMode(true);
         }, 500);
         setIsFormDisabled(false);
-        router.push("#diaryDate")
-
+        router.push("#diaryDate");
     };
 
     const handleCancelEdit = () => {
-        // Refetch the original data
-        if (!selectedDate || !userId) return;
-
-        const dateStr = format(selectedDate, "yyyy-MM-dd");
-
-        fetch(`/api/diary?date=${dateStr}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    setFormData({
-                        fajrToZuhr: data.data.fajrToZuhr || "",
-                        zuhrToAsar: data.data.zuhrToAsar || "",
-                        asarToMaghrib: data.data.asarToMaghrib || "",
-                        maghribToEsha: data.data.maghribToEsha || "",
-                        eshaToFajr: data.data.eshaToFajr || "",
-                        customNotes: data.data.customNotes || "",
-                        summary: data.data.summary || "",
-                    });
-                }
-            })
-            .catch(error => {
-                console.error("Error refetching diary:", error);
-            });
-
         setIsEditMode(false);
         setIsFormDisabled(true);
+        // Reset form to existing data
+        if (existingDiary) {
+            setFormData({
+                fajrToZuhr: existingDiary.fajrToZuhr || "",
+                zuhrToAsar: existingDiary.zuhrToAsar || "",
+                asarToMaghrib: existingDiary.asarToMaghrib || "",
+                maghribToEsha: existingDiary.maghribToEsha || "",
+                eshaToFajr: existingDiary.eshaToFajr || "",
+                customNotes: existingDiary.customNotes || "",
+                summary: existingDiary.summary || "",
+            });
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!userId) {
-            toast.error("User not authenticated");
-            return;
-        }
-
-        if (!selectedDate) {
-            toast.error("Please select a date");
-            return;
-        }
-
-        const dateStr = format(selectedDate, "yyyy-MM-dd");
-        setIsSaving(true);
+        if (!userId) return;
 
         const dataToSave = {
             userId,
@@ -185,64 +142,22 @@ export default function DiaryForm({session}: any) {
             ...formData,
         };
 
-        try {
-            if (isEditMode && existingDiaryId) {
-                // Update existing diary
-                const res = await fetch(`/api/diary`, {
-                    method: "PUT",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({id: existingDiaryId, ...dataToSave}),
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    toast.success("Diary updated successfully!", {
-                        description: `Diary for ${dateStr} has been updated.`,
-                    });
-
-                    // Update the form data with the response
-                    setFormData({
-                        fajrToZuhr: data.data.fajrToZuhr || "",
-                        zuhrToAsar: data.data.zuhrToAsar || "",
-                        asarToMaghrib: data.data.asarToMaghrib || "",
-                        maghribToEsha: data.data.maghribToEsha || "",
-                        eshaToFajr: data.data.eshaToFajr || "",
-                        customNotes: data.data.customNotes || "",
-                        summary: data.data.summary || "",
-                    });
-
-                    setIsEditMode(false);
-                    setIsFormDisabled(true);
-                } else {
-                    toast.error(data.error || "Failed to update diary");
+        if (isEditMode && existingDiaryId) {
+            updateDiary.mutate(
+                {id: existingDiaryId, ...dataToSave},
+                {
+                    onSuccess: () => {
+                        setIsEditMode(false);
+                        setIsFormDisabled(true);
+                    },
                 }
-            } else {
-                // Create new diary
-                const res = await fetch("/api/diary", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(dataToSave),
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    toast.success("Diary saved successfully!", {
-                        description: `Diary for ${dateStr} has been recorded.`,
-                    });
-                    setExistingDiaryId(data.data._id);
+            );
+        } else {
+            createDiary.mutate(dataToSave, {
+                onSuccess: () => {
                     setIsFormDisabled(true);
-                    setIsEditMode(false);
-                } else {
-                    toast.error(data.error || "Failed to save diary");
-                }
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            toast.error("Something went wrong!");
-        } finally {
-            setIsSaving(false);
+                },
+            });
         }
     };
 
@@ -291,16 +206,16 @@ export default function DiaryForm({session}: any) {
                     {isLoading ? (
                         <div className="text-center py-8 text-muted-foreground">
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                                initial={{opacity: 0, scale: 0.95}}
+                                animate={{opacity: 1, scale: 1}}
+                                transition={{duration: 0.3, ease: [0.25, 0.1, 0.25, 1]}}
                                 className="flex flex-col items-center gap-4 p-8"
                             >
                                 {/* iPhone-style minimal spinner */}
                                 <div className="relative w-16 h-16">
                                     <motion.div
-                                        animate={{ rotate: 360 }}
-                                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                        animate={{rotate: 360}}
+                                        transition={{duration: 1, repeat: Infinity, ease: "linear"}}
                                         className="absolute inset-0"
                                     >
                                         <svg
@@ -330,15 +245,14 @@ export default function DiaryForm({session}: any) {
                                 </div>
 
                                 <motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
+                                    initial={{opacity: 0}}
+                                    animate={{opacity: 1}}
+                                    transition={{delay: 0.2}}
                                     className="text-sm font-medium text-muted-foreground"
                                 >
                                     Loading diary data...
                                 </motion.p>
                             </motion.div>
-
                         </div>
                     ) : (
                         <>
@@ -387,13 +301,12 @@ export default function DiaryForm({session}: any) {
                                     placeholder="Summarize your day in a few words..."
                                     value={formData.summary}
                                     onChange={(e) => handleChange("summary", e.target.value)}
-                                    disabled={true}
+                                    disabled={isFormDisabled}
                                     className="min-h-[80px] resize-none"
                                 />
                             </div>
 
                             {/* Action Buttons */}
-
                             <div id={"diaryEdit"} className="flex flex-col sm:flex-row gap-3 pt-2">
                                 {existingDiaryId && !isEditMode ? (
                                     <Button
@@ -408,13 +321,16 @@ export default function DiaryForm({session}: any) {
                                 ) : (
                                     <>
                                         <Button
-
                                             type="submit"
                                             className="w-full sm:flex-1"
-                                            disabled={isFormDisabled || isSaving}
+                                            disabled={isFormDisabled || createDiary.isPending || updateDiary.isPending}
                                         >
                                             <Save className="mr-2 h-4 w-4"/>
-                                            {isSaving ? "Saving..." : isEditMode ? "Update Diary" : "Save Diary"}
+                                            {createDiary.isPending || updateDiary.isPending
+                                                ? "Saving..."
+                                                : isEditMode
+                                                    ? "Update Diary"
+                                                    : "Save Diary"}
                                         </Button>
                                         {isEditMode && (
                                             <Button
@@ -422,7 +338,6 @@ export default function DiaryForm({session}: any) {
                                                 variant="outline"
                                                 onClick={handleCancelEdit}
                                                 className="w-full sm:w-auto"
-                                                disabled={isSaving}
                                             >
                                                 Cancel
                                             </Button>

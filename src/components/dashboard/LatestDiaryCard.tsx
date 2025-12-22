@@ -75,7 +75,7 @@ export default function LatestEntryCard() {
 
     /* ---------------- Latest Entry ---------------- */
     return (
-        <Card className="shadow-sm gap-0">
+        <Card className={`border shadow-sm bg-card hover:shadow-md transition-all duration-200 gap-0 ${latestEntry.prayer.fajr  === "on time" && latestEntry.prayer.zuhr  === "on time" && latestEntry.prayer.asar  === "on time" && latestEntry.prayer.maghrib  === "on time" && latestEntry.prayer.esha  === "on time" ? "border-green-500 bg-green-300/10" : "border-border/60"}`}>
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-base sm:text-lg flex items-center gap-2">

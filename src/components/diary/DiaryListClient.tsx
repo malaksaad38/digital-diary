@@ -107,6 +107,7 @@ export default function DiaryListClient() {
     return pages;
   };
 
+
   return (
     <>
       {/* Header */}
@@ -214,7 +215,7 @@ export default function DiaryListClient() {
             {paginatedEntries.map((entry: any) => (
               <Card
                 key={entry.date}
-                className="border border-border/60 shadow-sm bg-card hover:shadow-md transition-all duration-200"
+                className={`border shadow-sm bg-card hover:shadow-md transition-all duration-200 ${entry.prayer.fajr  === "on time" && entry.prayer.zuhr  === "on time" && entry.prayer.asar  === "on time" && entry.prayer.maghrib  === "on time" && entry.prayer.esha  === "on time" ? "border-green-500 bg-green-300/10" : "border-border/60"}`}
               >
                 <CardHeader className="pb-3 sm:pb-4">
                   <div className="flex items-center justify-between">

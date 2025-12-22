@@ -9,7 +9,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Calendar} from "@/components/ui/calendar";
-import {CalendarIcon, Circle, CircleHelp, Diamond, Edit2, Save} from "lucide-react";
+import {CalendarIcon, Circle, CircleHelp, Diamond, Edit2, Save, StarsIcon} from "lucide-react";
 import {format, parse} from "date-fns";
 import {
     Dialog,
@@ -224,11 +224,12 @@ export default function PrayerForm({session}: any) {
     return (
         <Card className="w-full h-full shadow-lg border-border/50">
             <CardHeader className="space-y-1 pb-4">
-                <CardTitle className="text-center text-xl sm:text-2xl font-bold">
-                    Daily Prayer Log
+                <CardTitle className="text-center text-xl sm:text-2xl font-bold flex items-center justify-center gap-2">
+                    <StarsIcon className="h-6 w-6" />
+                    Daily Prayer
                 </CardTitle>
                 {existingPrayerId && !isEditMode && (
-                    <p className="text-center text-sm text-muted-foreground">
+                    <p className="text-center  text-sm text-rose-400">
                         Prayer log exists for this date
                     </p>
                 )}

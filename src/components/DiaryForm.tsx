@@ -169,8 +169,8 @@ export default function DiaryForm({session}: any) {
                     Daily Diary
                 </CardTitle>
                 {existingDiaryId && !isEditMode && (
-                    <p className="text-center text-sm text-muted-foreground">
-                        Diary exists for this date
+                    <p className="text-center text-sm text-rose-400">
+                        Diary log exists for this date
                     </p>
                 )}
             </CardHeader>

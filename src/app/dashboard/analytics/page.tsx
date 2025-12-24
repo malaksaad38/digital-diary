@@ -336,7 +336,7 @@ export default function PrayerAnalyticsDashboard() {
                     {isLoading ? (
                         // Loading skeleton for stats cards
                         <>
-                            {[...Array(5)].map((_, i) => (
+                            {[...Array(6)].map((_, i) => (
                                 <div
                                     key={i}
                                     className="flex flex-col items-center justify-center rounded-xl bg-muted/30 py-3 sm:py-5 border border-border/50 animate-pulse"

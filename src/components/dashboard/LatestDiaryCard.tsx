@@ -72,10 +72,22 @@ export default function LatestEntryCard() {
             </Card>
         );
     }
-
+ const onTime = latestEntry.prayer.fajr === "on time" && latestEntry.prayer.zuhr === "on time" &&
+     latestEntry.prayer.asar === "on time" && latestEntry.prayer.maghrib === "on time" &&
+     latestEntry.prayer.esha === "on time"
     /* ---------------- Latest Entry ---------------- */
     return (
-        <Card className={`border shadow-sm bg-card hover:shadow-md transition-all duration-200 gap-0`}>
+        <Card className={`border shadow-sm bg-card gap-0 ${ onTime ? "border-green-500 bg-green-300/10" : ""}`}>
+            {/*<div>*/}
+            {/*    {onTime &&*/}
+            {/*        <div className="flex justify-start px-4 pb-4">*/}
+            {/*            <div className="relative flex justify-center items-center gap-2 text-foreground px-3 py-1  rounded-full  shadow-lg shadow-green-300/50 text-xs md:text-sm">*/}
+            {/*                <span className={"w-2 h-2 rounded-full bg-green-500 animate-ping"}></span>*/}
+            {/*                <span className={"absolute left-3 w-2 h-2 rounded-full bg-green-500 animate-pulse"}></span>*/}
+            {/*                <span>Excellent</span>*/}
+            {/*            </div>*/}
+            {/*        </div>}*/}
+            {/*</div>*/}
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-base sm:text-lg flex items-center gap-2">

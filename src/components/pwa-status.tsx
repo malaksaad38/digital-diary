@@ -36,7 +36,7 @@ export default function PWAStatus() {
                         exit={{ y: -100, opacity: 0 }}
                         className="fixed top-0 left-0 right-0 z-50 bg-green-600 text-white py-3 px-4 shadow-lg"
                     >
-                        <div className="max-w-7xl mx-auto flex items-center justify-between">
+                        <div className="max-w-6xl mx-auto flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Wifi className="w-5 h-5" />
                                 <span className="font-medium">

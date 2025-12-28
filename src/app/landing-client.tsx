@@ -121,7 +121,7 @@ export default function PrayerDiaryLanding() {
                     isScrolled ? "bg-background/90 backdrop-blur-lg shadow-lg border-b" : "bg-transparent"
                 }`}
             >
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                     <motion.div className="flex items-center gap-2" whileHover={{scale: 1.05}}>
                         <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-full object-contain"/>
                         <span
@@ -176,7 +176,7 @@ export default function PrayerDiaryLanding() {
 
             {/* Hero Section */}
             <motion.section className="pt-36 pb-20 px-6">
-                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
                     <motion.div initial={{opacity: 0, x: -60}} animate={{opacity: 1, x: 0}}
                                 transition={{duration: 0.8}}>
                         <Badge variant="secondary"
@@ -273,7 +273,7 @@ export default function PrayerDiaryLanding() {
 
             {/* Features Section */}
             <section id="features" className="py-20 px-6">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-6xl mx-auto">
                     <motion.div {...fadeInUp} className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Everything you need for
                             consistent worship</h2>
@@ -305,7 +305,7 @@ export default function PrayerDiaryLanding() {
 
             {/* Testimonials Section */}
             <section id="testimonials" className="py-20 px-6 bg-background">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-6xl mx-auto">
                     <motion.div {...fadeInUp} className="text-center mb-12">
                         <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Loved by communities
                             worldwide</h2>
@@ -345,7 +345,7 @@ export default function PrayerDiaryLanding() {
 
             {/* FAQ Section */}
             <section id="faq" className="py-20 px-6 bg-background">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-6xl mx-auto">
                     <motion.div {...fadeInUp} className="text-center mb-12">
                         <h2 className="text-3xl font-bold text-foreground">Frequently Asked Questions</h2>
                         <p className="text-muted-foreground mt-2">Short answers to common questions about privacy,
@@ -382,7 +382,7 @@ export default function PrayerDiaryLanding() {
 
             {/* Footer */}
             <footer className="bg-background border-t border-gray-200 dark:border-gray-700 py-10 px-6">
-                <div className="max-w-7xl mx-auto text-center text-muted-foreground">
+                <div className="max-w-6xl mx-auto text-center text-muted-foreground">
                     <p>© {new Date().getFullYear()} Digital Diary. All rights reserved.</p>
                     <div className="flex justify-center gap-4 mt-4">
                         <a href="#" className="hover:text-green-500 transition">Privacy</a>

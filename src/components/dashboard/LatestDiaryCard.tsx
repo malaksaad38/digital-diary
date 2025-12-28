@@ -3,7 +3,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Loader2, Plus } from "lucide-react";
+import {ArrowRight, Calendar, Loader2, Plus} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCombinedHistory } from "@/hooks/use-prayer-queries";
 import PrayerLog from "@/components/diary/PrayerLog";
@@ -47,9 +47,9 @@ export default function LatestEntryCard() {
     if (isLoading) {
         return (
             <Card>
-                <CardContent className="flex flex-col items-center gap-4 justify-center">
-                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                    <p>Loading Data...</p>
+                <CardContent className="flex flex-col items-center gap-2 md:gap-4 justify-center">
+                    <Loader2 className="h-10 w-10 animate-spin" />
+                    <p className={"text-muted-foreground"}>Loading Data...</p>
                 </CardContent>
             </Card>
         );
@@ -105,7 +105,7 @@ export default function LatestEntryCard() {
                         size="sm"
                         onClick={() => router.push("/dashboard/diary")}
                     >
-                        View All
+                        View All <ArrowRight className="w-3 h-3 ml-1"/>
                     </Button>
                 </div>
             </CardHeader>

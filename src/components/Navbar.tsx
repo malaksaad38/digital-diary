@@ -34,7 +34,7 @@ export default function Navbar({ user }: { user: any }) {
     "/dashboard": "Home",
     "/dashboard/entry": "Entry",
     "/dashboard/diary": "Diary",
-    "/dashboard/analytics": "Analytics",
+    "/dashboard/analytics": "Prayer Analytics",
     "/dashboard/prayer-times": "Prayer Times",
   };
 

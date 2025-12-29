@@ -17,11 +17,11 @@ export default function PWAStatus() {
                         initial={{ y: -100, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -100, opacity: 0 }}
-                        className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-white py-2 px-4 text-center text-sm font-medium"
+                        className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-white py-0 md:py-2 px-4 text-center text-sm font-medium"
                     >
                         <div className="flex items-center justify-center gap-2">
-                            <WifiOff className="w-4 h-4" />
-                            <span>You're offline. Changes will sync when reconnected.</span>
+                            <WifiOff className="w-4 h-6" />
+                            <span>You're offline</span>
                         </div>
                     </motion.div>
                 )}

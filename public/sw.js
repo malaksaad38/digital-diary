@@ -39,7 +39,7 @@ self.addEventListener("activate", (event) => {
 // FETCH
 // ------------------------
 self.addEventListener("fetch", (event) => {
-    const { request } = event;
+    const {request} = event;
 
     // Only handle GET requests
     if (request.method !== "GET") return;

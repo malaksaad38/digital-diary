@@ -24,6 +24,7 @@ import {
 import { cn } from "@/lib/utils";
 import ButtonLogout from "@/components/ButtonLogout";
 import {PieChart} from "recharts";
+import TimeAlert from "@/components/TimeAlert";
 
 export default function Navbar({ user }: { user: any }) {
     const [time, setTime] = useState<Date | null>(null)
@@ -51,57 +52,63 @@ export default function Navbar({ user }: { user: any }) {
   return (
     <>
       {/* 🌐 Desktop Navbar */}
-      <motion.nav
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="hidden sm:flex sticky top-0 z-50 items-center justify-between px-6 py-3 border-b bg-background/70 backdrop-blur-md shadow-sm"
-      >
-        {/* Left: User */}
-        <UserPopover user={user} />
+        <div className={"fixed top-0 left-0 right-0"}>
+            {/*<TimeAlert/>*/}
+            <motion.nav
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="hidden sm:flex sticky top-0 z-50 items-center justify-between px-6 py-3 border-b bg-background/70 backdrop-blur-md shadow-sm"
+            >
 
-        {/* Middle: Navigation */}
-        <div className="flex items-center gap-6">
-          <NavLink href="/dashboard" label="Dashboard" pathname={pathname} />
-          <NavLink href="/dashboard/analytics" label="Analytics" pathname={pathname} />
-          <NavLink href="/dashboard/prayer-times" label="Prayer Times" pathname={pathname} />
-          <NavLink href="/dashboard/entry" label="Entry" pathname={pathname} />
-          <NavLink href="/dashboard/diary" label="Diary" pathname={pathname} />
-        </div>
+                {/* Left: User */}
+                <UserPopover user={user} />
 
-        {/* Right: Clock + Theme */}
-        <div className="flex items-center gap-5">
+                {/* Middle: Navigation */}
+                <div className="flex items-center gap-6">
+                    <NavLink href="/dashboard" label="Dashboard" pathname={pathname} />
+                    <NavLink href="/dashboard/analytics" label="Analytics" pathname={pathname} />
+                    <NavLink href="/dashboard/prayer-times" label="Prayer Times" pathname={pathname} />
+                    <NavLink href="/dashboard/entry" label="Entry" pathname={pathname} />
+                    <NavLink href="/dashboard/diary" label="Diary" pathname={pathname} />
+                </div>
+
+                {/* Right: Clock + Theme */}
+                <div className="flex items-center gap-5">
           <span className="text-sm font-mono text-muted-foreground">
             {time.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
             })}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="rounded-full hover:bg-accent"
-            aria-label="Toggle theme"
-          >
-            {theme === "light" ? (
-              <Moon size={18} className="text-foreground" />
-            ) : (
-              <Sun size={18} className="text-foreground" />
-            )}
-          </Button>
-        </div>
-      </motion.nav>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                        className="rounded-full hover:bg-accent"
+                        aria-label="Toggle theme"
+                    >
+                        {theme === "light" ? (
+                            <Moon size={18} className="text-foreground" />
+                        ) : (
+                            <Sun size={18} className="text-foreground" />
+                        )}
+                    </Button>
+                </div>
+            </motion.nav>
 
+        </div>
       {/* 📱 Mobile Top Bar - iPhone Style */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-        className="sm:hidden fixed top-2 left-2 right-2 z-50"
+        className="sm:hidden fixed top-0 left-0 right-0 z-40"
       >
-        <div className="relative overflow-hidden rounded-[22px] border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xs shadow-lg shadow-black/5">
+          {/*<TimeAlert/>*/}
+
+        <div className="relative overflow-hidden  border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xs shadow-lg shadow-black/5">
           {/* Subtle inner glow */}
           <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-white/40 dark:from-white/5 dark:to-transparent pointer-events-none" />
 

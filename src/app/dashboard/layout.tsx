@@ -15,9 +15,9 @@ export default async function LayoutPrivate({
 
     return (
         <div className="min-h-screen bg-background text-foreground transition-colors">
-            <Navbar user={user}/>
             <PWAStatus/>
-            <main className="max-w-6xl mx-auto md:px-6 py-6 pb-20 md:pb-4 pt-[70px] md:pt-4">
+            <Navbar user={user}/>
+            <main className="max-w-6xl mx-auto md:px-6 py-6 pb-20 md:pb-4 pt-[70px] md:pt-20">
                 {children}
             </main>
         </div>

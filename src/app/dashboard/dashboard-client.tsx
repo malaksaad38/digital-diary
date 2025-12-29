@@ -345,7 +345,7 @@ export default function ModernDashboard({user}: { user: any }) {
                             );
                         })}
                     </div>
-                    {prayerData?.items[0].shurooq || (
+                    {prayerData?.items[0].shurooq && (
                         <div className="flex justify-between mt-4 pt-4 border-t text-[10px] md:text-base">
                             <div className="flex items-center gap-2">
                                 <Sunrise className="w-4 h-4 text-orange-500"/>

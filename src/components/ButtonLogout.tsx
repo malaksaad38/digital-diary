@@ -13,6 +13,7 @@ const ButtonLogout = () => {
         onClick={() => {
             signOut()
         }}
+        className={"w-full"}
       >
         <LogOutIcon/>
         Logout

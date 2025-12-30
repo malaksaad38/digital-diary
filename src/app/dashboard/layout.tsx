@@ -2,6 +2,7 @@ import {auth} from "@/auth";
 import {redirect} from "next/navigation";
 import Navbar from "@/components/Navbar";
 import PWAStatus from "@/components/pwa-status";
+import TimeAlert from "@/components/TimeAlert";
 
 export default async function LayoutPrivate({
                                                 children,
@@ -17,7 +18,7 @@ export default async function LayoutPrivate({
         <div className="min-h-screen bg-background text-foreground transition-colors">
             <PWAStatus/>
             <Navbar user={user}/>
-            <main className="max-w-6xl mx-auto md:px-6 py-6 pb-20 md:pb-4 pt-[70px] md:pt-20">
+            <main className="max-w-6xl mx-auto md:px-6 py-6 pb-20 md:pb-4 pt-14 md:pt-20">
                 {children}
             </main>
         </div>

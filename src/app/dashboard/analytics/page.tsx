@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
 import {ChartContainer, ChartTooltip, ChartTooltipContent,} from "@/components/ui/chart";
-import {Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, XAxis, YAxis} from "recharts";
+import {Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, XAxis, YAxis} from "recharts";
 import {
     Dialog,
     DialogContent,
@@ -546,23 +546,23 @@ export default function PrayerAnalyticsDashboard() {
                                     }}
                                     className="w-full max-w-[300px] sm:max-w-[320px] h-[180px] sm:h-[210px]"
                                 >
-                                        <PieChart>
-                                            <Pie
-                                                data={overallChartData}
-                                                cx="50%"
-                                                cy="50%"
-                                                labelLine={false}
-                                                label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                                                outerRadius={55}
-                                                fill="#8884d8"
-                                                dataKey="value"
-                                            >
-                                                {overallChartData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color}/>
-                                                ))}
-                                            </Pie>
-                                            <ChartTooltip content={<ChartTooltipContent/>}/>
-                                        </PieChart>
+                                    <PieChart>
+                                        <Pie
+                                            data={overallChartData}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                            outerRadius={55}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                        >
+                                            {overallChartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color}/>
+                                            ))}
+                                        </Pie>
+                                        <ChartTooltip content={<ChartTooltipContent/>}/>
+                                    </PieChart>
                                 </ChartContainer>
                             )}
                         </CardContent>
@@ -595,24 +595,24 @@ export default function PrayerAnalyticsDashboard() {
                                             }}
                                             className="h-[160px] sm:h-[210px]"
                                         >
-                                                <BarChart
-                                                    data={prayerWiseChartData}
-                                                    margin={{top: 4, right: 6, left: -15, bottom: 3}}
-                                                >
-                                                    <CartesianGrid strokeDasharray="3 3"/>
-                                                    <XAxis dataKey="prayer" tick={{fontSize: 8}}/>
-                                                    <YAxis tick={{fontSize: 8}}/>
-                                                    <ChartTooltip content={<ChartTooltipContent/>}/>
-                                                    <Legend wrapperStyle={{fontSize: 8}}/>
-                                                    <Bar dataKey="missed" stackId="a" fill={statusColors.missed}
-                                                         name="Missed"/>
-                                                    <Bar dataKey="alone" stackId="a" fill={statusColors.alone}
-                                                         name="Alone"/>
-                                                    <Bar dataKey="jamaat" stackId="a" fill={statusColors.jamaat}
-                                                         name="Jamaat"/>
-                                                    <Bar dataKey="onTime" stackId="a" fill={statusColors["on time"]}
-                                                         name="On Time"/>
-                                                </BarChart>
+                                            <BarChart
+                                                data={prayerWiseChartData}
+                                                margin={{top: 4, right: 6, left: -15, bottom: 3}}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3"/>
+                                                <XAxis dataKey="prayer" tick={{fontSize: 8}}/>
+                                                <YAxis tick={{fontSize: 8}}/>
+                                                <ChartTooltip content={<ChartTooltipContent/>}/>
+                                                <Legend wrapperStyle={{fontSize: 8}}/>
+                                                <Bar dataKey="missed" stackId="a" fill={statusColors.missed}
+                                                     name="Missed"/>
+                                                <Bar dataKey="alone" stackId="a" fill={statusColors.alone}
+                                                     name="Alone"/>
+                                                <Bar dataKey="jamaat" stackId="a" fill={statusColors.jamaat}
+                                                     name="Jamaat"/>
+                                                <Bar dataKey="onTime" stackId="a" fill={statusColors["on time"]}
+                                                     name="On Time"/>
+                                            </BarChart>
                                         </ChartContainer>
                                     </div>
                                 </div>

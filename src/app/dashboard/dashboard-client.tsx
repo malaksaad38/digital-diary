@@ -257,7 +257,7 @@ export default function ModernDashboard({user}: { user: any }) {
                                 <div key={stat.label}
                                      className={cn(stat.bg, "relative flex-1 ga1 mx-0.5 rounded p-2 md:p-4")}>
                                     <Icon
-                                        className={cn("mx-auto size-8 mb-1 absolute top-1 right-0 opacity-10", stat.color)}/>
+                                        className={cn("mx-auto size-10 md:size-14 mb-1 absolute top-1 right-0 opacity-10", stat.color)}/>
                                     <p className="font-bold text-base">{stat.value}</p>
                                     <p className="text-[10px] md:text-base text-muted-foreground">{stat.label}</p>
 
@@ -330,7 +330,7 @@ export default function ModernDashboard({user}: { user: any }) {
                                 <div
                                     key={p}
                                     className={cn(
-                                        "rounded p-2 relative border transition",
+                                        "rounded p-2 md:p-4 relative border transition",
                                         isCurrent
                                             ? "bg-blue-100 dark:bg-blue-900/20 border-blue-400"
                                             : isNext
@@ -338,7 +338,7 @@ export default function ModernDashboard({user}: { user: any }) {
                                                 : "bg-muted/40 border-transparent"
                                     )}
                                 >
-                                    <Icon className={cn("mx-auto mb-1 absolute size-8 opacity-10 bottom-0 right-0", isCurrent ? "text-blue-600" : isNext ? "text-green-600" : "text-muted-foreground")}/>
+                                    <Icon className={cn("mx-auto mb-1 absolute size-10 md:size-12 opacity-10 bottom-0 right-0", isCurrent ? "text-blue-600" : isNext ? "text-green-600" : "text-muted-foreground")}/>
                                     <p className="font-mono font-semibold leading-tight tracking-tighter text-sm">{time || "00:00 am"}</p>
                                     <p>{p}</p>
                                 </div>

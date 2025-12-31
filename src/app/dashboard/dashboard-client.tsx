@@ -167,7 +167,7 @@ export default function ModernDashboard({user}: { user: any }) {
     const icons = {Fajr: Sunrise, Dhuhr: Sun, Asr: CloudSun, Maghrib: Sunset, Isha: Moon};
 
     return (
-        <div className="max-w-6xl mx-auto bg-background px-4 pb-4 md:py-10 space-y-6">
+        <div className="max-w-6xl mx-auto bg-background px-4 pb-4 md:py-10 space-y-6 pt-4">
             {/* Header */}
             <div className="flex flex-col gap-2 md:flex-row justify-between">
                 <div className="">
@@ -184,16 +184,16 @@ export default function ModernDashboard({user}: { user: any }) {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-2 gap-2">
+                <div className="fixed sm:static bottom-20 left-4 right-4 z-20 grid grid-cols-2 gap-2">
                     <Link href="/dashboard/entry">
                         <Button
-                            className="w-full bg-green-600 hover:bg-green-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-4">
+                            className="w-full bg-green-600 hover:bg-green-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-3">
                             <Plus className="w-4 h-4"/> Add Entry
                         </Button>
                     </Link>
                     <Link href="/dashboard/diary">
                         <Button
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-4">
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-3">
                             <BookOpen className="w-4 h-4"/> My Diary
                         </Button>
                     </Link>
@@ -201,7 +201,6 @@ export default function ModernDashboard({user}: { user: any }) {
             </div>
 
 
-            
             {/* Prayer Analytics */}
             <Card className="shadow-md py-2 md:py-6 pt-2">
                 <CardContent className="p-3 md:p-6">
@@ -282,7 +281,6 @@ export default function ModernDashboard({user}: { user: any }) {
             </Card>
 
 
-
             {/* Prayer Times */}
             <Card className="shadow-md py-2 md:py-6 pb-1">
                 <CardContent className="p-3 md:p-6">
@@ -338,7 +336,8 @@ export default function ModernDashboard({user}: { user: any }) {
                                                 : "bg-muted/40 border-transparent"
                                     )}
                                 >
-                                    <Icon className={cn("mx-auto mb-1 absolute size-10 md:size-12 opacity-10 bottom-0 right-0", isCurrent ? "text-blue-600" : isNext ? "text-green-600" : "text-muted-foreground")}/>
+                                    <Icon
+                                        className={cn("mx-auto mb-1 absolute size-10 md:size-12 opacity-10 bottom-0 right-0", isCurrent ? "text-blue-600" : isNext ? "text-green-600" : "text-muted-foreground")}/>
                                     <p className="font-mono font-semibold leading-tight tracking-tighter text-sm">{time || "00:00 am"}</p>
                                     <p>{p}</p>
                                 </div>
@@ -350,12 +349,14 @@ export default function ModernDashboard({user}: { user: any }) {
                             <div className="flex items-center gap-2">
                                 <Sunrise className="w-4 h-4 text-orange-500"/>
                                 <span className="text-muted-foreground">Sunrise:</span>
-                                <span className="font-mono font-semibold">{prayerData?.items[0].shurooq || "00:00"}</span>
+                                <span
+                                    className="font-mono font-semibold">{prayerData?.items[0].shurooq || "00:00"}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Sunset className="w-4 h-4 text-purple-500"/>
                                 <span className="text-muted-foreground">Sunset:</span>
-                                <span className="font-mono font-semibold">{prayerData?.items[0].maghrib || "00:00"}</span>
+                                <span
+                                    className="font-mono font-semibold">{prayerData?.items[0].maghrib || "00:00"}</span>
                             </div>
                         </div>
                     )}
@@ -364,7 +365,7 @@ export default function ModernDashboard({user}: { user: any }) {
                 </CardContent>
             </Card>
             {/* Dashboard Diary */}
-            <LatestDiaryCard />
+            <LatestDiaryCard/>
         </div>
     );
 }

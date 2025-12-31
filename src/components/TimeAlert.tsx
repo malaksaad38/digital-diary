@@ -113,7 +113,7 @@ const TimeAlert = () => {
     }, [prayerData, currentTime])
 
     return (
-        <div className={"bg-red-400 z-50"}>
+        <div className={"bg-red-400 z-40"}>
             <div className="flex items-center justify-between">
                 <Badge variant="secondary"
                        className="text-[10px] md:text-base px-2 py-1 rou ">Now: {currentPrayer || "Prayer"}

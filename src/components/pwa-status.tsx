@@ -17,7 +17,7 @@ export default function PWAStatus() {
                         initial={{ y: -100, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -100, opacity: 0 }}
-                        className="fixed top-2 md:top-0 right-1/3 md:right-0 z-50 bg-muted  text-yellow-500 rounded-full py-0 md:py-2 px-4 text-center text-xs md:text-sm font-medium"
+                        className="fixed top-2 md:top-2 right-1/3 md:right-4 z-50 bg-muted  text-yellow-500 rounded-full py-0 md:py-2 px-4 text-center text-xs md:text-sm font-medium"
                     >
                         <div className="flex items-center justify-center gap-2">
                             <WifiOff className="w-4 h-6 md:h-4" />

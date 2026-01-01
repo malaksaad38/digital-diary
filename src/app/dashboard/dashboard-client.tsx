@@ -188,13 +188,13 @@ export default function ModernDashboard({user}: { user: any }) {
                     <Link href="/dashboard/entry">
                         <Button
                             className="w-full bg-green-600 hover:bg-green-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-3">
-                            <Plus className="w-4 h-4"/> Add Entry
+                            <Plus className="size-3 md:size-4"/> Add Entry
                         </Button>
                     </Link>
                     <Link href="/dashboard/diary">
                         <Button
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-3">
-                            <BookOpen className="w-4 h-4"/> My Diary
+                            <BookOpen className="size-3 md:size-4"/> My Diary
                         </Button>
                     </Link>
                 </div>
@@ -266,12 +266,12 @@ export default function ModernDashboard({user}: { user: any }) {
                     </div>
                     <div className="flex justify-between mt-4 pt-4 border-t text-[10px]  md:text-base">
                         <div className="flex items-center gap-2">
-                            <CalendarDays className="w-4 h-4 text-blue-500"/>
+                            <CalendarDays className="size-3 md:size-4 text-blue-500"/>
                             <span className="text-muted-foreground">Total Days</span>
                             <span className="font-mono font-semibold">{overallStats.total / 5}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-cyan-500"/>
+                            <Calendar className="size-3 md:size-4 text-cyan-500"/>
                             <span className="text-muted-foreground">Total Prayers</span>
                             <span className="font-mono font-semibold">{overallStats.total}</span>
                         </div>
@@ -344,22 +344,36 @@ export default function ModernDashboard({user}: { user: any }) {
                             );
                         })}
                     </div>
-                    {prayerData?.items[0].shurooq && (
+                    {prayerData?.items[0].shurooq ? (
                         <div className="flex justify-between mt-4 pt-4 border-t text-[10px] md:text-base">
                             <div className="flex items-center gap-2">
-                                <Sunrise className="w-4 h-4 text-orange-500"/>
+                                <Sunrise className="size-3 md:size-4 text-orange-500"/>
                                 <span className="text-muted-foreground">Sunrise:</span>
                                 <span
-                                    className="font-mono font-semibold">{prayerData?.items[0].shurooq || "00:00"}</span>
+                                    className="font-mono font-semibold">{prayerData?.items[0].shurooq}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Sunset className="w-4 h-4 text-purple-500"/>
+                                <Sunset className="size-3 md:size-4 text-purple-500"/>
                                 <span className="text-muted-foreground">Sunset:</span>
                                 <span
-                                    className="font-mono font-semibold">{prayerData?.items[0].maghrib || "00:00"}</span>
+                                    className="font-mono font-semibold">{prayerData?.items[0].maghrib}</span>
                             </div>
                         </div>
-                    )}
+                    ):
+                        <div className="flex justify-between mt-4 pt-4 border-t text-[10px] md:text-base">
+                        <div className="flex items-center gap-2">
+                            <Sunrise className="size-3 md:size-4 text-orange-500"/>
+                            <span className="text-muted-foreground">Sunrise:</span>
+                            <span
+                                className="font-mono font-semibold">00:00</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Sunset className="size-3 md:size-4 text-purple-500"/>
+                            <span className="text-muted-foreground">Sunset:</span>
+                            <span
+                                className="font-mono font-semibold">00:00</span>
+                        </div>
+                    </div>}
 
 
                 </CardContent>

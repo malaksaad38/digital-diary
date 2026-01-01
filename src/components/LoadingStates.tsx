@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import {motion} from "framer-motion";
+import {Loader2} from "lucide-react";
 
 // ============================================
 // MAIN FALLBACK LOADING PAGE
@@ -12,13 +12,14 @@ export default function FallbackLoading() {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
             {/* Animated Background Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/5 animate-pulse" />
+            <div
+                className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/5 animate-pulse"/>
 
             {/* Main Loading Content */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                initial={{opacity: 0, scale: 0.9}}
+                animate={{opacity: 1, scale: 1}}
+                transition={{duration: 0.4, ease: [0.25, 0.1, 0.25, 1]}}
                 className="relative z-10 flex flex-col items-center gap-6"
             >
                 {/* Spinning Loader with Glow Effect */}
@@ -39,7 +40,7 @@ export default function FallbackLoading() {
 
                     {/* Main spinner */}
                     <motion.div
-                        animate={{ rotate: 360 }}
+                        animate={{rotate: 360}}
                         transition={{
                             duration: 1,
                             repeat: Infinity,
@@ -47,21 +48,21 @@ export default function FallbackLoading() {
                         }}
                         className="relative"
                     >
-                        <Loader2 size={48} className="text-primary" strokeWidth={2.5} />
+                        <Loader2 size={48} className="text-primary" strokeWidth={2.5}/>
                     </motion.div>
                 </div>
 
                 {/* Loading Text with Animation */}
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
+                    initial={{opacity: 0, y: 10}}
+                    animate={{opacity: 1, y: 0}}
+                    transition={{delay: 0.2, duration: 0.4}}
                     className="flex flex-col items-center gap-2"
                 >
                     <p className="text-lg font-semibold text-foreground">Loading</p>
                     <motion.div
-                        animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
+                        animate={{opacity: [0.5, 1, 0.5]}}
+                        transition={{duration: 1.5, repeat: Infinity}}
                         className="text-sm text-muted-foreground"
                     >
                         Please wait...
@@ -99,16 +100,16 @@ export function MobileFallbackLoading() {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                initial={{opacity: 0, scale: 0.95}}
+                animate={{opacity: 1, scale: 1}}
+                transition={{duration: 0.3, ease: [0.25, 0.1, 0.25, 1]}}
                 className="flex flex-col items-center gap-4 p-8"
             >
                 {/* iPhone-style minimal spinner */}
                 <div className="relative w-16 h-16">
                     <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        animate={{rotate: 360}}
+                        transition={{duration: 1, repeat: Infinity, ease: "linear"}}
                         className="absolute inset-0"
                     >
                         <svg
@@ -138,9 +139,9 @@ export function MobileFallbackLoading() {
                 </div>
 
                 <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
+                    initial={{opacity: 0}}
+                    animate={{opacity: 1}}
+                    transition={{delay: 0.2}}
                     className="text-sm font-medium text-muted-foreground"
                 >
                     Loading...

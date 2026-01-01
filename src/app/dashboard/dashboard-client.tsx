@@ -3,10 +3,10 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {
     Activity,
-    ArrowRight,
     BookOpen,
     Calendar,
     CalendarDays,
+    ChevronRight,
     Clock,
     CloudSun,
     MapPin,
@@ -188,13 +188,13 @@ export default function ModernDashboard({user}: { user: any }) {
                     <Link href="/dashboard/entry">
                         <Button
                             className="w-full bg-green-600 hover:bg-green-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-3">
-                            <Plus className="size-3 md:size-4"/> Add Entry
+                            <Plus className="size-4"/> Add Entry
                         </Button>
                     </Link>
                     <Link href="/dashboard/diary">
                         <Button
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-3">
-                            <BookOpen className="size-3 md:size-4"/> My Diary
+                            <BookOpen className="size-4"/> My Diary
                         </Button>
                     </Link>
                 </div>
@@ -208,7 +208,7 @@ export default function ModernDashboard({user}: { user: any }) {
                         <p className="font-semibold text-sm md:text-base">Prayer Analytics</p>
                         <Link href="/dashboard/analytics">
                             <Button size="sm" variant="outline" className="text-xs">
-                                Details <ArrowRight className="w-3 h-3 ml-1"/>
+                                Details <ChevronRight className="w-3 h-3"/>
                             </Button>
                         </Link>
                     </div>
@@ -254,7 +254,7 @@ export default function ModernDashboard({user}: { user: any }) {
                             const Icon = stat.icon;
                             return (
                                 <div key={stat.label}
-                                     className={cn(stat.bg, "relative flex-1 ga1 mx-0.5 rounded p-2 md:p-4")}>
+                                     className={cn(stat.bg, "relative flex-1 rounded p-2 md:p-4")}>
                                     <Icon
                                         className={cn("mx-auto size-10 md:size-14 mb-1 absolute top-1 right-0 opacity-10", stat.color)}/>
                                     <p className="font-bold text-base">{stat.value}</p>
@@ -298,7 +298,7 @@ export default function ModernDashboard({user}: { user: any }) {
                             </Button>
                             <Link href="/dashboard/prayer-times">
                                 <Button size="sm" variant="outline" className="text-xs p-1">
-                                    Details <ArrowRight className="w-3 h-3 ml-1"/>
+                                    Details <ChevronRight className="w-3 h-3 ml-1"/>
                                 </Button>
                             </Link>
                         </div>

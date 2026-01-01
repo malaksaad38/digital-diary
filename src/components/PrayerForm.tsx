@@ -225,7 +225,7 @@ export default function PrayerForm({session}: any) {
         <Card className="w-full h-full shadow-lg border-border/50">
             <CardHeader className="space-y-1 pb-4">
                 <CardTitle className="text-center text-xl sm:text-2xl font-bold flex items-center justify-center gap-2">
-                    <StarsIcon className="h-6 w-6" />
+                    <StarsIcon className="h-6 w-6"/>
                     Daily Prayer
                 </CardTitle>
                 {existingPrayerId && !isEditMode && (

@@ -3,7 +3,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {ArrowRight, Calendar, Loader2, Plus} from "lucide-react";
+import {ArrowRight, Calendar, ChevronRight, Loader2, Plus} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCombinedHistory } from "@/hooks/use-prayer-queries";
 import PrayerLog from "@/components/diary/PrayerLog";
@@ -88,7 +88,7 @@ export default function LatestEntryCard() {
             {/*            </div>*/}
             {/*        </div>}*/}
             {/*</div>*/}
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 px-3 md:px-6">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                         <Calendar className="h-4 w-4 opacity-70" />
@@ -105,12 +105,12 @@ export default function LatestEntryCard() {
                         size="sm"
                         onClick={() => router.push("/dashboard/diary")}
                     >
-                        View All <ArrowRight className="w-3 h-3 ml-1"/>
+                        View All <ChevronRight className="w-3 h-3"/>
                     </Button>
                 </div>
             </CardHeader>
 
-            <CardContent className="space-y-4 pt-0">
+            <CardContent className="space-y-4 pt-0 px-3 md:px-6">
                 {/* Prayer */}
                 <PrayerLog
                     prayer={latestEntry.prayer}

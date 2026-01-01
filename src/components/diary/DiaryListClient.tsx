@@ -215,7 +215,7 @@ export default function DiaryListClient() {
                         {paginatedEntries.map((entry: any) => (
                             <Card
                                 key={entry.date}
-                                className={`relative border shadow-sm bg-card ${entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
+                                className={`relative gap-2 border shadow-sm bg-card ${entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
                                 entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
                                 entry.prayer.esha === "on time" ? "border-green-500 bg-green-300/10" : ""}`}
                             >
@@ -234,7 +234,7 @@ export default function DiaryListClient() {
                                             </div>
                                         </div>}
                                 </div>
-                                <CardHeader className="pb-3 sm:pb-4">
+                                <CardHeader className="pb-3 sm:pb-4 px-3 md:px-6">
                                     <div className="flex items-center justify-between">
                                         <CardTitle
                                             className="text-base sm:text-lg font-semibold flex items-center gap-2">
@@ -251,7 +251,7 @@ export default function DiaryListClient() {
                                     </div>
                                 </CardHeader>
 
-                                <CardContent className="pt-0 space-y-4">
+                                <CardContent className="pt-0 space-y-4 px-3 md:px-6">
                                     {/* Prayer Section */}
                                     <PrayerLog
                                         prayer={entry.prayer}

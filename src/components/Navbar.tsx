@@ -6,12 +6,13 @@ import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useTheme} from "next-themes";
 import {motion} from "framer-motion";
-import {Clock8, Home, Moon, Notebook, PenLine, PieChartIcon, Sun,} from "lucide-react";
+import {Clock8, Home, Moon, Notebook, PenLine, PieChartIcon, Plus, PlusCircleIcon, Sun,} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";
 import ButtonLogout from "@/components/ButtonLogout";
 import TimeAlert from "@/components/TimeAlert";
+import PWAStatus from "@/components/pwa-status";
 
 export default function Navbar({user}: { user: any }) {
     const [time, setTime] = useState<Date | null>(null)
@@ -40,9 +41,11 @@ export default function Navbar({user}: { user: any }) {
         <>
             {/* 🌐 Desktop Navbar */}
             <div className={"fixed top-0 left-0 right-0 z-40"}>
-                {/*<div className="hidden md:block">*/}
-                {/*    <TimeAlert/>*/}
-                {/*</div>*/}
+                <div className="hidden md:block">
+                    {/*<TimeAlert/>*/}
+                    <PWAStatus/>
+                </div>
+
                 <motion.nav
                     initial={{opacity: 0, y: -8}}
                     animate={{opacity: 1, y: 0}}
@@ -95,9 +98,10 @@ export default function Navbar({user}: { user: any }) {
                 transition={{duration: 0.35, ease: [0.25, 0.1, 0.25, 1]}}
                 className="sm:hidden fixed top-0 left-0 right-0 z-40"
             >
-                {/*<div className="md:hidden">*/}
-                {/*    <TimeAlert/>*/}
-                {/*</div>*/}
+                <div className="md:hidden">
+                    {/*<TimeAlert/>*/}
+                    <PWAStatus/>
+                </div>
                 <div
                     className="relative overflow-hidden  border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xs shadow-lg shadow-black/5">
                     {/* Subtle inner glow */}
@@ -239,7 +243,7 @@ export default function Navbar({user}: { user: any }) {
                         />
                         <NavIcon
                             href="/dashboard/entry"
-                            icon={<PenLine size={20}/>}
+                            icon={<PlusCircleIcon size={20}/>}
                             label="Entry"
                             active={pathname === "/dashboard/entry"}
                         />

@@ -133,7 +133,7 @@ export default function PrayerLog({ prayer, date, onEdit }: PrayerLogProps) {
       </div>
 
       {/* Prayer Table */}
-      <div className="overflow-x-auto rounded-md border -mx-4 sm:mx-0">
+      <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">

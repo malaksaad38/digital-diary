@@ -191,7 +191,7 @@ export default function Navbar({user}: { user: any }) {
                                <span className="text-xs font-semibold text-foreground/80 leading-relaxed">
                               {currentPage}
                             </span>
-                            <div className={"h-4 w-0.5 rounded-full bg-foreground/60"}></div>
+                            <div className={"h-4 w-[1px] rounded-full bg-foreground/60"}></div>
                             {/* Theme Toggle */}
                             <Button
                                 variant="ghost"

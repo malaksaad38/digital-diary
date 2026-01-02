@@ -211,7 +211,7 @@ export default function ModernDashboard({user}: { user: any }) {
                         </Link>
                     </div>
 
-                    <div className="flex justify-between text-xs md:text-base md:gap-4">
+                    <div className="flex justify-between text-xs md:text-base gap-1 md:gap-4">
                         {[
                             {
                                 label: "On Time",
@@ -252,7 +252,7 @@ export default function ModernDashboard({user}: { user: any }) {
                             const Icon = stat.icon;
                             return (
                                 <div key={stat.label}
-                                     className={cn(stat.bg, "relative flex-1 rounded p-2 md:p-4")}>
+                                     className={cn(stat.bg, "relative flex-1 rounded  p-2 md:p-4")}>
                                     <Icon
                                         className={cn("mx-auto size-10 md:size-14 mb-1 absolute top-1 right-0 opacity-10", stat.color)}/>
                                     <p className="font-bold text-base">{stat.value}</p>

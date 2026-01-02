@@ -186,15 +186,13 @@ export default function ModernDashboard({user}: { user: any }) {
                 {/* Quick Actions */}
                 <div className="fixed sm:static bottom-20 left-4 right-4 z-20 grid grid-cols-2 gap-2">
                     <Link href="/dashboard/entry">
-                        <Button
-                            className="w-full bg-green-600 hover:bg-green-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-3">
-                            <Plus className="size-4"/> Add Entry
+                        <Button  className={"w-full"}>
+                            <Plus/> Add Entry
                         </Button>
                     </Link>
                     <Link href="/dashboard/diary">
-                        <Button
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base py-4 flex items-center justify-center gap-1 md:gap-3">
-                            <BookOpen className="size-4"/> My Diary
+                        <Button  className={"w-full"}>
+                            <BookOpen/> My Diary
                         </Button>
                     </Link>
                 </div>

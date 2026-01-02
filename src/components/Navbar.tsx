@@ -201,11 +201,11 @@ export default function Navbar({user}: { user: any }) {
                                 aria-label="Toggle theme"
                             >
                                 {theme === "light" ? (
-                                    <div className={"text-foreground bg-background ml-3 rounded-full p-1 outline"}>
+                                    <div className={"text-foreground bg-background ml-2 rounded-full p-1"}>
                                         <Sun size={12} strokeWidth={2.5}/>
                                     </div>
                                 ) : (
-                                    <div className={"text-foreground bg-background mr-3 rounded-full p-1 outline"}>
+                                    <div className={"text-foreground bg-background mr-2 rounded-full p-1"}>
                                         <Moon size={12} strokeWidth={2.5}/>
                                     </div>
                                 )}

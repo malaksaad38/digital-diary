@@ -12,7 +12,7 @@ export default function PWAStatus() {
         <>
             {/* Offline Indicator */}
             <AnimatePresence>
-                {!isOnline || (
+                {!isOnline && (
                     <motion.div
                         initial={{ y: -100, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}

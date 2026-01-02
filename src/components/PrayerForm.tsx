@@ -55,7 +55,7 @@ export default function PrayerForm({session}: any) {
 
     const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
     const prayerOptions = ["Missed", "Alone", "Jamaat", "On Time"];
-    const reciteOptions = ["0", "2", "Custom"];
+    const reciteOptions = ["0", "3", "Custom"];
     const zikrOptions = ["Half", "Full", "None"];
     const customReciteValues = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2", "2.25", "2.5", "2.75", "3", "3.25", "3.5", "3.75", "4", "5"];
 

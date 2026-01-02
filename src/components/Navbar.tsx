@@ -144,7 +144,7 @@ export default function Navbar({user}: { user: any }) {
                                                 alt="User Avatar"
                                                 fill
                                                 sizes="24px"
-                                                className="object-cover"
+                                                className="object-cover rounded-full"
                                             />
                                         </div>
 

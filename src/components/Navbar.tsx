@@ -138,7 +138,7 @@ export default function Navbar({user}: { user: any }) {
                                     className="w-72 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xs border border-black/5 dark:border-white/10 rounded-[22px] shadow-xl shadow-black/10 p-4 mt-1"
                                 >
                                     <div className="flex items-center gap-2">
-                                        <div className="relative w-20 h-14 rounded-full">
+                                        <div className="relative w-14 h-14 rounded-full">
                                             <Image
                                                 src={user?.image || "/default-avatar.png"}
                                                 alt="User Avatar"

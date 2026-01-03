@@ -196,15 +196,15 @@ export default function Navbar({user}: { user: any }) {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                                className="p-0 h-6 w-8 rounded-full  bg-foreground text-background "
+                                className="p-0 h-6 w-8 rounded-full  bg-foreground text-background border border-foreground"
                                 aria-label="Toggle theme"
                             >
                                 {theme === "light" ? (
-                                    <div className={"text-foreground bg-background ml-2 rounded-full p-1"}>
+                                    <div className={"text-foreground bg-background ml-2 rounded-full p-[3px]"}>
                                         <Sun size={12} strokeWidth={2.5}/>
                                     </div>
                                 ) : (
-                                    <div className={"text-foreground bg-background mr-2 rounded-full p-1"}>
+                                    <div className={"text-foreground bg-background mr-2 rounded-full p-[3px]"}>
                                         <Moon size={12} strokeWidth={2.5}/>
                                     </div>
                                 )}

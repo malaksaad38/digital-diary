@@ -42,7 +42,7 @@ export default function Navbar({user}: { user: any }) {
             {/* 🌐 Desktop Navbar */}
             <div className={"fixed top-0 left-0 right-0 z-40"}>
                 <div className="hidden md:block">
-                    {/*<TimeAlert/>*/}
+                    <TimeAlert/>
                     <PWAStatus/>
                 </div>
 
@@ -99,7 +99,7 @@ export default function Navbar({user}: { user: any }) {
                 className="sm:hidden fixed top-0 left-0 right-0 z-40"
             >
                 <div className="md:hidden">
-                    {/*<TimeAlert/>*/}
+                    <TimeAlert/>
                     <PWAStatus/>
                 </div>
                 <div

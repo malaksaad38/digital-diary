@@ -2,6 +2,7 @@
 
 import {motion} from "framer-motion";
 import {Loader2} from "lucide-react";
+import {Card} from "@/components/ui/card";
 
 // ============================================
 // MAIN FALLBACK LOADING PAGE
@@ -96,9 +97,9 @@ export default function FallbackLoading() {
 // MOBILE-OPTIMIZED FALLBACK (iPhone Style)
 // ============================================
 
-export function MobileFallbackLoading() {
+export function LoadingState({label}: any) {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+        <Card>
             <motion.div
                 initial={{opacity: 0, scale: 0.95}}
                 animate={{opacity: 1, scale: 1}}
@@ -144,9 +145,9 @@ export function MobileFallbackLoading() {
                     transition={{delay: 0.2}}
                     className="text-sm font-medium text-muted-foreground"
                 >
-                    Loading...
+                    {label || "Loading..."}
                 </motion.p>
             </motion.div>
-        </div>
+        </Card>
     );
 }

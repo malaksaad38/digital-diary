@@ -6,7 +6,7 @@ const EntryForm = async () => {
     const session = await auth();
 
     return (
-        <div className="grid md:grid-cols-2 gap-6 px-4 mb-3 pb-8 pt-4 md:pt-8">
+        <div className="grid md:grid-cols-2 gap-6 px-4 mb-3 pt-4 md:pt-8">
             <PrayerForm session={session}/>
             <DiaryForm session={session}/>
         </div>

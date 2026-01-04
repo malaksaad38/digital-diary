@@ -100,7 +100,7 @@ export default function PrayerForm({session}: any) {
                 zikr: capitalizeFirst(existingPrayer.zikr) || "",
             });
 
-            if (existingPrayer.recite === "0" || existingPrayer.recite === "2") {
+            if (existingPrayer.recite === "0" || existingPrayer.recite === "3") {
                 setReciteMode(existingPrayer.recite);
                 setCustomRecite("");
             } else {
@@ -161,7 +161,7 @@ export default function PrayerForm({session}: any) {
                 esha: capitalizeFirst(existingPrayer.esha),
                 zikr: capitalizeFirst(existingPrayer.zikr) || "",
             });
-            if (existingPrayer.recite === "0" || existingPrayer.recite === "2") {
+            if (existingPrayer.recite === "0" || existingPrayer.recite === "3") {
                 setReciteMode(existingPrayer.recite);
                 setCustomRecite("");
             } else {

@@ -222,10 +222,10 @@ export default function Navbar({user}: { user: any }) {
                 className="sm:hidden fixed bottom-2 left-2 right-2 z-50"
             >
                 <div
-                    className="relative  rounded-full border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xs shadow-lg shadow-black/5">
+                    className="relative rounded-full border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xs shadow-lg shadow-black/5">
                     {/* Subtle inner glow */}
                     <div
-                        className="absolute inset-0 bg-gradient-to-t from-white/80 to-white/40 dark:from-white/5 dark:to-transparent pointer-events-none"/>
+                        className="absolute  pointer-events-none"/>
 
                     <div className="relative flex items-center justify-around px-3 py-1">
                         <NavIcon

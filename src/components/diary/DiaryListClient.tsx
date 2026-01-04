@@ -4,13 +4,12 @@
 import React from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {Calendar, ChevronLeft, ChevronRight, Loader2, RefreshCw, Search, X} from "lucide-react";
+import {Calendar, ChevronLeft, ChevronRight, RefreshCw, Search, X} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
 import PrayerLog from "./PrayerLog";
 import DiaryLog from "./DiaryLog";
 import PrayerLegend from "@/components/diary/PrayerLegend";
-import {motion} from "framer-motion";
 import {LoadingState} from "@/components/LoadingStates";
 
 const ITEMS_PER_PAGE = 7;
@@ -165,76 +164,91 @@ export default function DiaryListClient() {
 
             {/* Loading State */}
             {isLoading ? (
-                <LoadingState label={"Loading data..."}/>)
+                    <LoadingState label={"Loading data..."}/>)
                 : filteredEntries.length === 0 ? (
-                // Empty State
-                <Card>
-                    <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
-                        <Calendar className="h-16 w-16 text-muted-foreground/50"/>
-                        <div className="text-center space-y-2">
-                            <h3 className="text-lg font-semibold">
-                                {searchQuery ? 'No Matching Entries' : 'No Records Found'}
-                            </h3>
-                            <p className="text-sm text-muted-foreground max-w-sm">
-                                {searchQuery
-                                    ? `No entries found matching "${searchQuery}". Try a different search term.`
-                                    : 'Start tracking your daily prayers and thoughts by adding your first entry.'
-                                }
+                    // Empty State
+                    <Card>
+                        <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
+                            <Calendar className="h-16 w-16 text-muted-foreground/50"/>
+                            <div className="text-center space-y-2">
+                                <h3 className="text-lg font-semibold">
+                                    {searchQuery ? 'No Matching Entries' : 'No Records Found'}
+                                </h3>
+                                <p className="text-sm text-muted-foreground max-w-sm">
+                                    {searchQuery
+                                        ? `No entries found matching "${searchQuery}". Try a different search term.`
+                                        : 'Start tracking your daily prayers and thoughts by adding your first entry.'
+                                    }
+                                </p>
+                            </div>
+                            {searchQuery ? (
+                                <Button onClick={() => setSearchQuery("")} variant="outline" className="mt-4">
+                                    Clear Search
+                                </Button>
+                            ) : (
+                                <Button onClick={handleAddNewClick} className="mt-4">
+                                    Add First Entry
+                                </Button>
+                            )}
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <>
+                        {/* Pagination Info */}
+                        <div className="flex items-center justify-between text-sm text-muted-foreground px-1">
+                            <p>
+                                Showing {startIndex + 1}-{Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length} entries
+                            </p>
+                            <p>
+                                Page {currentPage} of {totalPages}
                             </p>
                         </div>
-                        {searchQuery ? (
-                            <Button onClick={() => setSearchQuery("")} variant="outline" className="mt-4">
-                                Clear Search
-                            </Button>
-                        ) : (
-                            <Button onClick={handleAddNewClick} className="mt-4">
-                                Add First Entry
-                            </Button>
-                        )}
-                    </CardContent>
-                </Card>
-            ) : (
-                <>
-                    {/* Pagination Info */}
-                    <div className="flex items-center justify-between text-sm text-muted-foreground px-1">
-                        <p>
-                            Showing {startIndex + 1}-{Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length} entries
-                        </p>
-                        <p>
-                            Page {currentPage} of {totalPages}
-                        </p>
-                    </div>
 
-                    {/* Combined Entries */}
-                    <div className="space-y-4">
-                        {paginatedEntries.map((entry: any) => (
-                            <Card
-                                key={entry.date}
-                                className={`relative gap-2 border shadow-sm bg-card ${entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
-                                entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
-                                entry.prayer.esha === "on time" ? "border-green-500 bg-green-300/10" : ""}`}
-                            >
-                                <div className={"absolute right-0"}>
-                                    {entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
-                                        entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
-                                        entry.prayer.esha === "on time" &&
-                                        <div className="flex justify-end px-6">
-                                            <div
-                                                className="relative flex justify-center items-center gap-2 text-foreground px-3 py-1  rounded-full  shadow-lg shadow-green-300/50 text-xs md:text-sm">
+                        {/* Combined Entries */}
+                        <div className="space-y-4">
+                            {paginatedEntries.map((entry: any) => (
+                                <Card
+                                    key={entry.date}
+                                    className={`relative gap-2 border shadow-sm bg-card ${entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
+                                    entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
+                                    entry.prayer.esha === "on time" && "border-sky-500 bg-sky-300/10" || (entry.prayer.fajr === "on time" || entry.prayer.fajr === "jamaat") && (entry.prayer.zuhr === "on time" || entry.prayer.zuhr === "jamaat") &&
+                                    (entry.prayer.asar === "on time" || entry.prayer.asar === "jamaat") && (entry.prayer.maghrib === "on time" || entry.prayer.maghrib === "jamaat") &&
+                                    (entry.prayer.esha === "on time" || entry.prayer.esha === "jamaat") && "border-green-500 bg-green-300/10"}`}
+                                >
+                                    <div className={"absolute right-3 md:right-7 z-10"}>
+                                        {entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
+                                            entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
+                                            entry.prayer.esha === "on time" &&
+                                            <div className="flex justify-end z-10">
+                                                <div
+                                                    className="relative flex justify-center items-center gap-2 text-sky-950 px-3 py-1 bg-sky-300 rounded-full  shadow-lg shadow-sky-300/50 text-xs md:text-sm">
+                                                    <span
+                                                        className={"w-2 h-2 rounded-full bg-sky-500 animate-ping"}></span>
+                                                    <span
+                                                        className={"absolute left-3 w-2 h-2 rounded-full bg-sky-500 animate-pulse"}></span>
+                                                    <span>Excellent</span>
+                                                </div>
+                                            </div> || (entry.prayer.fajr === "on time" || entry.prayer.fajr === "jamaat") && (entry.prayer.zuhr === "on time" || entry.prayer.zuhr === "jamaat") &&
+                                            (entry.prayer.asar === "on time" || entry.prayer.asar === "jamaat") && (entry.prayer.maghrib === "on time" || entry.prayer.maghrib === "jamaat") &&
+                                            (entry.prayer.esha === "on time" || entry.prayer.esha === "jamaat") &&
+                                            <div className="flex justify-end">
+                                                <div
+                                                    className="relative flex justify-center items-center gap-2 text-green-950 bg-green-300 px-3 py-1  rounded-full  shadow-lg shadow-green-300/50 text-xs md:text-sm">
                                                 <span
                                                     className={"w-2 h-2 rounded-full bg-green-500 animate-ping"}></span>
-                                                <span
-                                                    className={"absolute left-3 w-2 h-2 rounded-full bg-green-500 animate-pulse"}></span>
-                                                <span>Excellent</span>
-                                            </div>
-                                        </div>}
-                                </div>
-                                <CardHeader className="pb-3 sm:pb-4 px-3 md:px-6">
-                                    <div className="flex items-center justify-between">
-                                        <CardTitle
-                                            className="text-base sm:text-lg font-semibold flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 opacity-70"/>
-                                            <span>
+                                                    <span
+                                                        className={"absolute left-3 w-2 h-2 rounded-full bg-green-500 animate-pulse"}></span>
+                                                    <span>Good</span>
+                                                </div>
+                                            </div>}
+                                    </div>
+
+                                    <CardHeader className="pb-3 sm:pb-4 px-3 md:px-6">
+                                        <div className="flex items-center justify-between">
+                                            <CardTitle
+                                                className="text-base sm:text-lg font-semibold flex items-center gap-2">
+                                                <Calendar className="h-4 w-4 opacity-70"/>
+                                                <span>
                         {new Date(entry.date).toLocaleDateString("en-US", {
                             weekday: "short",
                             year: "numeric",
@@ -242,83 +256,83 @@ export default function DiaryListClient() {
                             day: "numeric",
                         })}
                       </span>
-                                        </CardTitle>
-                                    </div>
-                                </CardHeader>
+                                            </CardTitle>
+                                        </div>
+                                    </CardHeader>
 
-                                <CardContent className="pt-0 space-y-4 px-3 md:px-6">
-                                    {/* Prayer Section */}
-                                    <PrayerLog
-                                        prayer={entry.prayer}
-                                        date={entry.date}
-                                        onEdit={handleEditClick}
-                                    />
+                                    <CardContent className="pt-0 space-y-4 px-3 md:px-6">
+                                        {/* Prayer Section */}
+                                        <PrayerLog
+                                            prayer={entry.prayer}
+                                            date={entry.date}
+                                            onEdit={handleEditClick}
+                                        />
 
-                                    {/* Diary Section */}
-                                    <DiaryLog
-                                        diary={entry.diary}
-                                        date={entry.date}
-                                        onEdit={handleEditDiary}
-                                        onAdd={handleAddDiary}
-                                    />
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
+                                        {/* Diary Section */}
+                                        <DiaryLog
+                                            diary={entry.diary}
+                                            date={entry.date}
+                                            onEdit={handleEditDiary}
+                                            onAdd={handleAddDiary}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
 
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                        <div>
-                            <div className="flex items-center justify-center gap-2">
-                                {/* Previous Button */}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handlePreviousPage}
-                                    disabled={currentPage === 1}
-                                    className="gap-1"
-                                >
-                                    <ChevronLeft className="h-4 w-4"/>
-                                    <span className="hidden sm:inline">Previous</span>
-                                </Button>
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div>
+                                <div className="flex items-center justify-center gap-2">
+                                    {/* Previous Button */}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handlePreviousPage}
+                                        disabled={currentPage === 1}
+                                        className="gap-1"
+                                    >
+                                        <ChevronLeft className="h-4 w-4"/>
+                                        <span className="hidden sm:inline">Previous</span>
+                                    </Button>
 
-                                {/* Page Numbers */}
-                                <div className="flex items-center gap-1">
-                                    {getPageNumbers().map((page, index) => (
-                                        typeof page === 'number' ? (
-                                            <Button
-                                                key={index}
-                                                variant={currentPage === page ? "default" : "outline"}
-                                                size="sm"
-                                                onClick={() => handlePageClick(page)}
-                                                className="w-9 h-9 p-0"
-                                            >
-                                                {page}
-                                            </Button>
-                                        ) : (
-                                            <span key={index} className="px-2 text-muted-foreground">
+                                    {/* Page Numbers */}
+                                    <div className="flex items-center gap-1">
+                                        {getPageNumbers().map((page, index) => (
+                                            typeof page === 'number' ? (
+                                                <Button
+                                                    key={index}
+                                                    variant={currentPage === page ? "default" : "outline"}
+                                                    size="sm"
+                                                    onClick={() => handlePageClick(page)}
+                                                    className="w-9 h-9 p-0"
+                                                >
+                                                    {page}
+                                                </Button>
+                                            ) : (
+                                                <span key={index} className="px-2 text-muted-foreground">
                           {page}
                         </span>
-                                        )
-                                    ))}
-                                </div>
+                                            )
+                                        ))}
+                                    </div>
 
-                                {/* Next Button */}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleNextPage}
-                                    disabled={currentPage === totalPages}
-                                    className="gap-1"
-                                >
-                                    <span className="hidden sm:inline">Next</span>
-                                    <ChevronRight className="h-4 w-4"/>
-                                </Button>
+                                    {/* Next Button */}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleNextPage}
+                                        disabled={currentPage === totalPages}
+                                        className="gap-1"
+                                    >
+                                        <span className="hidden sm:inline">Next</span>
+                                        <ChevronRight className="h-4 w-4"/>
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </>
-            )}
+                        )}
+                    </>
+                )}
         </>
     );
 }

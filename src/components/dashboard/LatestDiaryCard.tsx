@@ -9,6 +9,7 @@ import { useCombinedHistory } from "@/hooks/use-prayer-queries";
 import PrayerLog from "@/components/diary/PrayerLog";
 import DiaryLog from "@/components/diary/DiaryLog";
 import {motion} from "framer-motion";
+import {LoadingState} from "@/components/LoadingStates";
 
 export default function LatestEntryCard() {
     const router = useRouter();
@@ -47,58 +48,7 @@ export default function LatestEntryCard() {
     /* ---------------- Loading ---------------- */
     if (isLoading) {
         return (
-            <Card>
-            <div className="text-center py-8 text-muted-foreground">
-                <motion.div
-                    initial={{opacity: 0, scale: 0.95}}
-                    animate={{opacity: 1, scale: 1}}
-                    transition={{duration: 0.3, ease: [0.25, 0.1, 0.25, 1]}}
-                    className="flex flex-col items-center gap-4 p-8"
-                >
-                    {/* iPhone-style minimal spinner */}
-                    <div className="relative w-16 h-16">
-                        <motion.div
-                            animate={{rotate: 360}}
-                            transition={{duration: 1, repeat: Infinity, ease: "linear"}}
-                            className="absolute inset-0"
-                        >
-                            <svg
-                                className="w-full h-full"
-                                viewBox="0 0 50 50"
-                            >
-                                <circle
-                                    className="stroke-primary/20"
-                                    cx="25"
-                                    cy="25"
-                                    r="20"
-                                    fill="none"
-                                    strokeWidth="4"
-                                />
-                                <circle
-                                    className="stroke-primary"
-                                    cx="25"
-                                    cy="25"
-                                    r="20"
-                                    fill="none"
-                                    strokeWidth="4"
-                                    strokeDasharray="80 40"
-                                    strokeLinecap="round"
-                                />
-                            </svg>
-                        </motion.div>
-                    </div>
-
-                    <motion.p
-                        initial={{opacity: 0}}
-                        animate={{opacity: 1}}
-                        transition={{delay: 0.2}}
-                        className="text-sm font-medium text-muted-foreground"
-                    >
-                        Loading data...
-                    </motion.p>
-                </motion.div>
-            </div>
-            </Card>
+           <LoadingState label={"Loading data..."} />
         );
     }
 

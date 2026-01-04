@@ -220,24 +220,18 @@ export default function DiaryListClient() {
                                             entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
                                             entry.prayer.esha === "on time" &&
                                             <div className="flex justify-end z-10">
-                                                <div
-                                                    className="relative flex justify-center items-center gap-2 text-sky-950 px-3 py-1 bg-sky-300 rounded-full  shadow-lg shadow-sky-300/50 text-xs md:text-sm">
-                                                    <span
-                                                        className={"w-2 h-2 rounded-full bg-sky-500 animate-ping"}></span>
-                                                    <span
-                                                        className={"absolute left-3 w-2 h-2 rounded-full bg-sky-500 animate-pulse"}></span>
+                                                <div className="relative flex justify-center items-center gap-2 text-sky-950 px-3 py-1 bg-sky-300 rounded-full  shadow-lg shadow-sky-300/50 text-xs md:text-sm">
+                                                    <span className={"w-2 h-2 rounded-full bg-sky-500 animate-ping"}></span>
+                                                    <span className={"absolute left-3 w-2 h-2 rounded-full bg-sky-500 animate-pulse"}></span>
                                                     <span>Excellent</span>
                                                 </div>
                                             </div> || (entry.prayer.fajr === "on time" || entry.prayer.fajr === "jamaat") && (entry.prayer.zuhr === "on time" || entry.prayer.zuhr === "jamaat") &&
                                             (entry.prayer.asar === "on time" || entry.prayer.asar === "jamaat") && (entry.prayer.maghrib === "on time" || entry.prayer.maghrib === "jamaat") &&
                                             (entry.prayer.esha === "on time" || entry.prayer.esha === "jamaat") &&
                                             <div className="flex justify-end">
-                                                <div
-                                                    className="relative flex justify-center items-center gap-2 text-green-950 bg-green-300 px-3 py-1  rounded-full  shadow-lg shadow-green-300/50 text-xs md:text-sm">
-                                                <span
-                                                    className={"w-2 h-2 rounded-full bg-green-500 animate-ping"}></span>
-                                                    <span
-                                                        className={"absolute left-3 w-2 h-2 rounded-full bg-green-500 animate-pulse"}></span>
+                                                <div className="relative flex justify-center items-center gap-2 text-green-950 bg-green-300 px-3 py-1  rounded-full  shadow-lg shadow-green-300/50 text-xs md:text-sm">
+                                                <span className={"w-2 h-2 rounded-full bg-green-500 animate-ping"}></span>
+                                                    <span className={"absolute left-3 w-2 h-2 rounded-full bg-green-500 animate-pulse"}></span>
                                                     <span>Good</span>
                                                 </div>
                                             </div>}

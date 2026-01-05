@@ -623,18 +623,17 @@ export default function PrayerAnalyticsDashboard() {
 
 
                 {/* Individual Prayer Performance Cards */}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-3">
                     {isLoading ? (
                         // Loading skeleton for prayer cards
                         <>
                             {prayers.map((prayer) => (
                                 <Card key={prayer} className="overflow-hidden">
-                                    <CardHeader className="px-1">
+                                    <CardHeader className="px-1 flex justify-between items-center">
                                         <div className="flex items-center justify-between">
                                             <div className="h-5 w-16 bg-muted rounded animate-pulse"/>
-                                            <Clock className="h-4 w-4 text-muted-foreground"/>
                                         </div>
-                                        <div className="h-4 w-24 bg-muted rounded mt-2 animate-pulse"/>
+                                        <div className="h-4 w-24 bg-muted rounded animate-pulse"/>
                                     </CardHeader>
                                     <CardContent className="pt-1 space-y-2 px-1">
                                         {[...Array(4)].map((_, i) => (
@@ -653,36 +652,79 @@ export default function PrayerAnalyticsDashboard() {
                         <>
                             {prayers.map((prayer) => {
                                 const stats = prayerWiseStats[prayer];
-                                const prayerSuccessRate = stats.total > 0
+                                const prayerSuccessRate: any = stats.total > 0
                                     ? ((stats.jamaat + stats.onTime) / stats.total * 100).toFixed(1)
                                     : 0;
 
                                 return (
                                     <Card
                                         key={prayer}
-                                        className="group relative overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 px-6"
+                                        className={`${prayerSuccessRate < 30 && "bg-red-300/50" || prayerSuccessRate < 60 && "bg-yellow-300/20" || prayerSuccessRate < 90 && "bg-green-300/20" || prayerSuccessRate > 90 && "bg-sky-300/20"} group relative gap-5 md:gap-4 overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 p-4 px-6 md:px-4`}
                                     >
+                                        {prayerSuccessRate < 30  &&
+                                            <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
+                                                <div
+                                                    className="relative flex justify-center items-center gap-1.5 text-red-950 px-2 py-0.5 bg-red-300 rounded-full  shadow-lg shadow-red-300/50 text-[9px]">
+                                                    <span
+                                                        className={"w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"}></span>
+                                                    <span
+                                                        className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"}></span>
+                                                    <span>Bad</span>
+                                                </div>
+                                            </div>
+                                            || prayerSuccessRate < 60 &&
+                                            <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
+                                                <div
+                                                    className="relative flex justify-center items-center gap-1.5 text-yellow-950 px-2 py-0.5 bg-yellow-300 rounded-full  shadow-lg shadow-yellow-300/50 text-[9px]">
+                                                    <span
+                                                        className={"w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping"}></span>
+                                                    <span
+                                                        className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"}></span>
+                                                    <span>Normal</span>
+                                                </div>
+                                            </div>
+                                            || prayerSuccessRate < 90 &&
+                                            <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
+                                                <div
+                                                    className="relative flex justify-center items-center gap-1.5 text-green-950 px-2 py-0.5 bg-green-300 rounded-full  shadow-lg shadow-green-300/50 text-[9px]">
+                                                    <span
+                                                        className={"w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"}></span>
+                                                    <span
+                                                        className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"}></span>
+                                                    <span>Good</span>
+                                                </div>
+                                            </div>
+                                            || prayerSuccessRate > 90 &&
+                                            <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
+                                                <div
+                                                    className="relative flex justify-center items-center gap-1.5 text-sky-950 px-2 py-0.5 bg-sky-300 rounded-full  shadow-lg shadow-sky-300/50 text-[9px]">
+                                                    <span
+                                                        className={"w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"}></span>
+                                                    <span
+                                                        className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"}></span>
+                                                    <span>Excellent</span>
+                                                </div>
+                                            </div>}
                                         {/* Subtle gradient accent on hover */}
                                         <div
                                             className=" inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"/>
 
-                                        <CardHeader className={"px-1"}>
-                                            <div className="flex items-center justify-between">
-                                                <CardTitle
-                                                    className="text-base sm:text-lg font-semibold capitalize flex items-center gap-2">
+                                        <CardHeader className={"px-0"}>
+                                            <div className="flex flex-col gap-1">
+                                                <div
+                                                    className=" font-semibold capitalize flex items-center gap-2">
                                                     {prayerLabels[prayer as keyof typeof prayerLabels]}
-                                                </CardTitle>
-                                                <Clock
-                                                    className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors"/>
+                                                </div>
+                                                <div className="text-xs pt-2">
+                                                    <div className="font-medium text-foreground flex justify-between">
+                                                        <span
+                                                            className={"text-muted-foreground"}>Success Rate:</span> {prayerSuccessRate}%
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
-                                                Success Rate:{" "}
-                                                <span
-                                                    className="font-medium text-foreground">{prayerSuccessRate}%</span>
-                                            </CardDescription>
                                         </CardHeader>
 
-                                        <CardContent className="pt-1 space-y-2 text-sm px-1">
+                                        <CardContent className="pt-1 space-y-2 md:text-xs px-1">
                                             <div
                                                 className="flex items-center justify-between border-b border-border/40 pb-1.5">
         <span className="text-muted-foreground flex items-center gap-1">
@@ -716,9 +758,9 @@ export default function PrayerAnalyticsDashboard() {
                                         </CardContent>
 
                                         {/* Optional Progress Bar */}
-                                        <div className="mt-3 mx-4 mb-4 h-2 rounded-full bg-muted overflow-hidden ">
+                                        <div className="mt-3 mb-4 h-2 rounded-full bg-white dark:bg-muted overflow-hidden ">
                                             <div
-                                                className="h-full bg-primary transition-all"
+                                                className={`h-full ${prayerSuccessRate < 30 && "bg-red-600" || prayerSuccessRate < 60 && "bg-yellow-500" || prayerSuccessRate < 90 && "bg-green-500" || prayerSuccessRate > 90 && "bg-sky-500"} transition-all`}
                                                 style={{width: `${prayerSuccessRate}%`}}
                                             />
                                         </div>

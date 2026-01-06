@@ -229,10 +229,10 @@ export default function Navbar({user}: { user: any }) {
 
                     <div className="relative flex items-center justify-around px-3 py-1">
                         <NavIcon
-                            href="/dashboard"
-                            icon={<Home size={20}/>}
-                            label="Home"
-                            active={pathname === "/dashboard"}
+                            href="/dashboard/entry"
+                            icon={<PlusCircleIcon size={20}/>}
+                            label="Entry"
+                            active={pathname === "/dashboard/entry"}
                         />
                         <NavIcon
                             href="/dashboard/analytics"
@@ -241,10 +241,10 @@ export default function Navbar({user}: { user: any }) {
                             active={pathname === "/dashboard/analytics"}
                         />
                         <NavIcon
-                            href="/dashboard/entry"
-                            icon={<PlusCircleIcon size={20}/>}
-                            label="Entry"
-                            active={pathname === "/dashboard/entry"}
+                            href="/dashboard"
+                            icon={<Home size={20}/>}
+                            label="Home"
+                            active={pathname === "/dashboard"}
                         />
                         <NavIcon
                             href="/dashboard/prayer-times"

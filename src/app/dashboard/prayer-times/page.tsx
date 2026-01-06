@@ -501,7 +501,7 @@ export default function PrayerTimes() {
                                 return (
                                     <div
                                         key={p.key}
-                                        className={`p-4 border rounded-lg text-center transition ${
+                                        className={`relative p-4 border rounded-lg text-center transition ${
                                             isCurrent
                                                 ? "bg-background border border-blue-400"
                                                 : isNext
@@ -520,8 +520,8 @@ export default function PrayerTimes() {
                                         />
                                         <p className="font-semibold">{p.name}</p>
                                         <p className="text-xl font-mono font-bold">{today[p.key]}</p>
-                                        {isCurrent && <p className="text-xs text-blue-600">Now</p>}
-                                        {isNext && <p className="text-xs text-green-600">Next</p>}
+                                        {isCurrent && <p className="absolute text-3xl opacity-30 top-5 -left-4 rotate-90 text-blue-600">Now</p>}
+                                        {isNext && <p className="absolute text-3xl opacity-30 top-5 -left-4 rotate-90 text-green-600">Next</p>}
                                     </div>
                                 );
                             })}

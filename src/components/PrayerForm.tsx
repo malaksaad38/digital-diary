@@ -145,7 +145,6 @@ export default function PrayerForm({session}: any) {
             setIsEditMode(true);
         }, 500);
         setIsFormDisabled(false);
-        router.push("#date");
     };
 
     const handleCancelEdit = () => {

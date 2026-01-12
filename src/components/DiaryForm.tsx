@@ -111,7 +111,6 @@ export default function DiaryForm({session}: any) {
             setIsEditMode(true);
         }, 500);
         setIsFormDisabled(false);
-        router.push("#diaryDate");
     };
 
     const handleCancelEdit = () => {

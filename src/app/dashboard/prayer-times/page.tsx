@@ -351,7 +351,7 @@ export default function PrayerTimes() {
 
     const prayers = [
         {name: 'Fajr', key: 'fajr', icon: Sunrise},
-        {name: 'Ishraq', key: 'shurooq', icon: Sunrise},
+        {name: 'Sunrise', key: 'shurooq', icon: Sunrise},
         {name: 'Dhuhr', key: 'dhuhr', icon: Sun},
         {name: 'Asr', key: 'asr', icon: CloudSun},
         {name: 'Maghrib', key: 'maghrib', icon: Sunset},

@@ -659,9 +659,9 @@ export default function PrayerAnalyticsDashboard() {
                                 return (
                                     <Card
                                         key={prayer}
-                                        className={`${prayerSuccessRate < 30 && "bg-red-300/50" || prayerSuccessRate < 60 && "bg-yellow-300/20" || prayerSuccessRate < 90 && "bg-green-300/20" || prayerSuccessRate > 90 && "bg-sky-300/20"} group relative gap-5 md:gap-4 overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 p-4 px-6 md:px-4`}
+                                        className={`${prayerSuccessRate <= 29 && "bg-red-300/10" || prayerSuccessRate <= 59 && "bg-yellow-300/10" || prayerSuccessRate <= 89 && "bg-green-300/10" || prayerSuccessRate >= 90 && "bg-sky-300/10"} group relative gap-5 md:gap-4 overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 p-4 px-6 md:px-4`}
                                     >
-                                        {prayerSuccessRate < 30  &&
+                                        {prayerSuccessRate <= 29  &&
                                             <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
                                                 <div
                                                     className="relative flex justify-center items-center gap-1.5 text-red-950 px-2 py-0.5 bg-red-300 rounded-full  shadow-lg shadow-red-300/50 text-[9px]">
@@ -672,7 +672,7 @@ export default function PrayerAnalyticsDashboard() {
                                                     <span>Bad</span>
                                                 </div>
                                             </div>
-                                            || prayerSuccessRate < 60 &&
+                                            || prayerSuccessRate  <= 59 &&
                                             <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
                                                 <div
                                                     className="relative flex justify-center items-center gap-1.5 text-yellow-950 px-2 py-0.5 bg-yellow-300 rounded-full  shadow-lg shadow-yellow-300/50 text-[9px]">
@@ -683,7 +683,7 @@ export default function PrayerAnalyticsDashboard() {
                                                     <span>Normal</span>
                                                 </div>
                                             </div>
-                                            || prayerSuccessRate < 90 &&
+                                            || prayerSuccessRate <= 89 &&
                                             <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
                                                 <div
                                                     className="relative flex justify-center items-center gap-1.5 text-green-950 px-2 py-0.5 bg-green-300 rounded-full  shadow-lg shadow-green-300/50 text-[9px]">
@@ -694,7 +694,7 @@ export default function PrayerAnalyticsDashboard() {
                                                     <span>Good</span>
                                                 </div>
                                             </div>
-                                            || prayerSuccessRate > 90 &&
+                                            || prayerSuccessRate >= 90 &&
                                             <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
                                                 <div
                                                     className="relative flex justify-center items-center gap-1.5 text-sky-950 px-2 py-0.5 bg-sky-300 rounded-full  shadow-lg shadow-sky-300/50 text-[9px]">

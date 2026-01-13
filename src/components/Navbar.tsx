@@ -6,7 +6,7 @@ import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useTheme} from "next-themes";
 import {motion} from "framer-motion";
-import {Clock8, Home, Moon, Notebook, PenLine, PieChartIcon, Plus, PlusCircleIcon, Sun,} from "lucide-react";
+import {Clock8, Home, Moon, Notebook, PieChartIcon, PlusCircleIcon, Sun,} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";

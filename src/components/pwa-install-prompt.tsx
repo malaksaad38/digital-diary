@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Download, Smartphone } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {useEffect, useState} from "react";
+import {Download, Smartphone, X} from "lucide-react";
+import {AnimatePresence, motion} from "framer-motion";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
 
 interface BeforeInstallPromptEvent extends Event {
     prompt: () => Promise<void>;
@@ -62,7 +62,7 @@ export default function PWAInstallPrompt() {
         if (!deferredPrompt) return;
 
         deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        const {outcome} = await deferredPrompt.userChoice;
 
         if (outcome === 'accepted') {
             console.log('User accepted the install prompt');
@@ -84,23 +84,24 @@ export default function PWAInstallPrompt() {
         <AnimatePresence>
             {showPrompt && (
                 <motion.div
-                    initial={{ y: 100, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 100, opacity: 0 }}
-                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    initial={{y: 100, opacity: 0}}
+                    animate={{y: 0, opacity: 1}}
+                    exit={{y: 100, opacity: 0}}
+                    transition={{type: "spring", damping: 25, stiffness: 300}}
                     className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-50"
                 >
-                    <Card className="p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 border-2 border-green-200 dark:border-green-800 shadow-2xl">
+                    <Card
+                        className="p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 border-2 border-green-200 dark:border-green-800 shadow-2xl">
                         <button
                             onClick={handleDismiss}
                             className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="w-5 h-5"/>
                         </button>
 
                         <div className="flex items-start gap-4">
                             <div className="bg-gradient-to-br from-green-400 to-blue-500 p-3 rounded-xl">
-                                <Smartphone className="w-6 h-6 text-white" />
+                                <Smartphone className="w-6 h-6 text-white"/>
                             </div>
 
                             <div className="flex-1">
@@ -118,7 +119,7 @@ export default function PWAInstallPrompt() {
                                         onClick={handleInstall}
                                         className="w-full bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-400 text-white"
                                     >
-                                        <Download className="w-4 h-4 mr-2" />
+                                        <Download className="w-4 h-4 mr-2"/>
                                         Install App
                                     </Button>
                                 )}
@@ -128,7 +129,8 @@ export default function PWAInstallPrompt() {
                                         <div className="flex items-center gap-2 text-muted-foreground">
                                             <div className="bg-blue-100 dark:bg-blue-900 p-1.5 rounded">
                                                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z"/>
+                                                    <path
+                                                        d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z"/>
                                                 </svg>
                                             </div>
                                             <span>Tap the share icon</span>

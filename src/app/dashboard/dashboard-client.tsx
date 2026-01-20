@@ -26,6 +26,7 @@ import {cn} from "@/lib/utils";
 import Link from "next/link";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
 import LatestDiaryCard from "@/components/dashboard/LatestDiaryCard";
+import UpdateNameDialog from "@/components/dashboard/UpdateNameDialog";
 
 export default function ModernDashboard({user}: { user: any }) {
     const {data: combinedEntries = []} = useCombinedHistory();
@@ -170,19 +171,24 @@ export default function ModernDashboard({user}: { user: any }) {
         <div className="max-w-6xl mx-auto bg-background px-4 pb-12 md:py-10 space-y-6 pt-4">
             {/* Header */}
             <div className="flex flex-col gap-2 md:flex-row justify-between">
-                <div className="">
-                    <h1 className="text-xl md:text-3xl font-bold mb-1">
-                        Assalamu Alaikum, {user?.name || "User"}
-                    </h1>
-                    <p className="text-sm md:text-base text-muted-foreground">
-                        {currentTime.toLocaleDateString("en-US", {
-                            weekday: "long",
-                            month: "long",
-                            day: "numeric",
-                        })}
-                    </p>
-                </div>
+                <div className="flex items-start gap-2">
+                    <div>
+                        <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2">
+                            Assalamu Alaikum, {user?.name || "User"}
 
+                            {/* Edit icon */}
+                            <UpdateNameDialog currentName={user?.name} />
+                        </h1>
+
+                        <p className="text-sm md:text-base text-muted-foreground">
+                            {currentTime.toLocaleDateString("en-US", {
+                                weekday: "long",
+                                month: "long",
+                                day: "numeric",
+                            })}
+                        </p>
+                    </div>
+                </div>
                 {/* Quick Actions */}
                 <div className="fixed sm:static bottom-20 left-4 right-4 z-20 grid grid-cols-2 gap-2">
                     <Link href="/dashboard/entry">

@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
@@ -13,6 +13,7 @@ import {cn} from "@/lib/utils";
 import ButtonLogout from "@/components/ButtonLogout";
 import TimeAlert from "@/components/TimeAlert";
 import PWAStatus from "@/components/pwa-status";
+import UpdateNameDialog from "@/components/dashboard/UpdateNameDialog";
 
 export default function Navbar({user}: { user: any }) {
     const [time, setTime] = useState<Date | null>(null)
@@ -151,7 +152,10 @@ export default function Navbar({user}: { user: any }) {
                                         <div className="space-y-0.5">
                                             <p className="text-sm font-semibold text-foreground/90">
                                                 {user?.name || "User"}
+                                                <UpdateNameDialog currentName={user?.name} />
+
                                             </p>
+
                                             <p className="text-xs text-foreground/50  mx-auto">
                                                 {user?.email || "No email available"}
                                             </p>
@@ -309,6 +313,7 @@ function UserPopover({user}: { user: any }) {
                     </div>
                     <span className="font-medium text-sm hidden md:block">
             {user?.name || "User"}
+
           </span>
                 </button>
             </PopoverTrigger>
@@ -332,6 +337,8 @@ function UserPopover({user}: { user: any }) {
                         <div className="leading-tight">
                             <p className="font-semibold text-sm text-foreground">
                                 {user?.name || "User"}
+                                <UpdateNameDialog currentName={user?.name} />
+
                             </p>
                             <p className="text-xs text-muted-foreground truncate">
                                 {user?.email || ""}

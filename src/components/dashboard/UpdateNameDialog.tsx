@@ -52,7 +52,7 @@ export default function UpdateNameDialog({ currentName }: { currentName?: string
         <Dialog>
             <DialogTrigger asChild>
                 <Button size="icon" variant="ghost" className="h-7 w-7" title="Edit name">
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-2 w-2" />
                 </Button>
             </DialogTrigger>
 

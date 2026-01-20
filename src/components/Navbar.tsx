@@ -6,7 +6,7 @@ import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useTheme} from "next-themes";
 import {motion} from "framer-motion";
-import {Clock8, Home, Moon, Notebook, PieChartIcon, PlusCircleIcon, Sun,} from "lucide-react";
+import {Clock8, EllipsisVertical, Home, Moon, Notebook, PieChartIcon, PlusCircleIcon, Sun,} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";
@@ -115,7 +115,7 @@ export default function Navbar({user}: { user: any }) {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <div className={"flex justify-center items-center gap-2"}>
-                                        <button
+                                        <div
                                             className="flex items-center justify-center h-7 w-7 rounded-full overflow-hidden border border-foreground/10 transition-all duration-200 active:scale-90">
                                             <div className="relative w-full h-full">
                                                 <Image
@@ -126,9 +126,11 @@ export default function Navbar({user}: { user: any }) {
                                                     className="object-cover"
                                                 />
                                             </div>
-                                        </button>
+                                        </div>
                                         <div
-                                            className={"text-xs font-semibold text-foreground/80 leading-relaxed"}>{user?.name || "User"}</div>
+                                            className={"text-xs font-semibold text-foreground/80 leading-relaxed"}>{user?.name || "User"}
+                                        </div>
+                                        <EllipsisVertical size={14} className={"-ml-1"}/>
 
                                     </div>
                                 </PopoverTrigger>
@@ -313,8 +315,8 @@ function UserPopover({user}: { user: any }) {
                     </div>
                     <span className="font-medium text-sm hidden md:block">
             {user?.name || "User"}
-
           </span>
+
                 </button>
             </PopoverTrigger>
 

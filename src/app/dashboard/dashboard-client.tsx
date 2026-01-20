@@ -173,7 +173,7 @@ export default function ModernDashboard({user}: { user: any }) {
             <div className="flex flex-col gap-2 md:flex-row justify-between">
                 <div className="flex items-start gap-2">
                     <div>
-                        <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2">
+                        <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-start gap-2">
                             Assalamu Alaikum, {user?.name || "User"}
 
                             {/* Edit icon */}

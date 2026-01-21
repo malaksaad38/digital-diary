@@ -315,7 +315,7 @@ export default function DiaryForm({session}: any) {
                                         variant="outline"
                                     >
                                         <Edit2 className="mr-2 h-4 w-4"/>
-                                        Edit Diary
+                                        Edit Diary Log
                                     </Button>
                                 ) : (
                                     <>
@@ -328,8 +328,8 @@ export default function DiaryForm({session}: any) {
                                             {createDiary.isPending || updateDiary.isPending
                                                 ? "Saving..."
                                                 : isEditMode
-                                                    ? "Update Diary"
-                                                    : "Save Diary"}
+                                                    ? "Update Diary Log"
+                                                    : "Save Diary Log"}
                                         </Button>
                                         {isEditMode && (
                                             <Button

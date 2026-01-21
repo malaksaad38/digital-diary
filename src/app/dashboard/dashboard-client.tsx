@@ -175,8 +175,6 @@ export default function ModernDashboard({user}: { user: any }) {
                     <div>
                         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-start md:items-center gap-2">
                             Assalamu Alaikum, {user?.name || "User"}
-
-                            {/* Edit icon */}
                             <UpdateNameDialog currentName={user?.name} />
                         </h1>
 

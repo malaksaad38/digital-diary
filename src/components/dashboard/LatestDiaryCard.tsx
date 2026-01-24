@@ -44,6 +44,9 @@ export default function LatestEntryCard() {
         router.push("/dashboard/entry");
     };
 
+    if (!latestEntry?.prayer) {
+        return null; // or loader / fallback UI
+    }
     /* ---------------- Loading ---------------- */
     if (isLoading) {
         return (
@@ -68,14 +71,18 @@ export default function LatestEntryCard() {
             </Card>
         );
     }
-    const onTime = latestEntry.prayer.fajr === "on time" && latestEntry.prayer.zuhr === "on time" &&
-        latestEntry.prayer.asar === "on time" && latestEntry.prayer.maghrib === "on time" &&
-        latestEntry.prayer.esha === "on time"
+    const onTime =
+        latestEntry?.prayer?.fajr === "on time" &&
+        latestEntry?.prayer?.zuhr === "on time" &&
+        latestEntry?.prayer?.asar === "on time" &&
+        latestEntry?.prayer?.maghrib === "on time" &&
+        latestEntry?.prayer?.esha === "on time";
 
     const jamaat = (latestEntry.prayer.fajr === "on time" || latestEntry.prayer.fajr === "jamaat") && (latestEntry.prayer.zuhr === "on time" || latestEntry.prayer.zuhr === "jamaat") &&
         (latestEntry.prayer.asar === "on time" || latestEntry.prayer.asar === "jamaat") && (latestEntry.prayer.maghrib === "on time" || latestEntry.prayer.maghrib === "jamaat") &&
         (latestEntry.prayer.esha === "on time" || latestEntry.prayer.esha === "jamaat")
     /* ---------------- Latest Entry ---------------- */
+
     return (
         <Card
             className={`border shadow-sm bg-card gap-0 ${onTime && "border-sky-500 bg-sky-300/10" || jamaat && "border-green-500 bg-green-300/10"}`}>

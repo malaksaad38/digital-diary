@@ -8,10 +8,13 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Calendar} from "@/components/ui/calendar";
 import {Textarea} from "@/components/ui/textarea";
 import {Label} from "@/components/ui/label";
-import {BookOpen, CalendarIcon, Edit2, Save} from "lucide-react";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {BookOpen, CalendarIcon, Edit2, Save, Sparkles, Languages} from "lucide-react";
 import {format, parse} from "date-fns";
 import {motion} from "framer-motion";
 import {useCreateDiary, useDiaryByDate, useUpdateDiary} from "@/hooks/use-prayer-queries";
+import {useAiSummary} from "@/hooks/use-ai-summary";
+import {useTranslation} from "@/hooks/use-translation";
 
 export default function DiaryForm({session}: any) {
     const searchParams = useSearchParams();
@@ -31,6 +34,7 @@ export default function DiaryForm({session}: any) {
 
     const [isEditMode, setIsEditMode] = useState(false);
     const [isFormDisabled, setIsFormDisabled] = useState(false);
+    const [translationLanguage, setTranslationLanguage] = useState<string>("en");
 
     const [formData, setFormData] = useState({
         fajrToZuhr: "",
@@ -65,6 +69,8 @@ export default function DiaryForm({session}: any) {
     const {data: diaryData, isLoading} = useDiaryByDate(dateStr, !!selectedDate && !!userId);
     const createDiary = useCreateDiary();
     const updateDiary = useUpdateDiary();
+    const {generateSummary, isGenerating, error: summaryError} = useAiSummary();
+    const {translate, isTranslating, error: translationError} = useTranslation();
 
     const existingDiary = diaryData?.success && diaryData?.data ? diaryData.data : null;
     const existingDiaryId = existingDiary?._id || null;
@@ -116,7 +122,6 @@ export default function DiaryForm({session}: any) {
     const handleCancelEdit = () => {
         setIsEditMode(false);
         setIsFormDisabled(true);
-        // Reset form to existing data
         if (existingDiary) {
             setFormData({
                 fajrToZuhr: existingDiary.fajrToZuhr || "",
@@ -127,6 +132,64 @@ export default function DiaryForm({session}: any) {
                 customNotes: existingDiary.customNotes || "",
                 summary: existingDiary.summary || "",
             });
+        }
+    };
+
+    const handleGenerateSummary = async () => {
+        try {
+            const summary = await generateSummary({
+                fajrToZuhr: formData.fajrToZuhr,
+                zuhrToAsar: formData.zuhrToAsar,
+                asarToMaghrib: formData.asarToMaghrib,
+                maghribToEsha: formData.maghribToEsha,
+                eshaToFajr: formData.eshaToFajr,
+                customNotes: formData.customNotes,
+            });
+
+            setFormData((prev) => ({...prev, summary}));
+        } catch (err) {
+            console.error('Failed to generate summary:', err);
+        }
+    };
+
+    const handleTranslateSummary = async () => {
+        if (!formData.summary) return;
+
+        try {
+            const translated = await translate(formData.summary, translationLanguage);
+            setFormData((prev) => ({...prev, summary: translated}));
+        } catch (err) {
+            console.error('Failed to translate summary:', err);
+        }
+    };
+
+    const handleTranslateAllEntries = async () => {
+        try {
+            const entriesToTranslate = {
+                fajrToZuhr: formData.fajrToZuhr,
+                zuhrToAsar: formData.zuhrToAsar,
+                asarToMaghrib: formData.asarToMaghrib,
+                maghribToEsha: formData.maghribToEsha,
+                eshaToFajr: formData.eshaToFajr,
+                customNotes: formData.customNotes,
+            };
+
+            const translatedEntries: any = {};
+
+            for (const [key, value] of Object.entries(entriesToTranslate)) {
+                if (value) {
+                    translatedEntries[key] = await translate(value, translationLanguage);
+                } else {
+                    translatedEntries[key] = value;
+                }
+            }
+
+            setFormData((prev) => ({
+                ...prev,
+                ...translatedEntries,
+            }));
+        } catch (err) {
+            console.error('Failed to translate entries:', err);
         }
     };
 
@@ -159,6 +222,10 @@ export default function DiaryForm({session}: any) {
             });
         }
     };
+
+    const hasAnyContent = formData.fajrToZuhr || formData.zuhrToAsar ||
+        formData.asarToMaghrib || formData.maghribToEsha ||
+        formData.eshaToFajr || formData.customNotes;
 
     return (
         <Card id={"diary"} className="w-full h-full shadow-lg border-border/50">
@@ -202,6 +269,38 @@ export default function DiaryForm({session}: any) {
                         </Popover>
                     </div>
 
+                    {/* Translation Language Selector */}
+                    {!isFormDisabled && (
+                        <div>
+                            <h3 className="text-base sm:text-lg font-semibold mb-3">Translation Language</h3>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <Select value={translationLanguage} onValueChange={setTranslationLanguage}>
+                                    <SelectTrigger className="w-[100px]">
+                                        <SelectValue placeholder="Select language" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="en">English</SelectItem>
+                                        <SelectItem value="ur">Urdu (اردو)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleTranslateAllEntries}
+                                    disabled={isTranslating || !hasAnyContent}
+                                    className="text-xs"
+                                >
+                                    <Languages className="mr-1.5 h-3.5 w-3.5" />
+                                    {isTranslating ? "Translating..." : "Translate All Entries"}
+                                </Button>
+                            </div>
+                            {translationError && (
+                                <p className="text-xs text-destructive mt-2">{translationError}</p>
+                            )}
+                        </div>
+                    )}
+
                     {isLoading ? (
                         <div className="text-center py-8 text-muted-foreground">
                             <motion.div
@@ -210,7 +309,6 @@ export default function DiaryForm({session}: any) {
                                 transition={{duration: 0.3, ease: [0.25, 0.1, 0.25, 1]}}
                                 className="flex flex-col items-center gap-4 p-8"
                             >
-                                {/* iPhone-style minimal spinner */}
                                 <div className="relative w-16 h-16">
                                     <motion.div
                                         animate={{rotate: 360}}
@@ -290,19 +388,51 @@ export default function DiaryForm({session}: any) {
                                 />
                             </div>
 
-                            {/* Summary */}
+                            {/* Summary with AI Generation and Translation */}
                             <div className="space-y-2">
                                 <Label htmlFor="summary" className="text-sm font-medium">
                                     Day Summary
                                 </Label>
+                                <div className="flex items-center justify-between">
+
+                                    {!isFormDisabled && (
+                                        <div className="flex gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleGenerateSummary}
+                                                disabled={isGenerating || !hasAnyContent}
+                                                className="h-8 text-xs"
+                                            >
+                                                <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                                                {isGenerating ? "Generating..." : "Generate with AI"}
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleTranslateSummary}
+                                                disabled={isTranslating || !formData.summary}
+                                                className="h-8 text-xs"
+                                            >
+                                                <Languages className="mr-1.5 h-3.5 w-3.5" />
+                                                {isTranslating ? "Translating..." : "Translate"}
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
                                 <Textarea
                                     id="summary"
-                                    placeholder="Summarize your day in a few words..."
+                                    placeholder="AI will generate a summary of your day..."
                                     value={formData.summary}
                                     onChange={(e) => handleChange("summary", e.target.value)}
-                                    disabled={true}
+                                    disabled={isFormDisabled}
                                     className="min-h-[80px] resize-none"
                                 />
+                                {summaryError && (
+                                    <p className="text-xs text-destructive">{summaryError}</p>
+                                )}
                             </div>
 
                             {/* Action Buttons */}

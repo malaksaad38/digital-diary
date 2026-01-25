@@ -280,7 +280,7 @@ export default function DiaryForm({session}: any) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="en">English</SelectItem>
-                                        <SelectItem value="ur">Urdu (اردو)</SelectItem>
+                                        <SelectItem value="ur">Urdu</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <Button

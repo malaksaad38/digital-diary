@@ -44,14 +44,15 @@ export default function LatestEntryCard() {
         router.push("/dashboard/entry");
     };
 
-    if (!latestEntry?.prayer) {
-        return null; // or loader / fallback UI
-    }
+
     /* ---------------- Loading ---------------- */
     if (isLoading) {
         return (
             <LoadingState label={"Loading data..."}/>
         );
+    }
+    if (!latestEntry?.prayer) {
+        return null; // or loader / fallback UI
     }
 
     /* ---------------- Empty ---------------- */

@@ -4,12 +4,16 @@ import PWAInstallPrompt from '@/components/pwa-install-prompt';
 import {Toaster} from "sonner";
 import QueryProvider from "@/providers/query-provider";
 import {ThemeProvider} from "next-themes";
-import {Inter} from "next/font/google";
+import {Inter, Noto_Nastaliq_Urdu} from "next/font/google";
 import PWAStatus from "@/components/pwa-status";
 
 
 const inter = Inter({
     variable: "--font-inter",
+    subsets: ["latin"],
+});
+const noto_nastaliq_urdu = Noto_Nastaliq_Urdu({
+    variable: "--font-noto_nastaliq",
     subsets: ["latin"],
 });
 
@@ -58,7 +62,7 @@ export default function RootLayout({
             <meta name="apple-mobile-web-app-title" content="Digital Diary"/>
             <meta name="mobile-web-app-capable" content="yes"/>
         </head>
-        <body className={`${inter.variable} font-inter antialiased`}>
+        <body className={`${inter.variable} ${noto_nastaliq_urdu.variable} font-inter antialiased`}>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"

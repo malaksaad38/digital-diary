@@ -19,7 +19,6 @@ import {useTranslation} from "@/hooks/use-translation";
 export default function DiaryForm({session}: any) {
     const searchParams = useSearchParams();
     const dateParam = searchParams.get("date");
-    const router = useRouter();
 
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
         if (dateParam) {
@@ -242,7 +241,7 @@ export default function DiaryForm({session}: any) {
             </CardHeader>
 
             <CardContent className="px-4 sm:px-6">
-                <form id={"diaryDate"} onSubmit={handleSubmit} className="space-y-6">
+                <form id={"diaryDate"} onSubmit={handleSubmit} className={`space-y-6`}>
                     {/* Date Picker */}
                     <div>
                         <h3 className="text-base sm:text-lg font-semibold mb-3">Select Date</h3>
@@ -357,7 +356,7 @@ export default function DiaryForm({session}: any) {
                             <div className="space-y-4">
                                 <h3 className="text-base sm:text-lg font-semibold">Prayer Period Entries</h3>
                                 {timeFields.map((field) => (
-                                    <div key={field.key} className="space-y-2">
+                                    <div key={field.key} className={`space-y-2 `}>
                                         <Label htmlFor={field.key} className="text-sm font-medium">
                                             {field.label}
                                         </Label>
@@ -367,7 +366,7 @@ export default function DiaryForm({session}: any) {
                                             value={formData[field.key as keyof typeof formData]}
                                             onChange={(e) => handleChange(field.key, e.target.value)}
                                             disabled={isFormDisabled}
-                                            className="min-h-[80px] resize-none"
+                                            className={`min-h-[80px] resize-none ${translationLanguage === "en" && "font-inter" || translationLanguage === "ur" && "font-noto_nastaliq leading-10 text-end"}`}
                                         />
                                     </div>
                                 ))}
@@ -384,7 +383,7 @@ export default function DiaryForm({session}: any) {
                                     value={formData.customNotes}
                                     onChange={(e) => handleChange("customNotes", e.target.value)}
                                     disabled={isFormDisabled}
-                                    className="min-h-[100px] resize-none"
+                                    className={`min-h-[100px] resize-none ${translationLanguage === "en" && "font-inter" || translationLanguage === "ur" && "font-noto_nastaliq leading-10 text-end"}`}
                                 />
                             </div>
 
@@ -428,7 +427,7 @@ export default function DiaryForm({session}: any) {
                                     value={formData.summary}
                                     onChange={(e) => handleChange("summary", e.target.value)}
                                     disabled={isFormDisabled}
-                                    className="min-h-[80px] resize-none"
+                                    className={`min-h-[80px] resize-none ${translationLanguage === "en" && "font-inter" || translationLanguage === "ur" && "font-noto_nastaliq leading-10 text-end"}`}
                                 />
                                 {summaryError && (
                                     <p className="text-xs text-destructive">{summaryError}</p>

@@ -11,6 +11,7 @@ import PrayerLog from "./PrayerLog";
 import DiaryLog from "./DiaryLog";
 import PrayerLegend from "@/components/diary/PrayerLegend";
 import {LoadingState} from "@/components/LoadingStates";
+import prayer from "@/models/Prayer";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -207,7 +208,8 @@ export default function DiaryListClient() {
                         {/* Combined Entries */}
                         <div className="space-y-4">
                             {paginatedEntries.map((entry: any) => (
-                                <Card
+                                !entry?.prayer ? null :
+                                    <Card
                                     key={entry.date}
                                     className={`relative gap-2 border shadow-sm bg-card ${entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
                                     entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&

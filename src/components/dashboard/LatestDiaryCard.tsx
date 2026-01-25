@@ -51,9 +51,6 @@ export default function LatestEntryCard() {
             <LoadingState label={"Loading data..."}/>
         );
     }
-    if (!latestEntry?.prayer) {
-        return null; // or loader / fallback UI
-    }
 
     /* ---------------- Empty ---------------- */
     if (!latestEntry) {
@@ -73,13 +70,13 @@ export default function LatestEntryCard() {
         );
     }
     const onTime =
-        latestEntry?.prayer?.fajr === "on time" &&
+        !latestEntry?.prayer ? null : (latestEntry?.prayer?.fajr === "on time" &&
         latestEntry?.prayer?.zuhr === "on time" &&
         latestEntry?.prayer?.asar === "on time" &&
         latestEntry?.prayer?.maghrib === "on time" &&
-        latestEntry?.prayer?.esha === "on time";
+        latestEntry?.prayer?.esha === "on time")
 
-    const jamaat = (latestEntry.prayer.fajr === "on time" || latestEntry.prayer.fajr === "jamaat") && (latestEntry.prayer.zuhr === "on time" || latestEntry.prayer.zuhr === "jamaat") &&
+    const jamaat = !latestEntry?.prayer ? null : (latestEntry.prayer.fajr === "on time" || latestEntry.prayer.fajr === "jamaat") && (latestEntry.prayer.zuhr === "on time" || latestEntry.prayer.zuhr === "jamaat") &&
         (latestEntry.prayer.asar === "on time" || latestEntry.prayer.asar === "jamaat") && (latestEntry.prayer.maghrib === "on time" || latestEntry.prayer.maghrib === "jamaat") &&
         (latestEntry.prayer.esha === "on time" || latestEntry.prayer.esha === "jamaat")
     /* ---------------- Latest Entry ---------------- */

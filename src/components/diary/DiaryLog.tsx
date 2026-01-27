@@ -51,9 +51,16 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
 
   return (
     <div className="border-t pt-4">
+        {diary.summary && (
+            <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                <p className="text-xs font-medium text-primary mb-1">Day Summary</p>
+                <p className="text-sm text-foreground">{diary.summary}</p>
+            </div>
+        )}
       <Accordion type="single" collapsible defaultValue={false}>
         <AccordionItem value="diary-entry" className="border-none">
           <div className="flex items-center justify-between">
+
             <AccordionTrigger className="hover:no-underline py-2 flex-1">
               <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                 <BookOpen className="h-4 w-4" />
@@ -71,14 +78,9 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
             </Button>
           </div>
 
+
           <AccordionContent>
             <div className="space-y-2 pt-2">
-              {diary.summary && (
-                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-                  <p className="text-xs font-medium text-primary mb-1">Day Summary</p>
-                  <p className="text-sm text-foreground">{diary.summary}</p>
-                </div>
-              )}
 
               {periods.map((period) =>
                   period.value && (

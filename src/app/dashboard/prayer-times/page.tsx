@@ -453,7 +453,7 @@ export default function PrayerTimes() {
                             <CardTitle className="flex items-center gap-2 text-blue-700">
                                 <Clock className="w-5 h-5"/> Current Prayer
                             </CardTitle>
-                            <span className="px-2 py-1 bg-blue-600 text-white text-xs rounded">Active</span>
+                            <span className="px-2 py-1 bg-primary text-white text-xs rounded-full">Active</span>
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold">{currentPrayer}</p>
@@ -472,7 +472,7 @@ export default function PrayerTimes() {
                             <CardTitle className="flex items-center gap-2 text-green-700">
                                 <Timer className="w-5 h-5"/> Next Prayer
                             </CardTitle>
-                            <span className="px-2 py-1 bg-green-600 text-white text-xs rounded">Upcoming</span>
+                            <span className="px-2 py-1 bg-green-600 text-white text-xs rounded-full">Upcoming</span>
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold">{nextPrayer}</p>
@@ -544,7 +544,7 @@ export default function PrayerTimes() {
                                 <div className="flex justify-between mb-3">
                                     <span className="font-semibold">{day.date_for}</span>
                                     {idx === 0 && (
-                                        <span className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded">
+                                        <span className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded-full">
                       Today
                     </span>
                                     )}

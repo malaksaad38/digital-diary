@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Edit2, Grid3x3, BookOpen } from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {BookOpen, ChevronLeft, ChevronRight, Grid3x3, Pencil} from "lucide-react";
 
 interface DiaryEntry {
     date: string;
@@ -231,7 +231,7 @@ const BookPage = ({
                         onClick={() => onEdit(entry.date)}
                         className="h-8 text-xs gap-1"
                     >
-                        <Edit2 className="h-3.5 w-3.5" />
+                        <Pencil className="h-3.5 w-3.5" />
                         <span className="hidden sm:inline">Edit</span>
                     </Button>
                     <p className="text-xs text-muted-foreground/50">

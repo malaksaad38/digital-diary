@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useState} from "react";
-import {useRouter, useSearchParams} from "next/navigation";
+import {useSearchParams} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
@@ -9,7 +9,7 @@ import {Calendar} from "@/components/ui/calendar";
 import {Textarea} from "@/components/ui/textarea";
 import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {BookOpen, CalendarIcon, Edit2, Save, Sparkles, Languages} from "lucide-react";
+import {BookOpen, CalendarIcon, Languages, Pencil, Save, Sparkles} from "lucide-react";
 import {format, parse} from "date-fns";
 import {motion} from "framer-motion";
 import {useCreateDiary, useDiaryByDate, useUpdateDiary} from "@/hooks/use-prayer-queries";
@@ -274,7 +274,7 @@ export default function DiaryForm({session}: any) {
                             <h3 className="text-base sm:text-lg font-semibold mb-3">Translation Language</h3>
                             <div className="flex flex-wrap items-center gap-3">
                                 <Select value={translationLanguage} onValueChange={setTranslationLanguage}>
-                                    <SelectTrigger className="w-[100px]">
+                                    <SelectTrigger className="w-[100px] outline">
                                         <SelectValue placeholder="Select language" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -443,7 +443,7 @@ export default function DiaryForm({session}: any) {
                                         className="w-full"
                                         variant="outline"
                                     >
-                                        <Edit2 className="mr-2 h-4 w-4"/>
+                                        <Pencil className="mr-2 h-4 w-4"/>
                                         Edit Diary Log
                                     </Button>
                                 ) : (

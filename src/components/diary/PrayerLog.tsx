@@ -2,10 +2,17 @@
 "use client";
 
 import React from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Circle, Diamond, Edit2, CircleHelp } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {Button} from "@/components/ui/button";
+import {Circle, CircleHelp, Diamond, Pencil} from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog";
 
 const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
 
@@ -122,12 +129,12 @@ export default function PrayerLog({ prayer, date, onEdit }: PrayerLogProps) {
           </Dialog>
         </h4>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => onEdit(date)}
           className="h-7 px-2 hover:bg-primary/10"
         >
-          <Edit2 className="h-3 w-3 mr-1" />
+          <Pencil className="h-3 w-3" />
           Edit
         </Button>
       </div>

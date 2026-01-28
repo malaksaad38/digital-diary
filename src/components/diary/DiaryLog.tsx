@@ -9,7 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BookOpen, Edit2 } from "lucide-react";
+import { BookOpen, Pencil } from "lucide-react";
 
 interface DiaryData {
   summary?: string;
@@ -52,7 +52,7 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
   return (
     <div className="border-t pt-4">
         {diary.summary && (
-            <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <div className="p-3 mb-2 rounded-lg bg-primary/5 border border-primary/20">
                 <p className="text-xs font-medium text-primary mb-1">Day Summary</p>
                 <p className="text-sm text-foreground">{diary.summary}</p>
             </div>
@@ -68,12 +68,12 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
               </h4>
             </AccordionTrigger>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => onEdit(date)}
               className="h-7 px-2 hover:bg-primary/10"
             >
-              <Edit2 className="h-3 w-3 mr-1" />
+              <Pencil className="h-3 w-3" />
               Edit
             </Button>
           </div>

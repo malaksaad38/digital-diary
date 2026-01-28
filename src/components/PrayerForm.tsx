@@ -9,7 +9,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Calendar} from "@/components/ui/calendar";
-import {CalendarIcon, Circle, CircleHelp, Diamond, Edit2, Save, StarsIcon} from "lucide-react";
+import {CalendarIcon, Circle, CircleHelp, Diamond, Pencil, Save, StarsIcon} from "lucide-react";
 import {format, parse} from "date-fns";
 import {
     Dialog,
@@ -707,7 +707,7 @@ export default function PrayerForm({session}: any) {
                                 {existingPrayerId && !isEditMode ? (
                                     <Button type="button" onClick={handleEditClick} className="w-full"
                                             variant="outline">
-                                        <Edit2 className="mr-2 h-4 w-4"/>
+                                        <Pencil className="mr-2 h-4 w-4"/>
                                         Edit Prayer Log
                                     </Button>
                                 ) : (

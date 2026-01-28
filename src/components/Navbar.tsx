@@ -371,7 +371,7 @@ export function NavIcon({href, icon, label, active}: any) {
                 className={cn(
                     "flex items-center justify-center rounded-full p-2 transition-all duration-200",
                     active
-                        ? "bg-primary/95 text-background shadow-md shadow-primary/30 -translate-y-1.5"
+                        ? "bg-primary/95 text-white shadow-md shadow-primary/30 -translate-y-1.5"
                         : "text-foreground/60"
                 )}
             >

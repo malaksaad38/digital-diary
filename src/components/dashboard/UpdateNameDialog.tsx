@@ -51,7 +51,7 @@ export default function UpdateNameDialog({ currentName }: { currentName?: string
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button size="icon" variant="ghost" className="h-7 w-7" title="Edit name">
+                <Button size="icon" variant="outline" className="h-7 w-7" title="Edit name">
                     <Pencil className="h-2 w-2" />
                 </Button>
             </DialogTrigger>

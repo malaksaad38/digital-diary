@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useMemo, useState} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Activity,
     BookOpen,
@@ -18,18 +18,19 @@ import {
     Sunrise,
     Sunset,
     Target,
+    Shield,
 } from "lucide-react";
-import {Card, CardContent} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {Badge} from "@/components/ui/badge";
-import {cn} from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
-import {useCombinedHistory} from "@/hooks/use-prayer-queries";
+import { useCombinedHistory } from "@/hooks/use-prayer-queries";
 import LatestDiaryCard from "@/components/dashboard/LatestDiaryCard";
 import UpdateNameDialog from "@/components/dashboard/UpdateNameDialog";
 
-export default function ModernDashboard({user}: { user: any }) {
-    const {data: combinedEntries = []} = useCombinedHistory();
+export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?: boolean }) {
+    const { data: combinedEntries = [] } = useCombinedHistory();
     const [prayerData, setPrayerData] = useState<any>(null);
     const [isFromCache, setIsFromCache] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -98,7 +99,7 @@ export default function ModernDashboard({user}: { user: any }) {
 
     // 📊 Stats
     const overallStats = useMemo(() => {
-        const s = {missed: 0, alone: 0, jamaat: 0, onTime: 0, total: 0};
+        const s = { missed: 0, alone: 0, jamaat: 0, onTime: 0, total: 0 };
         combinedEntries.forEach((entry: any) => {
             prayers.forEach((p) => {
                 const val = entry.prayer?.[p]?.toLowerCase();
@@ -134,11 +135,11 @@ export default function ModernDashboard({user}: { user: any }) {
         const now = currentTime;
         const nowMins = now.getHours() * 60 + now.getMinutes();
         const list = [
-            {n: "Fajr", t: today.fajr},
-            {n: "Dhuhr", t: today.dhuhr},
-            {n: "Asr", t: today.asr},
-            {n: "Maghrib", t: today.maghrib},
-            {n: "Isha", t: today.isha},
+            { n: "Fajr", t: today.fajr },
+            { n: "Dhuhr", t: today.dhuhr },
+            { n: "Asr", t: today.asr },
+            { n: "Maghrib", t: today.maghrib },
+            { n: "Isha", t: today.isha },
         ];
 
         let next = list[0],
@@ -165,17 +166,19 @@ export default function ModernDashboard({user}: { user: any }) {
         setCurrentPrayer(current.n);
     }, [prayerData, currentTime]);
 
-    const icons = {Fajr: Sunrise, Dhuhr: Sun, Asr: CloudSun, Maghrib: Sunset, Isha: Moon};
+    const icons = { Fajr: Sunrise, Dhuhr: Sun, Asr: CloudSun, Maghrib: Sunset, Isha: Moon };
 
     return (
         <div className="max-w-6xl mx-auto bg-background px-4 pb-12 md:py-10 space-y-6 pt-4">
             {/* Header */}
+
             <div className="flex flex-col gap-2 md:flex-row justify-between">
                 <div className="flex items-start gap-2">
                     <div>
                         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-start md:items-center gap-2">
                             Assalamu Alaikum, {user?.name || "User"}
                             <UpdateNameDialog currentName={user?.name} />
+
                         </h1>
 
                         <p className="text-sm md:text-base text-muted-foreground">
@@ -184,19 +187,28 @@ export default function ModernDashboard({user}: { user: any }) {
                                 month: "long",
                                 day: "numeric",
                             })}
+                            {isAdmin && (
+                                <Link href="/admin" className="flex justify-end md:justify-start md:py-2 -mt-10 md:-mt-0">
+                                    <Button className="" variant="destructive">
+                                        <Shield className=" h-4 w-4" /> Admin Panel
+                                    </Button>
+                                </Link>
+                            )}
                         </p>
                     </div>
                 </div>
                 {/* Quick Actions */}
-                <div className="fixed sm:static bottom-20 left-4 right-4 z-20 grid grid-cols-2 gap-2">
+                <div className={
+                    "fixed sm:static bottom-20 left-4 right-4 z-20 grid grid-cols-2 gap-2"
+                }>
                     <Link href="/dashboard/entry">
-                        <Button  className={"w-full"}>
-                            <Plus/> Add Entry
+                        <Button className={"w-full"}>
+                            <Plus /> Add Entry
                         </Button>
                     </Link>
                     <Link href="/dashboard/diary">
-                        <Button  className={"w-full"}>
-                            <BookOpen/> My Diary
+                        <Button className={"w-full"}>
+                            <BookOpen /> My Diary
                         </Button>
                     </Link>
                 </div>
@@ -210,7 +222,7 @@ export default function ModernDashboard({user}: { user: any }) {
                         <p className="font-semibold text-sm md:text-base">Prayer Analytics</p>
                         <Link href="/dashboard/analytics">
                             <Button size="sm" variant="outline" className="text-xs">
-                                Details <ChevronRight className="w-3 h-3"/>
+                                Details <ChevronRight className="w-3 h-3" />
                             </Button>
                         </Link>
                     </div>
@@ -256,9 +268,9 @@ export default function ModernDashboard({user}: { user: any }) {
                             const Icon = stat.icon;
                             return (
                                 <div key={stat.label}
-                                     className={cn(stat.bg, "relative flex-1 rounded  p-2 md:p-4")}>
+                                    className={cn(stat.bg, "relative flex-1 rounded  p-2 md:p-4")}>
                                     <Icon
-                                        className={cn("mx-auto size-10 md:size-14 mb-1 absolute top-1 right-0 opacity-10", stat.color)}/>
+                                        className={cn("mx-auto size-10 md:size-14 mb-1 absolute top-1 right-0 opacity-10", stat.color)} />
                                     <p className="font-bold text-base">{stat.value}</p>
                                     <p className="text-[10px] md:text-base text-muted-foreground">{stat.label}</p>
 
@@ -268,12 +280,12 @@ export default function ModernDashboard({user}: { user: any }) {
                     </div>
                     <div className="flex justify-between mt-4 pt-4 border-t text-[10px]  md:text-base">
                         <div className="flex items-center gap-2">
-                            <CalendarDays className="size-3 md:size-4 text-blue-500"/>
+                            <CalendarDays className="size-3 md:size-4 text-blue-500" />
                             <span className="text-muted-foreground">Total Days</span>
                             <span className="font-mono font-semibold">{overallStats.total / 5}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Calendar className="size-3 md:size-4 text-cyan-500"/>
+                            <Calendar className="size-3 md:size-4 text-cyan-500" />
                             <span className="text-muted-foreground">Total Prayers</span>
                             <span className="font-mono font-semibold">{overallStats.total}</span>
                         </div>
@@ -296,11 +308,11 @@ export default function ModernDashboard({user}: { user: any }) {
                                 disabled={loading}
                                 className="text-xs p-1"
                             >
-                                <RefreshCw className={cn("w-3 h-3", loading ? "animate-spin" : "")}/>
+                                <RefreshCw className={cn("w-3 h-3", loading ? "animate-spin" : "")} />
                             </Button>
                             <Link href="/dashboard/prayer-times">
                                 <Button size="sm" variant="outline" className="text-xs p-1">
-                                    Details <ChevronRight className="w-3 h-3 ml-1"/>
+                                    Details <ChevronRight className="w-3 h-3 ml-1" />
                                 </Button>
                             </Link>
                         </div>
@@ -309,14 +321,14 @@ export default function ModernDashboard({user}: { user: any }) {
                     <div
                         className="flex justify-between items-center text-[10px] md:text-base text-muted-foreground mb-2 md:mb-4">
                         <div className="flex items-center gap-1 md:gap-4">
-                            <MapPin className="w-3 h-3"/>
+                            <MapPin className="w-3 h-3" />
                             {prayerData?.city || "City"}, {prayerData?.country || "Country"}
                         </div>
                         <div className="flex items-center ">
                             <Badge variant="outline"
-                                   className="text-[10px] md:text-base px-2 py-1 bg-blue-100 rounded-r-none  dark:bg-blue-900/20">Now: {currentPrayer || "Prayer"}</Badge>
+                                className="text-[10px] md:text-base px-2 py-1 bg-blue-100 rounded-r-none  dark:bg-blue-900/20">Now: {currentPrayer || "Prayer"}</Badge>
                             <Badge variant="outline"
-                                   className="text-[10px] md:text-base px-2 py-1 rounded-l-none bg-green-100 dark:bg-green-900/20">Next: {nextPrayer || "Prayer"} {countdown || "00:00"}</Badge>
+                                className="text-[10px] md:text-base px-2 py-1 rounded-l-none bg-green-100 dark:bg-green-900/20">Next: {nextPrayer || "Prayer"} {countdown || "00:00"}</Badge>
                         </div>
                     </div>
 
@@ -339,7 +351,7 @@ export default function ModernDashboard({user}: { user: any }) {
                                     )}
                                 >
                                     <Icon
-                                        className={cn("mx-auto mb-1 absolute size-10 md:size-12 opacity-10 bottom-0 right-0", isCurrent ? "text-blue-600" : isNext ? "text-green-600" : "text-muted-foreground")}/>
+                                        className={cn("mx-auto mb-1 absolute size-10 md:size-12 opacity-10 bottom-0 right-0", isCurrent ? "text-blue-600" : isNext ? "text-green-600" : "text-muted-foreground")} />
                                     <p className="font-mono font-semibold leading-tight tracking-tighter text-sm">{time || "00:00 am"}</p>
                                     <p>{p}</p>
                                 </div>
@@ -349,39 +361,39 @@ export default function ModernDashboard({user}: { user: any }) {
                     {prayerData?.items[0].shurooq ? (
                         <div className="flex justify-between mt-4 pt-4 border-t text-[10px] md:text-base">
                             <div className="flex items-center gap-2">
-                                <Sunrise className="size-3 md:size-4 text-orange-500"/>
+                                <Sunrise className="size-3 md:size-4 text-orange-500" />
                                 <span className="text-muted-foreground">Sunrise:</span>
                                 <span
                                     className="font-mono font-semibold">{prayerData?.items[0].shurooq}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Sunset className="size-3 md:size-4 text-purple-500"/>
+                                <Sunset className="size-3 md:size-4 text-purple-500" />
                                 <span className="text-muted-foreground">Sunset:</span>
                                 <span
                                     className="font-mono font-semibold">{prayerData?.items[0].maghrib}</span>
                             </div>
                         </div>
-                    ):
+                    ) :
                         <div className="flex justify-between mt-4 pt-4 border-t text-[10px] md:text-base">
-                        <div className="flex items-center gap-2">
-                            <Sunrise className="size-3 md:size-4 text-orange-500"/>
-                            <span className="text-muted-foreground">Sunrise:</span>
-                            <span
-                                className="font-mono font-semibold">00:00</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Sunset className="size-3 md:size-4 text-purple-500"/>
-                            <span className="text-muted-foreground">Sunset:</span>
-                            <span
-                                className="font-mono font-semibold">00:00</span>
-                        </div>
-                    </div>}
+                            <div className="flex items-center gap-2">
+                                <Sunrise className="size-3 md:size-4 text-orange-500" />
+                                <span className="text-muted-foreground">Sunrise:</span>
+                                <span
+                                    className="font-mono font-semibold">00:00</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Sunset className="size-3 md:size-4 text-purple-500" />
+                                <span className="text-muted-foreground">Sunset:</span>
+                                <span
+                                    className="font-mono font-semibold">00:00</span>
+                            </div>
+                        </div>}
 
 
                 </CardContent>
             </Card>
             {/* Dashboard Diary */}
-            <LatestDiaryCard/>
+            <LatestDiaryCard />
         </div>
     );
 }

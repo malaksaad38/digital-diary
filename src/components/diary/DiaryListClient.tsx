@@ -306,7 +306,7 @@ export default function DiaryListClient() {
                                                     {page}
                                                 </Button>
                                             ) : (
-                                                <span key={index} className="px-2 text-muted-foreground">
+                                                <span key={index} className=" text-muted-foreground">
                           {page}
                         </span>
                                             )

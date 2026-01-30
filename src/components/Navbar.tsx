@@ -130,7 +130,7 @@ export default function Navbar({user}: { user: any }) {
                                         <div
                                             className={"text-xs font-semibold text-foreground/80 leading-relaxed"}>{user?.name || "User"}
                                         </div>
-                                        <EllipsisVertical size={14} className={"-ml-1"}/>
+
 
                                     </div>
                                 </PopoverTrigger>

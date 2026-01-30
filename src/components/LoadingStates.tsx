@@ -11,18 +11,6 @@ import { useEffect, useState } from "react";
 // ============================================
 
 export default function FallbackLoading() {
-    const [show, setShow] = useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setShow(false);
-        }, 5000); // 5 seconds
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    if (!show) return null;
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
             {/* Animated Background Gradient */}
@@ -61,24 +49,6 @@ export default function FallbackLoading() {
                         <Loader2 size={48} className="text-primary" strokeWidth={2.5} />
                     </motion.div>
                 </div>
-
-                {/* Text */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
-                    className="flex flex-col items-center gap-2"
-                >
-                    <p className="text-lg font-semibold text-foreground">Loading</p>
-                    <motion.div
-                        animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        className="text-sm text-muted-foreground"
-                    >
-                        Please wait...
-                    </motion.div>
-                </motion.div>
-
                 {/* Dots */}
                 <div className="flex gap-2">
                     {[0, 1, 2].map((i) => (

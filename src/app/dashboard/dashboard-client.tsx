@@ -219,9 +219,9 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
             <Card className="shadow-md py-2 md:py-6 pt-2">
                 <CardContent className="p-3 md:p-6">
                     <div className="flex justify-between items-center mb-4">
-                        <p className="font-semibold text-sm md:text-base">Prayer Analytics</p>
+                        <p className="font-semibold ">Prayer Analytics</p>
                         <Link href="/dashboard/analytics">
-                            <Button size="default" variant="outline" className="text-xs">
+                            <Button size="default" variant="outline" >
                                 Details <ChevronRight className="w-3 h-3" />
                             </Button>
                         </Link>
@@ -299,7 +299,7 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
             <Card className="shadow-md py-2 md:py-6 pb-1">
                 <CardContent className="p-3 md:p-6">
                     <div className="flex justify-between items-center mb-4">
-                        <p className="font-semibold text-sm md:text-base">Prayer Times</p>
+                        <p className="font-semibold ">Prayer Times</p>
                         <div className="flex items-center gap-2 md:gap-4">
                             <Button
                                 size="icon"
@@ -341,7 +341,7 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
                                 <div
                                     key={p}
                                     className={cn(
-                                        "rounded p-2 md:p-4 relative border transition",
+                                        " rounded p-2 md:p-4 relative border transition",
                                         isCurrent
                                             ? "bg-blue-100 dark:bg-blue-900/20 border-blue-400"
                                             : isNext

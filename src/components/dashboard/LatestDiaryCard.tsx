@@ -117,7 +117,7 @@ export default function LatestEntryCard() {
 
                     <Button
                         variant="outline"
-                        size="sm"
+                        size="default"
                         onClick={() => router.push("/dashboard/diary")}
                     >
                         View All <ChevronRight className="w-3 h-3"/>

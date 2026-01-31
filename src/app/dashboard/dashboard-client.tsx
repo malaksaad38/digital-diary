@@ -221,7 +221,7 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
                     <div className="flex justify-between items-center mb-4">
                         <p className="font-semibold text-sm md:text-base">Prayer Analytics</p>
                         <Link href="/dashboard/analytics">
-                            <Button size="sm" variant="outline" className="text-xs">
+                            <Button size="default" variant="outline" className="text-xs">
                                 Details <ChevronRight className="w-3 h-3" />
                             </Button>
                         </Link>
@@ -302,16 +302,15 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
                         <p className="font-semibold text-sm md:text-base">Prayer Times</p>
                         <div className="flex items-center gap-1 md:gap-4">
                             <Button
-                                size="sm"
+                                size="icon"
                                 variant="outline"
                                 onClick={() => fetchPrayerTimes(true)}
                                 disabled={loading}
-                                className="text-xs p-1"
                             >
                                 <RefreshCw className={cn("w-3 h-3", loading ? "animate-spin" : "")} />
                             </Button>
                             <Link href="/dashboard/prayer-times">
-                                <Button size="sm" variant="outline" className="text-xs p-1">
+                                <Button size="default" variant="outline" >
                                     Details <ChevronRight className="w-3 h-3 ml-1" />
                                 </Button>
                             </Link>

@@ -311,7 +311,7 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
                             </Button>
                             <Link href="/dashboard/prayer-times">
                                 <Button size="default" variant="outline" >
-                                    Details <ChevronRight className="w-3 h-3 ml-1" />
+                                    Details <ChevronRight className="w-3 h-3" />
                                 </Button>
                             </Link>
                         </div>

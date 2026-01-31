@@ -1,9 +1,11 @@
 "use client";
 
 import {motion} from "framer-motion";
-import {Loader2} from "lucide-react";
+import {Loader2, RefreshCw} from "lucide-react";
 import {Card} from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import {Button} from "@/components/ui/button";
+import {useEffect, useState} from "react";
+import {timeInterval} from "d3-time";
 
 // ============================================
 // MAIN FALLBACK LOADING PAGE
@@ -11,16 +13,25 @@ import { useEffect, useState } from "react";
 // ============================================
 
 export default function FallbackLoading() {
+    const [show, setShow] = useState(true);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShow(false);
+        }, 5000); // 5 seconds
+
+        return () => clearTimeout(timer);
+    }, []);
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
             {/* Animated Background Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/5 animate-pulse" />
+            <div
+                className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/5 animate-pulse"/>
 
             {/* Main Loading Content */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                initial={{opacity: 0, scale: 0.9}}
+                animate={{opacity: 1, scale: 1}}
+                transition={{duration: 0.4, ease: [0.25, 0.1, 0.25, 1]}}
                 className="relative z-10 flex flex-col items-center gap-6"
             >
                 {/* Spinner */}
@@ -39,14 +50,14 @@ export default function FallbackLoading() {
                     />
 
                     <motion.div
-                        animate={{ rotate: 360 }}
+                        animate={{rotate: 360}}
                         transition={{
                             duration: 1,
                             repeat: Infinity,
                             ease: "linear",
                         }}
                     >
-                        <Loader2 size={48} className="text-primary" strokeWidth={2.5} />
+                        <Loader2 size={48} className="text-primary" strokeWidth={2.5}/>
                     </motion.div>
                 </div>
                 {/* Dots */}
@@ -67,6 +78,7 @@ export default function FallbackLoading() {
                         />
                     ))}
                 </div>
+                <Button variant={"outline"} className={`${show ? "hidden" : "flex"} `} onClick={()=>{window.location.reload()}}><RefreshCw/> Refresh Page</Button>
             </motion.div>
         </div>
     );

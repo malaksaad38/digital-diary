@@ -300,7 +300,7 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
                 <CardContent className="p-3 md:p-6">
                     <div className="flex justify-between items-center mb-4">
                         <p className="font-semibold text-sm md:text-base">Prayer Times</p>
-                        <div className="flex items-center gap-1 md:gap-4">
+                        <div className="flex items-center gap-2 md:gap-4">
                             <Button
                                 size="icon"
                                 variant="outline"

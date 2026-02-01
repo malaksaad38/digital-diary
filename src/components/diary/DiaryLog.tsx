@@ -69,12 +69,11 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
             </AccordionTrigger>
             <Button
               variant="outline"
-              size="sm"
+              size="icon-sm"
               onClick={() => onEdit(date)}
-              className="h-7 px-2 hover:bg-primary/10"
+              className="hover:bg-primary/10"
             >
               <Pencil className="h-3 w-3" />
-              Edit
             </Button>
           </div>
 

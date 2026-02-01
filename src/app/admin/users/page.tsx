@@ -9,6 +9,7 @@ import {Button} from "@/components/ui/button";
 import {ChevronLeft, ChevronRight, Search} from "lucide-react";
 import {UserActions} from "@/components/admin/user-actions";
 import {format} from "date-fns";
+import {LoadingState} from "@/components/LoadingStates";
 
 export default function UsersPage() {
     const [page, setPage] = useState(1);
@@ -47,7 +48,7 @@ export default function UsersPage() {
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Search users..."
-                        className="pl-8"
+                        className="pl-8 border border-border"
                         value={search}
                         onChange={handleSearch}
                     />
@@ -139,9 +140,10 @@ export default function UsersPage() {
                 {/* ================= MOBILE CARDS ================= */}
                 <div className="md:hidden space-y-4 p-4">
                     {isLoading ? (
-                        <p className="text-center text-sm text-muted-foreground">
-                            Loading users...
-                        </p>
+                        <div className="text-center text-sm text-muted-foreground">
+                            <LoadingState label={"Loading users..."} />
+
+                        </div>
                     ) : data?.users.length === 0 ? (
                         <p className="text-center text-sm text-muted-foreground">
                             No users found.

@@ -52,8 +52,8 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
   return (
     <div className="border-t pt-4">
         {diary.summary && (
-            <div className="p-3 mb-2 rounded-lg bg-primary/5 border border-primary/20">
-                <p className="text-xs font-medium text-primary mb-1">Day Summary</p>
+            <div className="p-3 mb-2 rounded-lg  border border-border">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Day Summary</p>
                 <p className="text-sm text-foreground">{diary.summary}</p>
             </div>
         )}

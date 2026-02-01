@@ -83,7 +83,7 @@ export default function LatestEntryCard() {
 
     return (
         <Card
-            className={`border shadow-sm bg-card gap-0 ${onTime && "border-sky-500 bg-sky-300/10" || jamaat && "border-green-500 bg-green-300/10"}`}>
+            className={`border shadow-sm bg-card gap-0 ${onTime && "border-sky-500" || jamaat && "border-green-500"}`}>
             {/*<div>*/}
             {/*    {onTime &&*/}
             {/*        <div className="flex justify-start px-4 pb-4">*/}
@@ -117,10 +117,10 @@ export default function LatestEntryCard() {
 
                     <Button
                         variant="outline"
-                        size="default"
+                        size="sm"
                         onClick={() => router.push("/dashboard/diary")}
                     >
-                        View All <ChevronRight className="w-3 h-3"/>
+                        View all <ChevronRight className="w-3 h-3"/>
                     </Button>
                 </div>
             </CardHeader>

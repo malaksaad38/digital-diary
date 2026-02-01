@@ -213,9 +213,9 @@ export default function DiaryListClient() {
                                     key={entry.date}
                                     className={`relative gap-2 border shadow-sm bg-card ${entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
                                     entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
-                                    entry.prayer.esha === "on time" && "border-sky-500 bg-sky-300/10" || (entry.prayer.fajr === "on time" || entry.prayer.fajr === "jamaat") && (entry.prayer.zuhr === "on time" || entry.prayer.zuhr === "jamaat") &&
+                                    entry.prayer.esha === "on time" && "border-sky-500" || (entry.prayer.fajr === "on time" || entry.prayer.fajr === "jamaat") && (entry.prayer.zuhr === "on time" || entry.prayer.zuhr === "jamaat") &&
                                     (entry.prayer.asar === "on time" || entry.prayer.asar === "jamaat") && (entry.prayer.maghrib === "on time" || entry.prayer.maghrib === "jamaat") &&
-                                    (entry.prayer.esha === "on time" || entry.prayer.esha === "jamaat") && "border-green-500 bg-green-300/10"}`}
+                                    (entry.prayer.esha === "on time" || entry.prayer.esha === "jamaat") && "border-green-500"}`}
                                 >
                                     <div className={"absolute right-3 md:right-7 z-10"}>
                                         {entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&

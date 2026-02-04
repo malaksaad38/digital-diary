@@ -67,7 +67,7 @@ export default function UsersPage() {
                                 <TableHead>Role</TableHead>
                                 <TableHead>Prayers</TableHead>
                                 <TableHead>Diaries</TableHead>
-                                <TableHead>Joined</TableHead>
+                                {/*<TableHead>Joined</TableHead>*/}
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -121,11 +121,11 @@ export default function UsersPage() {
                                             {user.diaryCount || 0}
                                         </TableCell>
 
-                                        <TableCell>
-                                            {user?.createdAt && !isNaN(Date.parse(user.createdAt))
-                                                ? format(new Date(user.createdAt), "MMM d, yyyy")
-                                                : "Invalid date"}
-                                        </TableCell>
+                                        {/*<TableCell>*/}
+                                        {/*    {user?.createdAt && !isNaN(Date.parse(user.createdAt))*/}
+                                        {/*        ? format(new Date(user.createdAt), "MMM d, yyyy")*/}
+                                        {/*        : "Invalid date"}*/}
+                                        {/*</TableCell>*/}
 
                                         <TableCell className="text-right">
                                             <UserActions user={user} />
@@ -171,20 +171,20 @@ export default function UsersPage() {
                                 </div>
 
                                 {/* Info Grid */}
-                                <div className="grid grid-cols-2 gap-3 text-sm">
-                                    <div>
+                                <div className="grid grid-cols-3 gap-3 text-sm">
+                                    <div className={`${!user.role ? "hidden" : "block"}`}>
                                         <p className="text-xs text-muted-foreground">Role</p>
                                         <span className="font-medium">{user.role}</span>
                                     </div>
 
-                                    <div>
-                                        <p className="text-xs text-muted-foreground">Joined</p>
-                                        <span className="font-medium">
-                    {user?.createdAt && !isNaN(Date.parse(user.createdAt))
-                        ? format(new Date(user.createdAt), "MMM d, yyyy")
-                        : "Invalid"}
-                  </span>
-                                    </div>
+                  {/*                  <div>*/}
+                  {/*                      <p className="text-xs text-muted-foreground">Joined</p>*/}
+                  {/*                      <span className="font-medium">*/}
+                  {/*  {user?.createdAt && !isNaN(Date.parse(user.createdAt))*/}
+                  {/*      ? format(new Date(user.createdAt), "MMM d, yyyy")*/}
+                  {/*      : "Invalid"}*/}
+                  {/*</span>*/}
+                  {/*                  </div>*/}
 
                                     <div>
                                         <p className="text-xs text-muted-foreground">Prayers</p>

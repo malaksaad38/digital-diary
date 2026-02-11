@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Calendar, ChevronRight, Plus} from "lucide-react";
@@ -9,13 +9,25 @@ import {useCombinedHistory} from "@/hooks/use-prayer-queries";
 import PrayerLog from "@/components/diary/PrayerLog";
 import DiaryLog from "@/components/diary/DiaryLog";
 import {LoadingState} from "@/components/LoadingStates";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog";
 
 export default function LatestEntryCard() {
     const router = useRouter();
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deletePrayerId, setDeletePrayerId] = useState<string | null>(null);
+    const [isDeletingPrayer, setIsDeletingPrayer] = useState(false);
 
     const {
         data: combinedEntries = [],
-        isLoading,
+        isLoading,refetch,
     } = useCombinedHistory();
 
     // Get latest entry (assuming entries are sorted by date desc)
@@ -28,19 +40,72 @@ export default function LatestEntryCard() {
         )[0];
     }, [combinedEntries]);
 
-    const handleEditPrayer = (date: string) => {
-        router.push(`/dashboard/entry?date=${date}#edit`);
+    const confirmPrayerDelete = async () => {
+        if (!deletePrayerId) return;
+
+        try {
+            setIsDeletingPrayer(true);
+
+            const res = await fetch(`/api/prayers?id=${deletePrayerId}`, {
+                method: "DELETE",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to delete prayer log");
+            }
+
+            await refetch();
+            setDeletePrayerId(null);
+        } catch (error: any) {
+            console.error("Prayer delete error:", error);
+            alert(error.message || "Something went wrong");
+        } finally {
+            setIsDeletingPrayer(false);
+        }
     };
 
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
+
+        try {
+            setIsDeleting(true);
+
+            const res = await fetch(`/api/diary?id=${deleteId}`, {
+                method: "DELETE",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to delete diary");
+            }
+
+            await refetch();
+            setDeleteId(null); // close dialog
+        } catch (error: any) {
+            console.error("Delete error:", error);
+            alert(error.message || "Something went wrong");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+    const handleAddPrayer = (date: string) => {
+        router.push(`/dashboard/entry?date=${date}#prayer`);
+    };
+    const handleEditPrayer = (date: string) => {
+        router.push(`/dashboard/entry?date=${date}#prayer`);
+    };
     const handleAddDiary = (date: string) => {
         router.push(`/dashboard/entry?date=${date}#diary`);
     };
-
     const handleEditDiary = (date: string) => {
-        router.push(`/dashboard/entry?date=${date}#diaryEdit`);
+        router.push(`/dashboard/entry?date=${date}#diary`);
     };
 
-    const handleAddNew = () => {
+    const handleAddNewClick = () => {
         router.push("/dashboard/entry");
     };
 
@@ -61,7 +126,7 @@ export default function LatestEntryCard() {
                     <p className="text-sm text-muted-foreground">
                         No entries yet. Start your journey today.
                     </p>
-                    <Button onClick={handleAddNew}>
+                    <Button onClick={handleAddNewClick}>
                         <Plus className="h-4 w-4 mr-1"/>
                         Add First Entry
                     </Button>
@@ -82,6 +147,7 @@ export default function LatestEntryCard() {
     /* ---------------- Latest Entry ---------------- */
 
     return (
+        <>
         <Card
             className={`border shadow-sm bg-card gap-0 ${onTime && "border-sky-500" || jamaat && "border-green-500"}`}>
             {/*<div>*/}
@@ -126,21 +192,90 @@ export default function LatestEntryCard() {
             </CardHeader>
 
             <CardContent className="space-y-4 pt-0 px-3 md:px-6">
-                {/* Prayer */}
+                {/* Prayer Section */}
                 <PrayerLog
                     prayer={latestEntry.prayer}
                     date={latestEntry.date}
                     onEdit={handleEditPrayer}
+                    onAdd={handleAddPrayer}
+                    onDelete={(id) => setDeletePrayerId(id)}
                 />
 
-                {/* Diary */}
+                {/* Diary Section */}
                 <DiaryLog
+                    key={latestEntry.date}
                     diary={latestEntry.diary}
                     date={latestEntry.date}
                     onEdit={handleEditDiary}
                     onAdd={handleAddDiary}
+                    onDelete={(id) => setDeleteId(id)}
                 />
             </CardContent>
         </Card>
+            {/*Prayer Dialog*/}
+            <Dialog
+                open={!!deletePrayerId}
+                onOpenChange={() => setDeletePrayerId(null)}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete prayer log?</DialogTitle>
+                        <DialogDescription>
+                            This will permanently delete this day’s prayer record.
+                            This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeletePrayerId(null)}
+                            disabled={isDeletingPrayer}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            variant="destructive"
+                            onClick={confirmPrayerDelete}
+                            disabled={isDeletingPrayer}
+                        >
+                            {isDeletingPrayer ? "Deleting..." : "Delete"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/*Diary Dialog*/}
+            <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete diary Log?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. Your diary entry will be permanently removed.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleteId(null)}
+                            disabled={isDeleting}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            variant="destructive"
+                            onClick={confirmDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "Deleting..." : "Delete"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+        </>
     );
 }

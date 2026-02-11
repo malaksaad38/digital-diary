@@ -1,7 +1,7 @@
 // components/diary/DiaryListClient.tsx
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Calendar, ChevronLeft, ChevronRight, RefreshCw, Search, X} from "lucide-react";
@@ -12,6 +12,15 @@ import DiaryLog from "./DiaryLog";
 import PrayerLegend from "@/components/diary/PrayerLegend";
 import {LoadingState} from "@/components/LoadingStates";
 import prayer from "@/models/Prayer";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog";
+import {refresh} from "next/cache";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -19,7 +28,10 @@ export default function DiaryListClient() {
     const router = useRouter();
     const [searchQuery, setSearchQuery] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
-
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deletePrayerId, setDeletePrayerId] = useState<string | null>(null);
+    const [isDeletingPrayer, setIsDeletingPrayer] = useState(false);
     // Use React Query hook with automatic caching
     const {data: combinedEntries = [], isLoading, refetch, isFetching} = useCombinedHistory();
 
@@ -51,16 +63,69 @@ export default function DiaryListClient() {
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const paginatedEntries = filteredEntries.slice(startIndex, endIndex);
 
-    const handleEditClick = (date: string) => {
-        router.push(`/dashboard/entry?date=${date}#edit`);
+    const confirmPrayerDelete = async () => {
+        if (!deletePrayerId) return;
+
+        try {
+            setIsDeletingPrayer(true);
+
+            const res = await fetch(`/api/prayers?id=${deletePrayerId}`, {
+                method: "DELETE",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to delete prayer log");
+            }
+
+            await refetch();
+            setDeletePrayerId(null);
+        } catch (error: any) {
+            console.error("Prayer delete error:", error);
+            alert(error.message || "Something went wrong");
+        } finally {
+            setIsDeletingPrayer(false);
+        }
     };
 
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
+
+        try {
+            setIsDeleting(true);
+
+            const res = await fetch(`/api/diary?id=${deleteId}`, {
+                method: "DELETE",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to delete diary");
+            }
+
+            await refetch();
+            setDeleteId(null); // close dialog
+        } catch (error: any) {
+            console.error("Delete error:", error);
+            alert(error.message || "Something went wrong");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+    const handleAddPrayer = (date: string) => {
+        router.push(`/dashboard/entry?date=${date}#prayer`);
+    };
+    const handleEditPrayer = (date: string) => {
+        router.push(`/dashboard/entry?date=${date}#prayer`);
+    };
     const handleAddDiary = (date: string) => {
         router.push(`/dashboard/entry?date=${date}#diary`);
     };
-
     const handleEditDiary = (date: string) => {
-        router.push(`/dashboard/entry?date=${date}#diaryEdit`);
+        router.push(`/dashboard/entry?date=${date}#diary`);
     };
 
     const handleAddNewClick = () => {
@@ -208,17 +273,16 @@ export default function DiaryListClient() {
                         {/* Combined Entries */}
                         <div className="space-y-4">
                             {paginatedEntries.map((entry: any) => (
-                                !entry?.prayer ? null :
                                     <Card
                                     key={entry.date}
-                                    className={`relative gap-2 border shadow-sm bg-card ${entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
+                                    className={`relative gap-2 border shadow-sm bg-card ${!entry?.prayer ? null : entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
                                     entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
                                     entry.prayer.esha === "on time" && "border-sky-500" || (entry.prayer.fajr === "on time" || entry.prayer.fajr === "jamaat") && (entry.prayer.zuhr === "on time" || entry.prayer.zuhr === "jamaat") &&
                                     (entry.prayer.asar === "on time" || entry.prayer.asar === "jamaat") && (entry.prayer.maghrib === "on time" || entry.prayer.maghrib === "jamaat") &&
                                     (entry.prayer.esha === "on time" || entry.prayer.esha === "jamaat") && "border-green-500"}`}
                                 >
                                     <div className={"absolute right-3 md:right-7 z-10"}>
-                                        {entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
+                                        {!entry?.prayer ? null : entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
                                             entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
                                             entry.prayer.esha === "on time" &&
                                             <div className="flex justify-end z-10">
@@ -252,7 +316,7 @@ export default function DiaryListClient() {
                             day: "numeric",
                         })}
                       </span>
-                                            </CardTitle>
+                                           </CardTitle>
                                         </div>
                                     </CardHeader>
 
@@ -261,15 +325,19 @@ export default function DiaryListClient() {
                                         <PrayerLog
                                             prayer={entry.prayer}
                                             date={entry.date}
-                                            onEdit={handleEditClick}
+                                            onEdit={handleEditPrayer}
+                                            onAdd={handleAddPrayer}
+                                            onDelete={(id) => setDeletePrayerId(id)}
                                         />
 
                                         {/* Diary Section */}
                                         <DiaryLog
+                                            key={entry.date}
                                             diary={entry.diary}
                                             date={entry.date}
                                             onEdit={handleEditDiary}
                                             onAdd={handleAddDiary}
+                                            onDelete={(id) => setDeleteId(id)}
                                         />
                                     </CardContent>
                                 </Card>
@@ -329,6 +397,71 @@ export default function DiaryListClient() {
                         )}
                     </>
                 )}
+
+             {/*Prayer Dialog*/}
+            <Dialog
+                open={!!deletePrayerId}
+                onOpenChange={() => setDeletePrayerId(null)}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete prayer log?</DialogTitle>
+                        <DialogDescription>
+                            This will permanently delete this day’s prayer record.
+                            This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeletePrayerId(null)}
+                            disabled={isDeletingPrayer}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            variant="destructive"
+                            onClick={confirmPrayerDelete}
+                            disabled={isDeletingPrayer}
+                        >
+                            {isDeletingPrayer ? "Deleting..." : "Delete"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+             {/*Diary Dialog*/}
+            <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete diary Log?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. Your diary entry will be permanently removed.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleteId(null)}
+                            disabled={isDeleting}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            variant="destructive"
+                            onClick={confirmDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "Deleting..." : "Delete"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
         </>
     );
 }

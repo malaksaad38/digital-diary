@@ -147,3 +147,55 @@ export async function PUT(req: Request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const session = await auth();
+
+        if (!session || !session.user) {
+            return NextResponse.json(
+                { success: false, error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
+        await connectDB();
+
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get("id");
+
+        if (!id) {
+            return NextResponse.json(
+                { success: false, error: "Prayer ID is required" },
+                { status: 400 }
+            );
+        }
+
+        const deletedPrayer = await Prayer.findOneAndDelete({
+            _id: id,
+            userId: session.user.id,
+        });
+
+        if (!deletedPrayer) {
+            return NextResponse.json(
+                { success: false, error: "Prayer log not found or unauthorized" },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json({
+            success: true,
+            message: "Prayer log deleted successfully",
+        });
+    } catch (error: any) {
+        console.error("Error deleting prayer log:", error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                error: error.message || "Internal Server Error",
+            },
+            { status: 500 }
+        );
+    }
+}

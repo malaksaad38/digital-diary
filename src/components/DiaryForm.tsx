@@ -47,8 +47,7 @@ export default function DiaryForm({session}: any) {
 
     const timeFields = [
         {key: "fajrToZuhr", label: "Fajr to Zuhr", placeholder: "What happened between Fajr and Zuhr prayers..."},
-        {key: "zuhrToAsar", label: "Zuhr to Asar", placeholder: "What happened between Zuhr and Asar prayers..."},
-        {
+        {key: "zuhrToAsar", label: "Zuhr to Asar", placeholder: "What happened between Zuhr and Asar prayers..."}, {
             key: "asarToMaghrib",
             label: "Asar to Maghrib",
             placeholder: "What happened between Asar and Maghrib prayers..."
@@ -241,7 +240,7 @@ export default function DiaryForm({session}: any) {
             </CardHeader>
 
             <CardContent className="px-4 sm:px-6">
-                <form id={"diaryDate"} onSubmit={handleSubmit} className={`space-y-6`}>
+                <form onSubmit={handleSubmit} className={`space-y-6`}>
                     {/* Date Picker */}
                     <div>
                         <h3 className="text-base sm:text-lg font-semibold mb-3">Select Date</h3>
@@ -366,7 +365,7 @@ export default function DiaryForm({session}: any) {
                                             value={formData[field.key as keyof typeof formData]}
                                             onChange={(e) => handleChange(field.key, e.target.value)}
                                             disabled={isFormDisabled}
-                                            className={`min-h-[80px] resize-none ${translationLanguage === "en" && "font-inter" || translationLanguage === "ur" && "font-noto_nastaliq leading-10 text-end"}`}
+                                            className={`min-h-[80px] resize-none ${translationLanguage === "en" && "font-inter" || translationLanguage === "ur" && "font-noto_nastaliq leading-8 text-end"}`}
                                         />
                                     </div>
                                 ))}

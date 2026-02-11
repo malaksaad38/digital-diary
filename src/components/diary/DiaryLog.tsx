@@ -9,7 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BookOpen, Pencil } from "lucide-react";
+import {BookOpen, Pencil, Trash, Trash2} from "lucide-react";
 
 interface DiaryData {
   summary?: string;
@@ -22,17 +22,18 @@ interface DiaryData {
 }
 
 interface DiaryLogProps {
-  diary: DiaryData | null;
-  date: string;
-  onEdit: (date: string) => void;
-  onAdd: (date: string) => void;
+    diary: (DiaryData & { _id: string }) | null;
+    date: string;
+    onEdit: (date: string) => void;
+    onAdd: (date: string) => void;
+    onDelete: (diaryId: string) => void;
 }
 
-export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) {
+export default function DiaryLog({ diary, date, onEdit, onAdd , onDelete }: DiaryLogProps) {
   if (!diary) {
     return (
       <div className="text-center py-4 border-t border rounded-lg bg-muted/20">
-        <p className="text-sm text-muted-foreground mb-2">No diary entry for this date</p>
+        <p className="text-sm text-muted-foreground mb-2">No diary Log for this date</p>
         <Button size="sm" variant="outline" onClick={() => onAdd(date)}>
           <BookOpen className="mr-2 h-3 w-3" />
           Add Diary Entry
@@ -67,14 +68,24 @@ export default function DiaryLog({ diary, date, onEdit, onAdd }: DiaryLogProps) 
                 Diary Entry
               </h4>
             </AccordionTrigger>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              onClick={() => onEdit(date)}
-              className="hover:bg-primary/10"
-            >
-              <Pencil className="h-3 w-3" />
-            </Button>
+            <div className={"flex items-center justify-center gap-2"}>
+                <Button
+                    variant="outline"
+                    size="icon-sm"
+                    onClick={() => diary?._id && onDelete(diary._id)}
+                    className="hover:bg-red-400/10"
+                >
+                    <Trash2 className="h-3 w-3 text-red-400" />
+                </Button>
+                <Button
+                    variant="outline"
+                    size="icon-sm"
+                    onClick={() => onEdit(date)}
+                    className="hover:bg-primary/10"
+                >
+                    <Pencil className="h-3 w-3 text-blue-400" />
+                </Button>
+            </div>
           </div>
 
 

@@ -239,7 +239,7 @@ export default function PrayerForm({session}: any) {
     };
 
     return (
-        <Card className="w-full h-fit shadow-lg border-border/50">
+        <Card id={"prayer"} className="w-full h-fit shadow-lg border-border/50">
             <CardHeader className="space-y-1 pb-4">
                 <CardTitle className="text-center text-xl sm:text-2xl font-bold flex items-center justify-center gap-2">
                     <StarsIcon className="h-6 w-6"/>

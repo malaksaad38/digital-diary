@@ -4,7 +4,7 @@
 import React from "react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
-import {Circle, CircleHelp, Diamond, Pencil} from "lucide-react";
+import {Circle, CircleHelp, Diamond, Pencil, Trash2} from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -42,18 +42,20 @@ interface PrayerData {
 }
 
 interface PrayerLogProps {
-  prayer: PrayerData | null;
-  date: string;
-  onEdit: (date: string) => void;
+    prayer: (PrayerData & { _id: string }) | null;
+    date: string;
+    onEdit: (date: string) => void;
+    onAdd: (date: string) => void;
+    onDelete: (prayerId: string) => void;
 }
 
-export default function PrayerLog({ prayer, date, onEdit }: PrayerLogProps) {
+export default function PrayerLog({ prayer, date, onEdit,onAdd, onDelete }: PrayerLogProps) {
   if (!prayer) {
     return (
       <div className="text-center py-4 border rounded-lg bg-muted/20">
         <p className="text-sm text-muted-foreground mb-2">No prayer log for this date</p>
-        <Button size="sm" variant="outline" onClick={() => onEdit(date)}>
-          Add Prayer Log
+        <Button size="sm" variant="outline" onClick={() => onAdd(date)}>
+          Add Prayer Entry
         </Button>
       </div>
     );
@@ -128,15 +130,25 @@ export default function PrayerLog({ prayer, date, onEdit }: PrayerLogProps) {
             </DialogContent>
           </Dialog>
         </h4>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          onClick={() => onEdit(date)}
-          className=" hover:bg-primary/10"
-        >
-          <Pencil className="h-3 w-3" />
+          <div className="flex items-center gap-2">
+              <Button
+                  variant="outline"
+                  size="icon-sm"
+                  onClick={() => prayer?._id && onDelete(prayer._id)}
+                  className="hover:bg-red-400/10"
+              >
+                  <Trash2 className="h-3 w-3 text-red-400" />
+              </Button>
 
-        </Button>
+              <Button
+                  variant="outline"
+                  size="icon-sm"
+                  onClick={() => onEdit(date)}
+                  className="hover:bg-primary/10"
+              >
+                  <Pencil className="h-3 w-3" />
+              </Button>
+          </div>
       </div>
 
       {/* Prayer Table */}

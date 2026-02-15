@@ -1042,6 +1042,7 @@ export default function PrayerAnalyticsDashboard() {
                                                 data={prayerSuccessRates}
                                                 innerRadius="10%"
                                                 outerRadius="90%"
+                                                className={""}
                                             >
                                                 <RadialBar
                                                     label={{ position: 'insideStart', fill: '#fff', fontSize: 10 }}
@@ -1051,9 +1052,16 @@ export default function PrayerAnalyticsDashboard() {
                                                 <Legend
                                                     iconSize={10}
                                                     layout="vertical"
-                                                    verticalAlign="middle"
-                                                    align="right"
+                                                    verticalAlign="bottom"
+                                                    align="left"
                                                     wrapperStyle={{ fontSize: '12px' }}
+                                                    payload={[
+                                                        { value: "Fajr " +  prayerSuccessRates[0]?.successRate, type: "circle", id: "Fajr", color: prayerSuccessRates[0]?.fill },
+                                                        { value: "Zuhr " +  prayerSuccessRates[1]?.successRate, type: "circle", id: "Zuhr", color: prayerSuccessRates[1]?.fill },
+                                                        { value: "Asar " +  prayerSuccessRates[2]?.successRate, type: "circle", id: "Asar", color: prayerSuccessRates[2]?.fill },
+                                                        { value: "Maghrib " +  prayerSuccessRates[3]?.successRate, type: "circle", id: "Maghrib", color: prayerSuccessRates[3]?.fill },
+                                                        { value: "Esha " +  prayerSuccessRates[4]?.successRate, type: "circle", id: "Esha", color: prayerSuccessRates[4]?.fill },
+                                                    ]}
                                                 />
                                                 <ChartTooltip content={<ChartTooltipContent />} />
                                             </RadialBarChart>
@@ -1134,7 +1142,7 @@ export default function PrayerAnalyticsDashboard() {
                                                 <CartesianGrid strokeDasharray="3 3" />
                                                 <XAxis
                                                     dataKey="day"
-                                                    label={{ value: 'Day of Month', position: 'insideBottom', offset: -5 }}
+                                                    label={{ value: 'Day of Month', position: 'insideBottom', offset: -3 }}
                                                 />
                                                 <YAxis
                                                     label={{ value: 'Cumulative Count', angle: -90, position: 'insideLeft' }}
@@ -1202,14 +1210,14 @@ export default function PrayerAnalyticsDashboard() {
                                         >
                                             <BarChart data={prayerWiseChartData}>
                                                 <CartesianGrid strokeDasharray="3 3"/>
-                                                <XAxis dataKey="prayer"/>
-                                                <YAxis/>
+                                                <XAxis dataKey="prayer" />
+                                                <YAxis label={{ value: 'Prayers Count Total', angle: -90, position: 'insideLeft' }}/>
                                                 <ChartTooltip content={<ChartTooltipContent/>}/>
-                                                <ChartLegend content={<ChartLegendContent />} />
+                                                <ChartLegend  content={<ChartLegendContent />} />
                                                 <Bar dataKey="missed" stackId="a" fill={STATUS_COLORS.missed}/>
                                                 <Bar dataKey="alone" stackId="a" fill={STATUS_COLORS.alone}/>
                                                 <Bar dataKey="jamaat" stackId="a" fill={STATUS_COLORS.jamaat}/>
-                                                <Bar dataKey="onTime" stackId="a" fill={STATUS_COLORS["on time"]}/>
+                                                <Bar dataKey="onTime" stackId="a"  fill={STATUS_COLORS["on time"]}/>
                                             </BarChart>
                                         </ChartContainer>
                                     )}
@@ -1239,14 +1247,14 @@ export default function PrayerAnalyticsDashboard() {
                                         >
                                             <BarChart data={weeklyComparisonData}>
                                                 <CartesianGrid strokeDasharray="3 3"/>
-                                                <XAxis dataKey="week"/>
-                                                <YAxis/>
+                                                <XAxis dataKey="week" />
+                                                <YAxis label={{ value: 'Prayers Count', angle: -90, position: 'insideLeft' }}/>
                                                 <ChartTooltip content={<ChartTooltipContent/>}/>
                                                 <ChartLegend content={<ChartLegendContent />} />
-                                                <Bar dataKey="onTime" fill={STATUS_COLORS["on time"]}/>
-                                                <Bar dataKey="jamaat" fill={STATUS_COLORS.jamaat}/>
-                                                <Bar dataKey="alone" fill={STATUS_COLORS.alone}/>
                                                 <Bar dataKey="missed" fill={STATUS_COLORS.missed}/>
+                                                <Bar dataKey="alone" fill={STATUS_COLORS.alone}/>
+                                                <Bar dataKey="jamaat" fill={STATUS_COLORS.jamaat}/>
+                                                <Bar dataKey="onTime" fill={STATUS_COLORS["on time"]}/>
                                             </BarChart>
                                         </ChartContainer>
                                     )}

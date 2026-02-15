@@ -83,7 +83,7 @@ export default function DiaryLog({ diary, date, onEdit, onAdd , onDelete }: Diar
                     onClick={() => onEdit(date)}
                     className="hover:bg-primary/10"
                 >
-                    <Pencil className="h-3 w-3 text-blue-400" />
+                    <Pencil className="h-3 w-3" />
                 </Button>
             </div>
           </div>

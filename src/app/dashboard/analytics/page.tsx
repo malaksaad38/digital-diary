@@ -12,12 +12,33 @@ import {
     Diamond,
     Loader2,
     TrendingUp,
+    TrendingDown,
     Users,
-    XCircle
+    XCircle,
+    Activity,
+    BarChart3,
+    PieChart as PieChartIcon
 } from "lucide-react";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
-import {ChartContainer, ChartTooltip, ChartTooltipContent,} from "@/components/ui/chart";
-import {Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, XAxis, YAxis} from "recharts";
+import {ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent} from "@/components/ui/chart";
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Legend,
+    Pie,
+    PieChart,
+    XAxis,
+    YAxis,
+    Line,
+    LineChart,
+    Area,
+    AreaChart,
+    RadialBarChart,
+    RadialBar,
+    ResponsiveContainer
+} from "recharts";
 import {
     Dialog,
     DialogContent,
@@ -27,6 +48,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 
 const prayers = ["fajr", "zuhr", "asar", "maghrib", "esha"];
 
@@ -53,7 +75,6 @@ export default function PrayerAnalyticsDashboard() {
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     });
 
-
     // Calculate overall statistics
     const overallStats = React.useMemo(() => {
         const stats = {
@@ -63,9 +84,7 @@ export default function PrayerAnalyticsDashboard() {
             onTime: 0,
             notSelected: 0,
             total: 0,
-
         };
-
 
         combinedEntries.forEach((entry: any) => {
             if (entry.prayer) {
@@ -103,7 +122,6 @@ export default function PrayerAnalyticsDashboard() {
             daysWithData: 0,
         };
 
-
         combinedEntries.forEach((entry: any) => {
             const entryDate = new Date(entry.date);
             const entryMonth = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`;
@@ -132,7 +150,6 @@ export default function PrayerAnalyticsDashboard() {
         return stats;
     }, [combinedEntries, selectedMonth]);
 
-
     // Calculate prayer-wise statistics
     const prayerWiseStats = React.useMemo(() => {
         const stats: any = {};
@@ -145,7 +162,6 @@ export default function PrayerAnalyticsDashboard() {
                 onTime: 0,
                 notSelected: 0,
                 total: 0,
-
             };
         });
 
@@ -173,13 +189,154 @@ export default function PrayerAnalyticsDashboard() {
         return stats;
     }, [combinedEntries]);
 
+    // NEW: Calculate daily trend data for the selected month
+    const dailyTrendData = React.useMemo(() => {
+        const dailyData: any = {};
+
+        combinedEntries.forEach((entry: any) => {
+            const entryDate = new Date(entry.date);
+            const entryMonth = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`;
+
+            if (entryMonth === selectedMonth && entry.prayer) {
+                const day = entryDate.getDate();
+
+                if (!dailyData[day]) {
+                    dailyData[day] = {
+                        day: day,
+                        missed: 0,
+                        alone: 0,
+                        jamaat: 0,
+                        onTime: 0,
+                        successRate: 0,
+                        total: 0
+                    };
+                }
+
+                prayers.forEach((prayer) => {
+                    const status = entry.prayer[prayer]?.toLowerCase();
+                    dailyData[day].total++;
+
+                    if (status === "missed") {
+                        dailyData[day].missed++;
+                    } else if (status === "alone") {
+                        dailyData[day].alone++;
+                    } else if (status === "jamaat") {
+                        dailyData[day].jamaat++;
+                    } else if (status === "on time") {
+                        dailyData[day].onTime++;
+                    }
+                });
+
+                // Calculate success rate for the day
+                const successful = dailyData[day].jamaat + dailyData[day].onTime;
+                dailyData[day].successRate = dailyData[day].total > 0
+                    ? ((successful / dailyData[day].total) * 100).toFixed(1)
+                    : 0;
+            }
+        });
+
+        return Object.values(dailyData).sort((a: any, b: any) => a.day - b.day);
+    }, [combinedEntries, selectedMonth]);
+
+    // NEW: Calculate weekly comparison data
+    const weeklyComparisonData = React.useMemo(() => {
+        const weeklyData: any = {};
+
+        combinedEntries.forEach((entry: any) => {
+            const entryDate = new Date(entry.date);
+            const entryMonth = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`;
+
+            if (entryMonth === selectedMonth && entry.prayer) {
+                const weekNumber = Math.ceil(entryDate.getDate() / 7);
+
+                if (!weeklyData[weekNumber]) {
+                    weeklyData[weekNumber] = {
+                        week: `Week ${weekNumber}`,
+                        missed: 0,
+                        alone: 0,
+                        jamaat: 0,
+                        onTime: 0,
+                        total: 0
+                    };
+                }
+
+                prayers.forEach((prayer) => {
+                    const status = entry.prayer[prayer]?.toLowerCase();
+                    weeklyData[weekNumber].total++;
+
+                    if (status === "missed") weeklyData[weekNumber].missed++;
+                    else if (status === "alone") weeklyData[weekNumber].alone++;
+                    else if (status === "jamaat") weeklyData[weekNumber].jamaat++;
+                    else if (status === "on time") weeklyData[weekNumber].onTime++;
+                });
+            }
+        });
+
+        return Object.values(weeklyData);
+    }, [combinedEntries, selectedMonth]);
+
+    // NEW: Calculate time-of-day performance (prayer-specific success rates)
+    const prayerSuccessRates = React.useMemo(() => {
+        return prayers.map((prayer) => {
+            const stats = prayerWiseStats[prayer];
+            const successRate = stats.total > 0
+                ? ((stats.jamaat + stats.onTime) / stats.total * 100)
+                : 0;
+
+            return {
+                prayer: prayerLabels[prayer as keyof typeof prayerLabels],
+                successRate: parseFloat(successRate.toFixed(1)),
+                fill: successRate >= 90 ? statusColors["on time"] :
+                    successRate >= 60 ? statusColors.jamaat :
+                        successRate >= 30 ? statusColors.alone :
+                            statusColors.missed
+            };
+        });
+    }, [prayerWiseStats]);
+
+    // NEW: Calculate cumulative statistics over time
+    const cumulativeData = React.useMemo(() => {
+        let cumulative = { jamaat: 0, onTime: 0, missed: 0, alone: 0 };
+        const data: any[] = [];
+
+        const sortedEntries = [...combinedEntries]
+            .filter((entry: any) => {
+                const entryDate = new Date(entry.date);
+                const entryMonth = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`;
+                return entryMonth === selectedMonth;
+            })
+            .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        sortedEntries.forEach((entry: any) => {
+            if (entry.prayer) {
+                prayers.forEach((prayer) => {
+                    const status = entry.prayer[prayer]?.toLowerCase();
+                    if (status === "jamaat") cumulative.jamaat++;
+                    else if (status === "on time") cumulative.onTime++;
+                    else if (status === "missed") cumulative.missed++;
+                    else if (status === "alone") cumulative.alone++;
+                });
+
+                const day = new Date(entry.date).getDate();
+                data.push({
+                    day,
+                    jamaat: cumulative.jamaat,
+                    onTime: cumulative.onTime,
+                    missed: cumulative.missed,
+                    alone: cumulative.alone
+                });
+            }
+        });
+
+        return data;
+    }, [combinedEntries, selectedMonth]);
+
     // Prepare chart data
     const overallChartData = [
         {name: "Missed", value: overallStats.missed, color: statusColors.missed},
         {name: "Alone", value: overallStats.alone, color: statusColors.alone},
         {name: "Jamaat", value: overallStats.jamaat, color: statusColors.jamaat},
         {name: "On Time", value: overallStats.onTime, color: statusColors["on time"]},
-        // { name: "Not Selected", value: overallStats.notSelected, color: statusColors["not selected"] },
     ];
 
     const prayerWiseChartData = prayers.map((prayer) => ({
@@ -251,8 +408,7 @@ export default function PrayerAnalyticsDashboard() {
 
     return (
         <div className="min-h-screen bg-background">
-            <div className="max-w-6xl mx-auto p-4  space-y-6 pt-4 sm:pt-8 pb-8">
-
+            <div className="max-w-6xl mx-auto p-4 space-y-6 pt-4 sm:pt-8 pb-8">
                 {/* Header */}
                 <div className="space-y-2">
                     <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
@@ -282,42 +438,42 @@ export default function PrayerAnalyticsDashboard() {
 
                                             <div className="space-y-3 pt-2">
                                                 <p>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Circle className="h-3 w-3 "/>
-                          <strong>Success Rate</strong>
-                        </span>{" "}
+                                                    <span className="inline-flex items-center gap-1.5">
+                                                        <Circle className="h-3 w-3 "/>
+                                                        <strong>Success Rate</strong>
+                                                    </span>{" "}
                                                     — Your <strong>Success rate</strong> Based on Jamaat and On time
                                                     (Takbeeri Oola). mean how many prayer you pray with Jamaat
                                                 </p>
                                                 <p>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Circle className="h-3 w-3 text-red-500 fill-red-500"/>
-                          <strong>Missed</strong>
-                        </span>{" "}
+                                                    <span className="inline-flex items-center gap-1.5">
+                                                        <Circle className="h-3 w-3 text-red-500 fill-red-500"/>
+                                                        <strong>Missed</strong>
+                                                    </span>{" "}
                                                     — You <strong>missed the prayer time</strong> (Qaza), meaning you
                                                     didn't pray within its proper time.
                                                 </p>
                                                 <p>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Circle className="h-3 w-3 text-yellow-400 fill-yellow-400"/>
-                          <strong>Alone</strong>
-                        </span>{" "}
+                                                    <span className="inline-flex items-center gap-1.5">
+                                                        <Circle className="h-3 w-3 text-yellow-400 fill-yellow-400"/>
+                                                        <strong>Alone</strong>
+                                                    </span>{" "}
                                                     — You <strong>prayed alone</strong> and not in congregation
                                                     (Jamaat).
                                                 </p>
                                                 <p>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Circle className="h-3 w-3 text-green-500 fill-green-500"/>
-                          <strong>Jamaat</strong>
-                        </span>{" "}
+                                                    <span className="inline-flex items-center gap-1.5">
+                                                        <Circle className="h-3 w-3 text-green-500 fill-green-500"/>
+                                                        <strong>Jamaat</strong>
+                                                    </span>{" "}
                                                     — You <strong>performed the prayer with Jamaat</strong> (in
                                                     congregation).
                                                 </p>
                                                 <p>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Diamond className="h-3 w-3 text-sky-500 fill-sky-500"/>
-                          <strong>On Time</strong>
-                        </span>{" "}
+                                                    <span className="inline-flex items-center gap-1.5">
+                                                        <Diamond className="h-3 w-3 text-sky-500 fill-sky-500"/>
+                                                        <strong>On Time</strong>
+                                                    </span>{" "}
                                                     — You <strong>prayed in Jamaat with Takbeeri Oola</strong> (the
                                                     first Takbeer at the start of the prayer).
                                                 </p>
@@ -334,7 +490,6 @@ export default function PrayerAnalyticsDashboard() {
                 {/* Overall Statistics Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 text-center">
                     {isLoading ? (
-                        // Loading skeleton for stats cards
                         <>
                             {[...Array(6)].map((_, i) => (
                                 <div
@@ -349,9 +504,7 @@ export default function PrayerAnalyticsDashboard() {
                         </>
                     ) : (
                         <>
-                            {/* Missed (Qaza) */}
-                            <div
-                                className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-cyan-50/80 to-transparent dark:from-cyan-950/20 py-3 sm:py-5 border border-transparent hover:border-cyan-200/40 transition-all duration-300">
+                            <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-cyan-50/80 to-transparent dark:from-cyan-950/20 py-3 sm:py-5 border border-transparent hover:border-cyan-200/40 transition-all duration-300">
                                 <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
                                     Total Prayers
                                 </p>
@@ -362,8 +515,7 @@ export default function PrayerAnalyticsDashboard() {
                                     Prayer count
                                 </p>
                             </div>
-                            <div
-                                className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-red-50/80 to-transparent dark:from-red-950/20 py-3 sm:py-5 border border-transparent hover:border-red-200/40 transition-all duration-300">
+                            <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-red-50/80 to-transparent dark:from-red-950/20 py-3 sm:py-5 border border-transparent hover:border-red-200/40 transition-all duration-300">
                                 <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
                                     Missed (Qaza)
                                 </p>
@@ -378,9 +530,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </p>
                             </div>
 
-                            {/* Alone */}
-                            <div
-                                className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-yellow-50/80 to-transparent dark:from-yellow-950/20 py-3 sm:py-5 border border-transparent hover:border-yellow-200/40 transition-all duration-300">
+                            <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-yellow-50/80 to-transparent dark:from-yellow-950/20 py-3 sm:py-5 border border-transparent hover:border-yellow-200/40 transition-all duration-300">
                                 <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
                                     Alone
                                 </p>
@@ -395,9 +545,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </p>
                             </div>
 
-                            {/* Jamaat */}
-                            <div
-                                className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-green-50/80 to-transparent dark:from-green-950/20 py-3 sm:py-5 border border-transparent hover:border-green-200/40 transition-all duration-300">
+                            <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-green-50/80 to-transparent dark:from-green-950/20 py-3 sm:py-5 border border-transparent hover:border-green-200/40 transition-all duration-300">
                                 <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
                                     Jamaat
                                 </p>
@@ -412,9 +560,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </p>
                             </div>
 
-                            {/* On Time */}
-                            <div
-                                className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-sky-50/80 to-transparent dark:from-sky-950/20 py-3 sm:py-5 border border-transparent hover:border-sky-200/40 transition-all duration-300">
+                            <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-sky-50/80 to-transparent dark:from-sky-950/20 py-3 sm:py-5 border border-transparent hover:border-sky-200/40 transition-all duration-300">
                                 <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
                                     On Time
                                 </p>
@@ -429,9 +575,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </p>
                             </div>
 
-                            {/* Success Rate */}
-                            <div
-                                className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-primary/10 to-transparent dark:from-primary/20 py-3 sm:py-5 border border-transparent hover:border-primary/40 transition-all duration-300">
+                            <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-b from-primary/10 to-transparent dark:from-primary/20 py-3 sm:py-5 border border-transparent hover:border-primary/40 transition-all duration-300">
                                 <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
                                     Success Rate
                                 </p>
@@ -445,7 +589,6 @@ export default function PrayerAnalyticsDashboard() {
                         </>
                     )}
                 </div>
-
 
                 {/* Monthly Filter and Stats */}
                 <Card className="overflow-hidden border border-border/50 shadow-sm">
@@ -461,11 +604,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </CardDescription>
                             </div>
 
-                            {/* ✨ Modern Month Selector */}
-                            <Select
-                                value={selectedMonth}
-                                onValueChange={setSelectedMonth}
-                            >
+                            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                                 <SelectTrigger className="w-[180px]">
                                     <SelectValue placeholder="Select month"/>
                                 </SelectTrigger>
@@ -485,11 +624,9 @@ export default function PrayerAnalyticsDashboard() {
 
                     <CardContent className="p-4 sm:p-6">
                         {isLoading ? (
-                            // Loading skeleton for monthly stats
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
                                 {[...Array(6)].map((_, i) => (
-                                    <div key={i}
-                                         className="flex flex-col items-center sm:items-start space-y-2 animate-pulse">
+                                    <div key={i} className="flex flex-col items-center sm:items-start space-y-2 animate-pulse">
                                         <div className="h-4 w-20 bg-muted rounded"/>
                                         <div className="h-6 w-12 bg-muted rounded"/>
                                     </div>
@@ -498,10 +635,7 @@ export default function PrayerAnalyticsDashboard() {
                         ) : (
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
                                 {stats.map((stat) => (
-                                    <div
-                                        key={stat.label}
-                                        className="flex flex-col items-center sm:items-start space-y-1"
-                                    >
+                                    <div key={stat.label} className="flex flex-col items-center sm:items-start space-y-1">
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             {stat.icon}
                                             <span>{stat.label}</span>
@@ -516,76 +650,44 @@ export default function PrayerAnalyticsDashboard() {
                     </CardContent>
                 </Card>
 
+                {/* NEW: Advanced Analytics Tabs */}
+                <Tabs defaultValue="overview" className="w-full">
+                    <TabsList className="grid w-full grid-cols-4">
+                        <TabsTrigger value="overview" className="flex items-center gap-2">
+                            <PieChartIcon className="h-4 w-4" />
+                            <span className="hidden sm:inline">Overview</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="trends" className="flex items-center gap-2">
+                            <Activity className="h-4 w-4" />
+                            <span className="hidden sm:inline">Trends</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="comparison" className="flex items-center gap-2">
+                            <BarChart3 className="h-4 w-4" />
+                            <span className="hidden sm:inline">Compare</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="prayers" className="flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            <span className="hidden sm:inline">Prayers</span>
+                        </TabsTrigger>
+                    </TabsList>
 
-                {/* Charts Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5 w-full">
-                    {/* Overall Distribution Pie Chart */}
-                    <Card className="w-full">
-                        <CardHeader className="pb-1 sm:pb-2 text-center">
-                            <CardTitle className="text-[11px] sm:text-xs font-semibold">
-                                Overall Prayer Distribution
-                            </CardTitle>
-                            <CardDescription className="text-[9px] sm:text-[10px]">
-                                {isLoading ? "Loading..." : `Total prayers: ${overallStats.total}`}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex justify-center items-center p-1.5">
-                            {isLoading ? (
-                                <div
-                                    className="w-full max-w-[300px] sm:max-w-[320px] h-[180px] sm:h-[210px] flex items-center justify-center">
-                                    <Loader2 className="h-8 w-8 animate-spin text-primary"/>
-                                </div>
-                            ) : (
-                                <ChartContainer
-                                    config={{
-                                        missed: {label: "Missed", color: statusColors.missed},
-                                        alone: {label: "Alone", color: statusColors.alone},
-                                        jamaat: {label: "Jamaat", color: statusColors.jamaat},
-                                        onTime: {label: "On Time", color: statusColors["on time"]},
-                                        // notSelected: { label: "Not Selected", color: statusColors["not selected"] },
-                                    }}
-                                    className="w-full max-w-[300px] sm:max-w-[320px] h-[180px] sm:h-[210px]"
-                                >
-                                    <PieChart>
-                                        <Pie
-                                            data={overallChartData}
-                                            cx="50%"
-                                            cy="50%"
-                                            labelLine={false}
-                                            label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                                            outerRadius={55}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                        >
-                                            {overallChartData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color}/>
-                                            ))}
-                                        </Pie>
-                                        <ChartTooltip content={<ChartTooltipContent/>}/>
-                                    </PieChart>
-                                </ChartContainer>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Prayer-wise Comparison Bar Chart */}
-                    <Card className="w-full">
-                        <CardHeader className="pb-1 sm:pb-2 text-center">
-                            <CardTitle className="text-[11px] sm:text-xs font-semibold">
-                                Prayer-wise Analysis
-                            </CardTitle>
-                            <CardDescription className="text-[9px] sm:text-[10px]">
-                                Compare performance across prayers
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-1.5">
-                            {isLoading ? (
-                                <div className="w-full h-[160px] sm:h-[210px] flex items-center justify-center">
-                                    <Loader2 className="h-8 w-8 animate-spin text-primary"/>
-                                </div>
-                            ) : (
-                                <div className="w-full overflow-x-auto">
-                                    <div className="min-w-[250px] sm:min-w-[300px] max-w-full mx-auto">
+                    {/* Overview Tab */}
+                    <TabsContent value="overview" className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Overall Distribution Pie Chart */}
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-semibold">Overall Prayer Distribution</CardTitle>
+                                    <CardDescription className="text-xs">
+                                        {isLoading ? "Loading..." : `Total prayers: ${overallStats.total}`}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="flex justify-center items-center p-4">
+                                    {isLoading ? (
+                                        <div className="w-full h-[250px] flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
+                                        </div>
+                                    ) : (
                                         <ChartContainer
                                             config={{
                                                 missed: {label: "Missed", color: statusColors.missed},
@@ -593,184 +695,405 @@ export default function PrayerAnalyticsDashboard() {
                                                 jamaat: {label: "Jamaat", color: statusColors.jamaat},
                                                 onTime: {label: "On Time", color: statusColors["on time"]},
                                             }}
-                                            className="h-[160px] sm:h-[210px]"
+                                            className="w-full h-[250px]"
                                         >
-                                            <BarChart
-                                                data={prayerWiseChartData}
-                                                margin={{top: 4, right: 6, left: -15, bottom: 3}}
-                                            >
-                                                <CartesianGrid strokeDasharray="3 3"/>
-                                                <XAxis dataKey="prayer" tick={{fontSize: 8}}/>
-                                                <YAxis tick={{fontSize: 8}}/>
+                                            <PieChart>
+                                                <Pie
+                                                    data={overallChartData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                    outerRadius={80}
+                                                    fill="#8884d8"
+                                                    dataKey="value"
+                                                >
+                                                    {overallChartData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={entry.color}/>
+                                                    ))}
+                                                </Pie>
                                                 <ChartTooltip content={<ChartTooltipContent/>}/>
-                                                <Legend wrapperStyle={{fontSize: 8}}/>
-                                                <Bar dataKey="missed" stackId="a" fill={statusColors.missed}
-                                                     name="Missed"/>
-                                                <Bar dataKey="alone" stackId="a" fill={statusColors.alone}
-                                                     name="Alone"/>
-                                                <Bar dataKey="jamaat" stackId="a" fill={statusColors.jamaat}
-                                                     name="Jamaat"/>
-                                                <Bar dataKey="onTime" stackId="a" fill={statusColors["on time"]}
-                                                     name="On Time"/>
+                                            </PieChart>
+                                        </ChartContainer>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+                            {/* Prayer Success Rate Radial Chart */}
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-semibold">Prayer Success Rates</CardTitle>
+                                    <CardDescription className="text-xs">
+                                        Performance by prayer time
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-4">
+                                    {isLoading ? (
+                                        <div className="w-full h-[250px] flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
+                                        </div>
+                                    ) : (
+                                        <ChartContainer
+                                            config={{
+                                                successRate: {label: "Success Rate", color: statusColors.jamaat},
+                                            }}
+                                            className="w-full h-[250px]"
+                                        >
+                                            <RadialBarChart
+                                                data={prayerSuccessRates}
+                                                innerRadius="10%"
+                                                outerRadius="90%"
+                                            >
+                                                <RadialBar
+                                                    label={{ position: 'insideStart', fill: '#fff', fontSize: 10 }}
+                                                    background
+                                                    dataKey="successRate"
+                                                />
+                                                <Legend
+                                                    iconSize={10}
+                                                    layout="vertical"
+                                                    verticalAlign="middle"
+                                                    align="right"
+                                                    wrapperStyle={{ fontSize: '12px' }}
+                                                />
+                                                <ChartTooltip content={<ChartTooltipContent />} />
+                                            </RadialBarChart>
+                                        </ChartContainer>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </TabsContent>
+
+                    {/* Trends Tab */}
+                    <TabsContent value="trends" className="space-y-4">
+                        <div className="grid grid-cols-1 gap-4">
+                            {/* Daily Success Rate Line Chart */}
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-semibold">Daily Success Rate Trend</CardTitle>
+                                    <CardDescription className="text-xs">
+                                        Track your daily performance throughout the month
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-4">
+                                    {isLoading ? (
+                                        <div className="w-full h-[300px] flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
+                                        </div>
+                                    ) : (
+                                        <ChartContainer
+                                            config={{
+                                                successRate: {label: "Success Rate %", color: statusColors.jamaat},
+                                            }}
+                                            className="w-full h-[300px]"
+                                        >
+                                            <LineChart data={dailyTrendData}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis
+                                                    dataKey="day"
+                                                    label={{ value: 'Day of Month', position: 'insideBottom', offset: -5 }}
+                                                />
+                                                <YAxis
+                                                    label={{ value: 'Success Rate %', angle: -90, position: 'insideLeft' }}
+                                                />
+                                                <ChartTooltip content={<ChartTooltipContent />} />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="successRate"
+                                                    stroke={statusColors.jamaat}
+                                                    strokeWidth={2}
+                                                    dot={{ r: 4 }}
+                                                    activeDot={{ r: 6 }}
+                                                />
+                                            </LineChart>
+                                        </ChartContainer>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+                            {/* Cumulative Area Chart */}
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-semibold">Cumulative Prayer Progress</CardTitle>
+                                    <CardDescription className="text-xs">
+                                        See how your prayers accumulate over time
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-4">
+                                    {isLoading ? (
+                                        <div className="w-full h-[300px] flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
+                                        </div>
+                                    ) : (
+                                        <ChartContainer
+                                            config={{
+                                                jamaat: {label: "Jamaat", color: statusColors.jamaat},
+                                                onTime: {label: "On Time", color: statusColors["on time"]},
+                                                alone: {label: "Alone", color: statusColors.alone},
+                                                missed: {label: "Missed", color: statusColors.missed},
+                                            }}
+                                            className="w-full h-[300px]"
+                                        >
+                                            <AreaChart data={cumulativeData}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis
+                                                    dataKey="day"
+                                                    label={{ value: 'Day of Month', position: 'insideBottom', offset: -5 }}
+                                                />
+                                                <YAxis
+                                                    label={{ value: 'Cumulative Count', angle: -90, position: 'insideLeft' }}
+                                                />
+                                                <ChartTooltip content={<ChartTooltipContent />} />
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="onTime"
+                                                    stackId="1"
+                                                    stroke={statusColors["on time"]}
+                                                    fill={statusColors["on time"]}
+                                                />
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="jamaat"
+                                                    stackId="1"
+                                                    stroke={statusColors.jamaat}
+                                                    fill={statusColors.jamaat}
+                                                />
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="alone"
+                                                    stackId="1"
+                                                    stroke={statusColors.alone}
+                                                    fill={statusColors.alone}
+                                                />
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="missed"
+                                                    stackId="1"
+                                                    stroke={statusColors.missed}
+                                                    fill={statusColors.missed}
+                                                />
+                                            </AreaChart>
+                                        </ChartContainer>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </TabsContent>
+
+                    {/* Comparison Tab */}
+                    <TabsContent value="comparison" className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Prayer-wise Comparison Bar Chart */}
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-semibold">Prayer-wise Analysis</CardTitle>
+                                    <CardDescription className="text-xs">
+                                        Compare performance across prayers
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-4">
+                                    {isLoading ? (
+                                        <div className="w-full h-[300px] flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
+                                        </div>
+                                    ) : (
+                                        <ChartContainer
+                                            config={{
+                                                missed: {label: "Missed", color: statusColors.missed},
+                                                alone: {label: "Alone", color: statusColors.alone},
+                                                jamaat: {label: "Jamaat", color: statusColors.jamaat},
+                                                onTime: {label: "On Time", color: statusColors["on time"]},
+                                            }}
+                                            className="w-full h-[300px]"
+                                        >
+                                            <BarChart data={prayerWiseChartData}>
+                                                <CartesianGrid strokeDasharray="3 3"/>
+                                                <XAxis dataKey="prayer"/>
+                                                <YAxis/>
+                                                <ChartTooltip content={<ChartTooltipContent/>}/>
+                                                <ChartLegend content={<ChartLegendContent />} />
+                                                <Bar dataKey="missed" stackId="a" fill={statusColors.missed}/>
+                                                <Bar dataKey="alone" stackId="a" fill={statusColors.alone}/>
+                                                <Bar dataKey="jamaat" stackId="a" fill={statusColors.jamaat}/>
+                                                <Bar dataKey="onTime" stackId="a" fill={statusColors["on time"]}/>
                                             </BarChart>
                                         </ChartContainer>
-                                    </div>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
+                                    )}
+                                </CardContent>
+                            </Card>
 
-
-                {/* Individual Prayer Performance Cards */}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-3">
-                    {isLoading ? (
-                        // Loading skeleton for prayer cards
-                        <>
-                            {prayers.map((prayer) => (
-                                <Card key={prayer} className="overflow-hidden">
-                                    <CardHeader className="px-1 flex justify-between items-center">
-                                        <div className="flex items-center justify-between">
-                                            <div className="h-5 w-16 bg-muted rounded animate-pulse"/>
+                            {/* Weekly Comparison */}
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-semibold">Weekly Comparison</CardTitle>
+                                    <CardDescription className="text-xs">
+                                        Performance breakdown by week
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-4">
+                                    {isLoading ? (
+                                        <div className="w-full h-[300px] flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 animate-spin text-primary"/>
                                         </div>
-                                        <div className="h-4 w-24 bg-muted rounded animate-pulse"/>
-                                    </CardHeader>
-                                    <CardContent className="pt-1 space-y-2 px-1">
-                                        {[...Array(4)].map((_, i) => (
-                                            <div key={i}
-                                                 className="flex items-center justify-between border-b border-border/40 pb-1.5">
-                                                <div className="h-4 w-16 bg-muted rounded animate-pulse"/>
-                                                <div className="h-4 w-8 bg-muted rounded animate-pulse"/>
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                    <div className="mt-3 mx-4 mb-4 h-2 rounded-full bg-muted animate-pulse"/>
-                                </Card>
-                            ))}
-                        </>
-                    ) : (
-                        <>
-                            {prayers.map((prayer) => {
-                                const stats = prayerWiseStats[prayer];
-                                const prayerSuccessRate: any = stats.total > 0
-                                    ? ((stats.jamaat + stats.onTime) / stats.total * 100).toFixed(1)
-                                    : 0;
+                                    ) : (
+                                        <ChartContainer
+                                            config={{
+                                                missed: {label: "Missed", color: statusColors.missed},
+                                                alone: {label: "Alone", color: statusColors.alone},
+                                                jamaat: {label: "Jamaat", color: statusColors.jamaat},
+                                                onTime: {label: "On Time", color: statusColors["on time"]},
+                                            }}
+                                            className="w-full h-[300px]"
+                                        >
+                                            <BarChart data={weeklyComparisonData}>
+                                                <CartesianGrid strokeDasharray="3 3"/>
+                                                <XAxis dataKey="week"/>
+                                                <YAxis/>
+                                                <ChartTooltip content={<ChartTooltipContent/>}/>
+                                                <ChartLegend content={<ChartLegendContent />} />
+                                                <Bar dataKey="onTime" fill={statusColors["on time"]}/>
+                                                <Bar dataKey="jamaat" fill={statusColors.jamaat}/>
+                                                <Bar dataKey="alone" fill={statusColors.alone}/>
+                                                <Bar dataKey="missed" fill={statusColors.missed}/>
+                                            </BarChart>
+                                        </ChartContainer>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </TabsContent>
 
-                                return (
-                                    <Card
-                                        key={prayer}
-                                        className={`${prayerSuccessRate <= 29 && "bg-red-300/10" || prayerSuccessRate <= 59 && "bg-yellow-300/10" || prayerSuccessRate <= 89 && "bg-green-300/10" || prayerSuccessRate >= 90 && "bg-sky-300/10"} group relative gap-5 md:gap-4 overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 p-4 px-6 md:px-4`}
-                                    >
-                                        {prayerSuccessRate <= 29  &&
-                                            <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
-                                                <div
-                                                    className="relative flex justify-center items-center gap-1.5 text-red-950 px-2 py-0.5 bg-red-300 rounded-full  shadow-lg shadow-red-300/50 text-[9px]">
-                                                    <span
-                                                        className={"w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"}></span>
-                                                    <span
-                                                        className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"}></span>
-                                                    <span>Bad</span>
+                    {/* Individual Prayers Tab */}
+                    <TabsContent value="prayers" className="space-y-4">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-3">
+                            {isLoading ? (
+                                <>
+                                    {prayers.map((prayer) => (
+                                        <Card key={prayer} className="overflow-hidden">
+                                            <CardHeader className="px-1 flex justify-between items-center">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="h-5 w-16 bg-muted rounded animate-pulse"/>
                                                 </div>
-                                            </div>
-                                            || prayerSuccessRate  <= 59 &&
-                                            <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
-                                                <div
-                                                    className="relative flex justify-center items-center gap-1.5 text-yellow-950 px-2 py-0.5 bg-yellow-300 rounded-full  shadow-lg shadow-yellow-300/50 text-[9px]">
-                                                    <span
-                                                        className={"w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping"}></span>
-                                                    <span
-                                                        className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"}></span>
-                                                    <span>Normal</span>
-                                                </div>
-                                            </div>
-                                            || prayerSuccessRate <= 89 &&
-                                            <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
-                                                <div
-                                                    className="relative flex justify-center items-center gap-1.5 text-green-950 px-2 py-0.5 bg-green-300 rounded-full  shadow-lg shadow-green-300/50 text-[9px]">
-                                                    <span
-                                                        className={"w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"}></span>
-                                                    <span
-                                                        className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"}></span>
-                                                    <span>Good</span>
-                                                </div>
-                                            </div>
-                                            || prayerSuccessRate >= 90 &&
-                                            <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
-                                                <div
-                                                    className="relative flex justify-center items-center gap-1.5 text-sky-950 px-2 py-0.5 bg-sky-300 rounded-full  shadow-lg shadow-sky-300/50 text-[9px]">
-                                                    <span
-                                                        className={"w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"}></span>
-                                                    <span
-                                                        className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"}></span>
-                                                    <span>Excellent</span>
-                                                </div>
-                                            </div>}
-                                        {/* Subtle gradient accent on hover */}
-                                        <div
-                                            className=" inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"/>
-
-                                        <CardHeader className={"px-0"}>
-                                            <div className="flex flex-col gap-1">
-                                                <div
-                                                    className=" font-semibold capitalize flex items-center gap-2">
-                                                    {prayerLabels[prayer as keyof typeof prayerLabels]}
-                                                </div>
-                                                <div className="text-xs pt-2">
-                                                    <div className="font-medium text-foreground flex justify-between">
-                                                        <span
-                                                            className={"text-muted-foreground"}>Success Rate:</span> {prayerSuccessRate}%
+                                                <div className="h-4 w-24 bg-muted rounded animate-pulse"/>
+                                            </CardHeader>
+                                            <CardContent className="pt-1 space-y-2 px-1">
+                                                {[...Array(4)].map((_, i) => (
+                                                    <div key={i} className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                                                        <div className="h-4 w-16 bg-muted rounded animate-pulse"/>
+                                                        <div className="h-4 w-8 bg-muted rounded animate-pulse"/>
                                                     </div>
+                                                ))}
+                                            </CardContent>
+                                            <div className="mt-3 mx-4 mb-4 h-2 rounded-full bg-muted animate-pulse"/>
+                                        </Card>
+                                    ))}
+                                </>
+                            ) : (
+                                <>
+                                    {prayers.map((prayer) => {
+                                        const stats = prayerWiseStats[prayer];
+                                        const prayerSuccessRate: any = stats.total > 0
+                                            ? ((stats.jamaat + stats.onTime) / stats.total * 100).toFixed(1)
+                                            : 0;
+
+                                        return (
+                                            <Card
+                                                key={prayer}
+                                                className={`${prayerSuccessRate <= 29 && "bg-red-300/10" || prayerSuccessRate <= 59 && "bg-yellow-300/10" || prayerSuccessRate <= 89 && "bg-green-300/10" || prayerSuccessRate >= 90 && "bg-sky-300/10"} group relative gap-5 md:gap-4 overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 p-4 px-6 md:px-4`}
+                                            >
+                                                {prayerSuccessRate <= 29 &&
+                                                    <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
+                                                        <div className="relative flex justify-center items-center gap-1.5 text-red-950 px-2 py-0.5 bg-red-300 rounded-full shadow-lg shadow-red-300/50 text-[9px]">
+                                                            <span className={"w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"}></span>
+                                                            <span className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"}></span>
+                                                            <span>Bad</span>
+                                                        </div>
+                                                    </div>
+                                                    || prayerSuccessRate <= 59 &&
+                                                    <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
+                                                        <div className="relative flex justify-center items-center gap-1.5 text-yellow-950 px-2 py-0.5 bg-yellow-300 rounded-full shadow-lg shadow-yellow-300/50 text-[9px]">
+                                                            <span className={"w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping"}></span>
+                                                            <span className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"}></span>
+                                                            <span>Normal</span>
+                                                        </div>
+                                                    </div>
+                                                    || prayerSuccessRate <= 89 &&
+                                                    <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
+                                                        <div className="relative flex justify-center items-center gap-1.5 text-green-950 px-2 py-0.5 bg-green-300 rounded-full shadow-lg shadow-green-300/50 text-[9px]">
+                                                            <span className={"w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"}></span>
+                                                            <span className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"}></span>
+                                                            <span>Good</span>
+                                                        </div>
+                                                    </div>
+                                                    || prayerSuccessRate >= 90 &&
+                                                    <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
+                                                        <div className="relative flex justify-center items-center gap-1.5 text-sky-950 px-2 py-0.5 bg-sky-300 rounded-full shadow-lg shadow-sky-300/50 text-[9px]">
+                                                            <span className={"w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"}></span>
+                                                            <span className={"absolute left-2 w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"}></span>
+                                                            <span>Excellent</span>
+                                                        </div>
+                                                    </div>}
+
+                                                <div className="inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"/>
+
+                                                <CardHeader className={"px-0"}>
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="font-semibold capitalize flex items-center gap-2">
+                                                            {prayerLabels[prayer as keyof typeof prayerLabels]}
+                                                        </div>
+                                                        <div className="text-xs pt-2">
+                                                            <div className="font-medium text-foreground flex justify-between">
+                                                                <span className={"text-muted-foreground"}>Success Rate:</span> {prayerSuccessRate}%
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </CardHeader>
+
+                                                <CardContent className="pt-1 space-y-2 md:text-xs px-1">
+                                                    <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                                                        <span className="text-muted-foreground flex items-center gap-1">
+                                                            <span className="w-2 h-2 bg-red-500 rounded-full"/> Missed
+                                                        </span>
+                                                        <span className="font-semibold text-foreground">{stats.missed}</span>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                                                        <span className="text-muted-foreground flex items-center gap-1">
+                                                            <span className="w-2 h-2 bg-yellow-500 rounded-full"/> Alone
+                                                        </span>
+                                                        <span className="font-semibold text-foreground">{stats.alone}</span>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                                                        <span className="text-muted-foreground flex items-center gap-1">
+                                                            <span className="w-2 h-2 bg-green-500 rounded-full"/> Jamaat
+                                                        </span>
+                                                        <span className="font-semibold text-foreground">{stats.jamaat}</span>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-muted-foreground flex items-center gap-1">
+                                                            <span className="w-2 h-2 bg-sky-500 rounded-full"/> On Time
+                                                        </span>
+                                                        <span className="font-semibold text-foreground">{stats.onTime}</span>
+                                                    </div>
+                                                </CardContent>
+
+                                                <div className="mt-3 mb-4 h-2 rounded-full bg-white dark:bg-muted overflow-hidden">
+                                                    <div
+                                                        className={`h-full ${prayerSuccessRate < 30 && "bg-red-600" || prayerSuccessRate < 60 && "bg-yellow-500" || prayerSuccessRate < 90 && "bg-green-500" || prayerSuccessRate > 90 && "bg-sky-500"} transition-all`}
+                                                        style={{width: `${prayerSuccessRate}%`}}
+                                                    />
                                                 </div>
-                                            </div>
-                                        </CardHeader>
-
-                                        <CardContent className="pt-1 space-y-2 md:text-xs px-1">
-                                            <div
-                                                className="flex items-center justify-between border-b border-border/40 pb-1.5">
-        <span className="text-muted-foreground flex items-center gap-1">
-          <span className="w-2 h-2 bg-red-500 rounded-full"/> Missed
-        </span>
-                                                <span className="font-semibold text-foreground">{stats.missed}</span>
-                                            </div>
-
-                                            <div
-                                                className="flex items-center justify-between border-b border-border/40 pb-1.5">
-        <span className="text-muted-foreground flex items-center gap-1">
-          <span className="w-2 h-2 bg-yellow-500 rounded-full"/> Alone
-        </span>
-                                                <span className="font-semibold text-foreground">{stats.alone}</span>
-                                            </div>
-
-                                            <div
-                                                className="flex items-center justify-between border-b border-border/40 pb-1.5">
-        <span className="text-muted-foreground flex items-center gap-1">
-          <span className="w-2 h-2 bg-green-500 rounded-full"/> Jamaat
-        </span>
-                                                <span className="font-semibold text-foreground">{stats.jamaat}</span>
-                                            </div>
-
-                                            <div className="flex items-center justify-between">
-        <span className="text-muted-foreground flex items-center gap-1">
-          <span className="w-2 h-2 bg-sky-500 rounded-full"/> On Time
-        </span>
-                                                <span className="font-semibold text-foreground">{stats.onTime}</span>
-                                            </div>
-                                        </CardContent>
-
-                                        {/* Optional Progress Bar */}
-                                        <div className="mt-3 mb-4 h-2 rounded-full bg-white dark:bg-muted overflow-hidden ">
-                                            <div
-                                                className={`h-full ${prayerSuccessRate < 30 && "bg-red-600" || prayerSuccessRate < 60 && "bg-yellow-500" || prayerSuccessRate < 90 && "bg-green-500" || prayerSuccessRate > 90 && "bg-sky-500"} transition-all`}
-                                                style={{width: `${prayerSuccessRate}%`}}
-                                            />
-                                        </div>
-                                    </Card>
-
-                                );
-                            })}
-                        </>
-                    )}
-                </div>
+                                            </Card>
+                                        );
+                                    })}
+                                </>
+                            )}
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </div>
         </div>
     );

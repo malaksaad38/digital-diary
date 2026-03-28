@@ -1133,28 +1133,20 @@ export default function PrayerAnalyticsDashboard() {
 
                 {/* Advanced Analytics Tabs */}
                 <Tabs defaultValue="overview" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4 mb-4">
+                    <TabsList className="grid w-full grid-cols-2 mb-4">
                         <TabsTrigger value="overview" className="flex items-center gap-2">
                             <PieChartIcon className="h-4 w-4" />
-                            <span className="hidden sm:inline">Overview</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="trends" className="flex items-center gap-2">
-                            <Activity className="h-4 w-4" />
-                            <span className="hidden sm:inline">Trends</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="comparison" className="flex items-center gap-2">
-                            <BarChart3 className="h-4 w-4" />
-                            <span className="hidden sm:inline">Compare</span>
+                            <span >Overview</span>
                         </TabsTrigger>
                         <TabsTrigger value="prayers" className="flex items-center gap-2">
                             <Users className="h-4 w-4" />
-                            <span className="hidden sm:inline">Prayers</span>
+                            <span >Prayers</span>
                         </TabsTrigger>
                     </TabsList>
 
                     {/* Overview Tab */}
                     <TabsContent value="overview" className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* Overall Distribution Pie Chart */}
                             <Card>
                                 <CardHeader className="pb-2">
@@ -1247,125 +1239,6 @@ export default function PrayerAnalyticsDashboard() {
                                     )}
                                 </CardContent>
                             </Card>
-                        </div>
-                    </TabsContent>
-
-                    {/* Trends Tab */}
-                    <TabsContent value="trends" className="space-y-4">
-                        <div className="grid grid-cols-1 gap-4">
-                            {/* Daily Success Rate Line Chart */}
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-semibold">Daily Success Rate Trend</CardTitle>
-                                    <CardDescription className="text-xs">
-                                        Track your daily performance throughout the month
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="p-4">
-                                    {isLoading ? (
-                                        <ChartSkeleton height="h-[300px]" />
-                                    ) : (
-                                        <ChartContainer
-                                            config={{
-                                                successRate: {label: "Success Rate %", color: STATUS_COLORS.jamaat},
-                                            }}
-                                            className="w-full h-[300px]"
-                                        >
-                                            <LineChart data={dailyTrendData}>
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis
-                                                    dataKey="day"
-                                                    label={{ value: 'Day of Month', position: 'insideBottom', offset: -5 }}
-                                                />
-                                                <YAxis
-                                                    label={{ value: 'Success Rate %', angle: -90, position: 'insideLeft' }}
-                                                />
-                                                <ChartTooltip content={<ChartTooltipContent />} />
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey="successRate"
-                                                    stroke={STATUS_COLORS.jamaat}
-                                                    strokeWidth={2}
-                                                    dot={{ r: 4 }}
-                                                    activeDot={{ r: 6 }}
-                                                />
-                                            </LineChart>
-                                        </ChartContainer>
-                                    )}
-                                </CardContent>
-                            </Card>
-
-                            {/* Cumulative Area Chart */}
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-semibold">Cumulative Prayer Progress</CardTitle>
-                                    <CardDescription className="text-xs">
-                                        See how your prayers accumulate over time
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="p-4">
-                                    {isLoading ? (
-                                        <ChartSkeleton height="h-[300px]" />
-                                    ) : (
-                                        <ChartContainer
-                                            config={{
-                                                jamaat: {label: "Jamaat", color: STATUS_COLORS.jamaat},
-                                                onTime: {label: "On Time", color: STATUS_COLORS["on time"]},
-                                                alone: {label: "Alone", color: STATUS_COLORS.alone},
-                                                missed: {label: "Missed", color: STATUS_COLORS.missed},
-                                            }}
-                                            className="w-full h-[300px]"
-                                        >
-                                            <AreaChart data={cumulativeData}>
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis
-                                                    dataKey="day"
-                                                    label={{ value: 'Day of Month', position: 'insideBottom', offset: -3 }}
-                                                />
-                                                <YAxis
-                                                    label={{ value: 'Cumulative Count', angle: -90, position: 'insideLeft' }}
-                                                />
-                                                <ChartTooltip content={<ChartTooltipContent />} />
-                                                <Area
-                                                    type="monotone"
-                                                    dataKey="onTime"
-                                                    stackId="1"
-                                                    stroke={STATUS_COLORS["on time"]}
-                                                    fill={STATUS_COLORS["on time"]}
-                                                />
-                                                <Area
-                                                    type="monotone"
-                                                    dataKey="jamaat"
-                                                    stackId="1"
-                                                    stroke={STATUS_COLORS.jamaat}
-                                                    fill={STATUS_COLORS.jamaat}
-                                                />
-                                                <Area
-                                                    type="monotone"
-                                                    dataKey="alone"
-                                                    stackId="1"
-                                                    stroke={STATUS_COLORS.alone}
-                                                    fill={STATUS_COLORS.alone}
-                                                />
-                                                <Area
-                                                    type="monotone"
-                                                    dataKey="missed"
-                                                    stackId="1"
-                                                    stroke={STATUS_COLORS.missed}
-                                                    fill={STATUS_COLORS.missed}
-                                                />
-                                            </AreaChart>
-                                        </ChartContainer>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </TabsContent>
-
-                    {/* Comparison Tab */}
-                    <TabsContent value="comparison" className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Prayer-wise Comparison Bar Chart */}
                             <Card>
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-sm font-semibold">Prayer-wise Analysis</CardTitle>
@@ -1402,45 +1275,8 @@ export default function PrayerAnalyticsDashboard() {
                                 </CardContent>
                             </Card>
 
-                            {/* Weekly Comparison */}
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-semibold">Weekly Comparison</CardTitle>
-                                    <CardDescription className="text-xs">
-                                        Performance breakdown by week
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="p-4">
-                                    {isLoading ? (
-                                        <ChartSkeleton height="h-[300px]" />
-                                    ) : (
-                                        <ChartContainer
-                                            config={{
-                                                missed: {label: "Missed", color: STATUS_COLORS.missed},
-                                                alone: {label: "Alone", color: STATUS_COLORS.alone},
-                                                jamaat: {label: "Jamaat", color: STATUS_COLORS.jamaat},
-                                                onTime: {label: "On Time", color: STATUS_COLORS["on time"]},
-                                            }}
-                                            className="w-full h-[300px]"
-                                        >
-                                            <BarChart data={weeklyComparisonData}>
-                                                <CartesianGrid strokeDasharray="3 3"/>
-                                                <XAxis dataKey="week" />
-                                                <YAxis label={{ value: 'Prayers Count', angle: -90, position: 'insideLeft' }}/>
-                                                <ChartTooltip content={<ChartTooltipContent/>}/>
-                                                <ChartLegend content={<ChartLegendContent />} />
-                                                <Bar dataKey="missed" fill={STATUS_COLORS.missed}/>
-                                                <Bar dataKey="alone" fill={STATUS_COLORS.alone}/>
-                                                <Bar dataKey="jamaat" fill={STATUS_COLORS.jamaat}/>
-                                                <Bar dataKey="onTime" fill={STATUS_COLORS["on time"]}/>
-                                            </BarChart>
-                                        </ChartContainer>
-                                    )}
-                                </CardContent>
-                            </Card>
                         </div>
                     </TabsContent>
-
                     {/* Individual Prayers Tab */}
                     <TabsContent value="prayers" className="space-y-4">
                         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-3">

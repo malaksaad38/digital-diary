@@ -16,7 +16,7 @@ import {
     XCircle,
     Activity,
     BarChart3,
-    PieChart as PieChartIcon
+    PieChart as PieChartIcon, BookOpen
 } from "lucide-react";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
 import {ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent} from "@/components/ui/chart";
@@ -46,6 +46,8 @@ import {
 } from "@/components/ui/dialog";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Separator} from "@/components/ui/separator";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -950,7 +952,183 @@ export default function PrayerAnalyticsDashboard() {
                                 ))}
                             </div>
                         )}
+
                     </CardContent>
+
+                    <Accordion type={"single"} collapsible defaultValue={false} >
+
+
+
+
+                        <AccordionItem value="monthly-charts" >
+                        <AccordionTrigger className="hover:no-underline px-6 flex-1">
+                            <div>
+                                <div className="flex items-center gap-2 text-lg sm:text-xl font-semibold pb-1">
+                                    <PieChartIcon className="h-5 w-5 text-primary"/>
+                                    Monthly Charts
+                                </div>
+                                <h2 className="text-muted-foreground flex items-center gap-2">
+                                   Monthly performance by charts
+                                </h2>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <div className="space-y-4 pt-4">
+                                <div className="grid grid-cols-1 gap-4">
+                                    {/* Daily Success Rate Line Chart */}
+                                    <div>
+                                        <CardHeader className="pb-2">
+                                            <CardTitle className="text-sm font-semibold">Daily Success Rate Trend</CardTitle>
+                                            <CardDescription className="text-xs">
+                                                Track your daily performance throughout the month
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="p-4">
+                                            {isLoading ? (
+                                                <ChartSkeleton height="h-[300px]" />
+                                            ) : (
+                                                <ChartContainer
+                                                    config={{
+                                                        successRate: {label: "Success Rate %", color: STATUS_COLORS.jamaat},
+                                                    }}
+                                                    className="w-full h-[300px]"
+                                                >
+                                                    <LineChart data={dailyTrendData}>
+                                                        <CartesianGrid strokeDasharray="3 3" />
+                                                        <XAxis
+                                                            dataKey="day"
+                                                            label={{ value: 'Day of Month', position: 'insideBottom', offset: -5 }}
+                                                        />
+                                                        <YAxis
+                                                            label={{ value: 'Success Rate %', angle: -90, position: 'insideLeft' }}
+                                                        />
+                                                        <ChartTooltip content={<ChartTooltipContent />} />
+                                                        <Line
+                                                            type="monotone"
+                                                            dataKey="successRate"
+                                                            stroke={STATUS_COLORS.jamaat}
+                                                            strokeWidth={2}
+                                                            dot={{ r: 4 }}
+                                                            activeDot={{ r: 6 }}
+                                                        />
+                                                    </LineChart>
+                                                </ChartContainer>
+                                            )}
+                                        </CardContent>
+                                    </div>
+                                    <Separator/>
+
+                                    {/* Cumulative Area Chart */}
+                                    <div>
+                                        <CardHeader className="pb-2">
+                                            <CardTitle className="text-sm font-semibold">Cumulative Prayer Progress</CardTitle>
+                                            <CardDescription className="text-xs">
+                                                See how your prayers accumulate over time
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="p-4">
+                                            {isLoading ? (
+                                                <ChartSkeleton height="h-[300px]" />
+                                            ) : (
+                                                <ChartContainer
+                                                    config={{
+                                                        jamaat: {label: "Jamaat", color: STATUS_COLORS.jamaat},
+                                                        onTime: {label: "On Time", color: STATUS_COLORS["on time"]},
+                                                        alone: {label: "Alone", color: STATUS_COLORS.alone},
+                                                        missed: {label: "Missed", color: STATUS_COLORS.missed},
+                                                    }}
+                                                    className="w-full h-[300px]"
+                                                >
+                                                    <AreaChart data={cumulativeData}>
+                                                        <CartesianGrid strokeDasharray="3 3" />
+                                                        <XAxis
+                                                            dataKey="day"
+                                                            label={{ value: 'Day of Month', position: 'insideBottom', offset: -3 }}
+                                                        />
+                                                        <YAxis
+                                                            label={{ value: 'Cumulative Count', angle: -90, position: 'insideLeft' }}
+                                                        />
+                                                        <ChartTooltip content={<ChartTooltipContent />} />
+                                                        <Area
+                                                            type="monotone"
+                                                            dataKey="onTime"
+                                                            stackId="1"
+                                                            stroke={STATUS_COLORS["on time"]}
+                                                            fill={STATUS_COLORS["on time"]}
+                                                        />
+                                                        <Area
+                                                            type="monotone"
+                                                            dataKey="jamaat"
+                                                            stackId="1"
+                                                            stroke={STATUS_COLORS.jamaat}
+                                                            fill={STATUS_COLORS.jamaat}
+                                                        />
+                                                        <Area
+                                                            type="monotone"
+                                                            dataKey="alone"
+                                                            stackId="1"
+                                                            stroke={STATUS_COLORS.alone}
+                                                            fill={STATUS_COLORS.alone}
+                                                        />
+                                                        <Area
+                                                            type="monotone"
+                                                            dataKey="missed"
+                                                            stackId="1"
+                                                            stroke={STATUS_COLORS.missed}
+                                                            fill={STATUS_COLORS.missed}
+                                                        />
+                                                    </AreaChart>
+                                                </ChartContainer>
+                                            )}
+                                        </CardContent>
+                                    </div>
+                                    <Separator/>
+                                    <div>
+                                        <CardHeader className="pb-2">
+                                            <CardTitle className="text-sm font-semibold">Weekly Comparison</CardTitle>
+                                            <CardDescription className="text-xs">
+                                                Performance breakdown by week
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="p-4">
+                                            {isLoading ? (
+                                                <ChartSkeleton height="h-[300px]" />
+                                            ) : (
+                                                <ChartContainer
+                                                    config={{
+                                                        missed: {label: "Missed", color: STATUS_COLORS.missed},
+                                                        alone: {label: "Alone", color: STATUS_COLORS.alone},
+                                                        jamaat: {label: "Jamaat", color: STATUS_COLORS.jamaat},
+                                                        onTime: {label: "On Time", color: STATUS_COLORS["on time"]},
+                                                    }}
+                                                    className="w-full h-[300px]"
+                                                >
+                                                    <BarChart data={weeklyComparisonData}>
+                                                        <CartesianGrid strokeDasharray="3 3"/>
+                                                        <XAxis dataKey="week" />
+                                                        <YAxis label={{ value: 'Prayers Count', angle: -90, position: 'insideLeft' }}/>
+                                                        <ChartTooltip content={<ChartTooltipContent/>}/>
+                                                        <ChartLegend content={<ChartLegendContent />} />
+                                                        <Bar dataKey="missed" fill={STATUS_COLORS.missed}/>
+                                                        <Bar dataKey="alone" fill={STATUS_COLORS.alone}/>
+                                                        <Bar dataKey="jamaat" fill={STATUS_COLORS.jamaat}/>
+                                                        <Bar dataKey="onTime" fill={STATUS_COLORS["on time"]}/>
+                                                    </BarChart>
+                                                </ChartContainer>
+                                            )}
+                                        </CardContent>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </AccordionContent>
+
+                    </AccordionItem>
+
+
+                    </Accordion>
+
                 </Card>
 
                 {/* Advanced Analytics Tabs */}

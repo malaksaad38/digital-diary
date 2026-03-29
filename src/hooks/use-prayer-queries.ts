@@ -203,6 +203,9 @@ export function useCombinedHistory() {
     return useQuery({
         queryKey: queryKeys.history.combined,
         queryFn: historyApi.getCombined,
+        staleTime: 1000 * 60 * 2,       // Data is fresh for 2 minutes — no refetch on re-mount
+        gcTime: 1000 * 60 * 10,         // Keep cached data for 10 minutes after unmount
+        refetchOnWindowFocus: false,     // Don't re-fetch when tab regains focus
         select: (data) => {
             // Transform data into combined entries
             const dateMap = new Map<string, any>();

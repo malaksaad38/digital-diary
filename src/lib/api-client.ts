@@ -54,17 +54,13 @@ export const diaryApi = {
   },
 };
 
-// Combined API for history page
+// Combined API for history page — single endpoint, faster
 export const historyApi = {
   getCombined: async () => {
-    const [prayerRes, diaryRes] = await Promise.all([
-      prayerApi.getAll(),
-      diaryApi.getAll(),
-    ]);
-
+    const { data } = await apiClient.get('/history');
     return {
-      prayers: prayerRes.data || [],
-      diaries: diaryRes.data || [],
+      prayers: data.prayers || [],
+      diaries: data.diaries || [],
     };
   },
 };

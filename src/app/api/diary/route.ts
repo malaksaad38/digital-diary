@@ -1,27 +1,7 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 import Diary from "@/models/Diary";
 import { auth } from "@/auth";
-
-// --- MongoDB Connection ---
-const MONGODB_URI = process.env.MONGODB_URI || "";
-
-if (!MONGODB_URI) {
-  throw new Error("⚠️ Please define MONGODB_URI in .env.local");
-}
-
-let isConnected = false;
-async function connectDB() {
-  if (isConnected) return;
-  try {
-    await mongoose.connect(MONGODB_URI);
-    isConnected = true;
-    console.log("✅ MongoDB Connected");
-  } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
-    throw error;
-  }
-}
+import connectMongo from "@/lib/mongoose";
 
 // --- POST: Create New Diary Entry ---
 export async function POST(req: Request) {
@@ -34,7 +14,7 @@ export async function POST(req: Request) {
       );
     }
 
-    await connectDB();
+    await connectMongo();
     const body = await req.json();
 
     const {
@@ -110,7 +90,7 @@ export async function GET(req: Request) {
       );
     }
 
-    await connectDB();
+    await connectMongo();
 
     // Check if date parameter exists in URL
     const { searchParams } = new URL(req.url);
@@ -121,7 +101,7 @@ export async function GET(req: Request) {
       const diary = await Diary.findOne({
         userId: session.user.id,
         date: date
-      });
+      }).lean();
 
       if (diary) {
         return NextResponse.json({ success: true, data: diary });
@@ -130,9 +110,9 @@ export async function GET(req: Request) {
       }
     } else {
       // Fetch all diaries for user
-      const diaries = await Diary.find({ userId: session.user.id }).sort({
-        date: -1,
-      });
+      const diaries = await Diary.find({ userId: session.user.id })
+        .sort({ date: -1 })
+        .lean();
       return NextResponse.json({ success: true, data: diaries });
     }
   } catch (error: any) {
@@ -155,7 +135,7 @@ export async function PUT(req: Request) {
       );
     }
 
-    await connectDB();
+    await connectMongo();
     const body = await req.json();
 
     const {
@@ -220,7 +200,7 @@ export async function DELETE(req: Request) {
       );
     }
 
-    await connectDB();
+    await connectMongo();
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");

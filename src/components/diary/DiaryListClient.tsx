@@ -2,16 +2,15 @@
 "use client";
 
 import React, {useCallback, useDeferredValue, useState} from "react";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent} from "@/components/ui/card";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
 import {Calendar, ChevronLeft, ChevronRight, RefreshCw, Search, X} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
-import PrayerLog from "./PrayerLog";
-import DiaryLog from "./DiaryLog";
 import PrayerLegend from "@/components/diary/PrayerLegend";
 import {LoadingState} from "@/components/LoadingStates";
+import DiaryEntryCard from "@/components/diary/DiaryEntryCard";
 import {
     Dialog,
     DialogContent,
@@ -289,74 +288,16 @@ export default function DiaryListClient() {
                         {/* Combined Entries */}
                         <div className="space-y-4">
                             {paginatedEntries.map((entry: any) => (
-                                    <Card
+                                <DiaryEntryCard
                                     key={entry.date}
-                                    className={`relative gap-2 border shadow-sm bg-card ${!entry?.prayer ? null : entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
-                                    entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
-                                    entry.prayer.esha === "on time" && "border-sky-500" || (entry.prayer.fajr === "on time" || entry.prayer.fajr === "jamaat") && (entry.prayer.zuhr === "on time" || entry.prayer.zuhr === "jamaat") &&
-                                    (entry.prayer.asar === "on time" || entry.prayer.asar === "jamaat") && (entry.prayer.maghrib === "on time" || entry.prayer.maghrib === "jamaat") &&
-                                    (entry.prayer.esha === "on time" || entry.prayer.esha === "jamaat") && "border-green-500"}`}
-                                >
-                                    <div className={"absolute right-3 md:right-7 z-10"}>
-                                        {!entry?.prayer ? null : entry.prayer.fajr === "on time" && entry.prayer.zuhr === "on time" &&
-                                            entry.prayer.asar === "on time" && entry.prayer.maghrib === "on time" &&
-                                            entry.prayer.esha === "on time" &&
-                                            <div className="flex justify-end z-10">
-                                                <div className="relative flex justify-center items-center gap-2 text-sky-950 px-3 py-1 bg-sky-300 rounded-full  shadow-lg shadow-sky-300/50 text-xs md:text-sm">
-                                                    <span className={"w-2 h-2 rounded-full bg-sky-500 animate-ping"}></span>
-                                                    <span className={"absolute left-3 w-2 h-2 rounded-full bg-sky-500 animate-pulse"}></span>
-                                                    <span>Excellent</span>
-                                                </div>
-                                            </div> || (entry.prayer.fajr === "on time" || entry.prayer.fajr === "jamaat") && (entry.prayer.zuhr === "on time" || entry.prayer.zuhr === "jamaat") &&
-                                            (entry.prayer.asar === "on time" || entry.prayer.asar === "jamaat") && (entry.prayer.maghrib === "on time" || entry.prayer.maghrib === "jamaat") &&
-                                            (entry.prayer.esha === "on time" || entry.prayer.esha === "jamaat") &&
-                                            <div className="flex justify-end">
-                                                <div className="relative flex justify-center items-center gap-2 text-green-950 bg-green-300 px-3 py-1  rounded-full  shadow-lg shadow-green-300/50 text-xs md:text-sm">
-                                                <span className={"w-2 h-2 rounded-full bg-green-500 animate-ping"}></span>
-                                                    <span className={"absolute left-3 w-2 h-2 rounded-full bg-green-500 animate-pulse"}></span>
-                                                    <span>Good</span>
-                                                </div>
-                                            </div>}
-                                    </div>
-
-                                    <CardHeader className="pb-3 sm:pb-4 px-3 md:px-6">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle
-                                                className="text-base sm:text-lg font-semibold flex items-center gap-2">
-                                                <Calendar className="h-4 w-4 opacity-70"/>
-                                                <span>
-                        {new Date(entry.date).toLocaleDateString("en-US", {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                        })}
-                      </span>
-                                           </CardTitle>
-                                        </div>
-                                    </CardHeader>
-
-                                    <CardContent className="pt-0 space-y-4 px-3 md:px-6">
-                                        {/* Prayer Section */}
-                                        <PrayerLog
-                                            prayer={entry.prayer}
-                                            date={entry.date}
-                                            onEdit={handleEditPrayer}
-                                            onAdd={handleAddPrayer}
-                                            onDelete={(id) => setDeletePrayerId(id)}
-                                        />
-
-                                        {/* Diary Section */}
-                                        <DiaryLog
-                                            key={entry.date}
-                                            diary={entry.diary}
-                                            date={entry.date}
-                                            onEdit={handleEditDiary}
-                                            onAdd={handleAddDiary}
-                                            onDelete={(id) => setDeleteId(id)}
-                                        />
-                                    </CardContent>
-                                </Card>
+                                    entry={entry}
+                                    onEditPrayer={handleEditPrayer}
+                                    onAddPrayer={handleAddPrayer}
+                                    onDeletePrayer={(id) => setDeletePrayerId(id)}
+                                    onEditDiary={handleEditDiary}
+                                    onAddDiary={handleAddDiary}
+                                    onDeleteDiary={(id) => setDeleteId(id)}
+                                />
                             ))}
                         </div>
 

@@ -1,31 +1,12 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 import Prayer from "@/models/Prayer";
 import { auth } from "@/auth";
-
-// --- MongoDB Connection ---
-const MONGODB_URI = process.env.MONGODB_URI || "";
-
-if (!MONGODB_URI) {
-  throw new Error("⚠️ Please define MONGODB_URI in .env.local");
-}
-
-let isConnected = false;
-async function connectDB() {
-  if (isConnected) return;
-  try {
-    await mongoose.connect(MONGODB_URI);
-    isConnected = true;
-    console.log("✅ MongoDB Connected");
-  } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
-  }
-}
+import connectMongo from "@/lib/mongoose";
 
 // --- POST: Create New Prayer ---
 export async function POST(req: Request) {
   try {
-    await connectDB();
+    await connectMongo();
     const body = await req.json();
     const { userId, date, fajr, zuhr, asar, maghrib, esha, recite, zikr } = body;
 
@@ -75,7 +56,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    await connectDB();
+    await connectMongo();
 
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date");
@@ -84,12 +65,12 @@ export async function GET(req: Request) {
       const prayer = await Prayer.findOne({
         userId: session.user.id,
         date,
-      });
+      }).lean();
 
       return NextResponse.json({ success: true, data: prayer || null });
     }
 
-    const prayers = await Prayer.find({ userId: session.user.id }).sort({ date: -1 });
+    const prayers = await Prayer.find({ userId: session.user.id }).sort({ date: -1 }).lean();
     return NextResponse.json({ success: true, data: prayers });
   } catch (error: any) {
     console.error("❌ Error fetching prayers:", error);
@@ -108,7 +89,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    await connectDB();
+    await connectMongo();
     const body = await req.json();
     const { id, fajr, zuhr, asar, maghrib, esha, recite, zikr } = body;
 
@@ -159,7 +140,7 @@ export async function DELETE(req: Request) {
             );
         }
 
-        await connectDB();
+        await connectMongo();
 
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");

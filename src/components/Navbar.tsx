@@ -228,7 +228,7 @@ export default function Navbar({user}: { user: any }) {
                 className="sm:hidden fixed bottom-2 left-2 right-2 z-50"
             >
                 <div
-                    className="relative rounded-full border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xs shadow-lg shadow-black/5">
+                    className="relative rounded-full border border-black/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] shadow-black/5">
                     {/* Subtle inner glow */}
                     <div
                         className="absolute  pointer-events-none"/>

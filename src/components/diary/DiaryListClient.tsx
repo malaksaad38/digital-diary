@@ -6,7 +6,7 @@ import {Card, CardContent} from "@/components/ui/card";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
 import {Calendar, ChevronLeft, ChevronRight, RefreshCw, Search, X} from "lucide-react";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
 import PrayerLegend from "@/components/diary/PrayerLegend";
 import {LoadingState} from "@/components/LoadingStates";
@@ -22,11 +22,47 @@ import {
 
 export default function DiaryListClient() {
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const [searchQuery, setSearchQuery] = React.useState("");
-    // useDeferredValue defers the expensive filter during rapid typing — UI stays responsive
     const deferredSearch = useDeferredValue(searchQuery);
-    const [currentPage, setCurrentPage] = React.useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState<number>(7);
+
+    // Constants and URL State
+    const ITEMS_PER_PAGE_KEY = 'diary_items_per_page';
+    const currentPage = parseInt(searchParams.get('page') || '1', 10);
+    const itemsPerPage = parseInt(searchParams.get('limit') || '7', 10);
+
+    // Sync state with URL when page or limit changes
+    const updateURL = useCallback((page: number, limit: number, replace = false) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', page.toString());
+        params.set('limit', limit.toString());
+        const url = `${pathname}?${params.toString()}`;
+        if (replace) router.replace(url, { scroll: false });
+        else router.push(url, { scroll: false });
+    }, [pathname, router, searchParams]);
+
+    // Initial Mount: Load saved preference if not in URL
+    React.useEffect(() => {
+        const urlLimit = searchParams.get('limit');
+        const storedLimit = typeof window !== 'undefined' ? localStorage.getItem(ITEMS_PER_PAGE_KEY) : null;
+        
+        if (!urlLimit && storedLimit) {
+            updateURL(1, parseInt(storedLimit, 10), true);
+        }
+    }, []); // Only runs once on mount
+
+    const handleSetItemsPerPage = (val: string) => {
+        if (typeof window !== 'undefined') localStorage.setItem(ITEMS_PER_PAGE_KEY, val);
+        updateURL(1, Number(val));
+    };
+
+    const handleSetPage = (page: number) => {
+        updateURL(page, itemsPerPage);
+    };
+
+
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [deletePrayerId, setDeletePrayerId] = useState<string | null>(null);
@@ -51,10 +87,13 @@ export default function DiaryListClient() {
         });
     }, [combinedEntries, deferredSearch]);
 
-    // Reset to page 1 when search query or itemsPerPage changes
+    // Reset to page 1 when search query changes — also updates URL
     React.useEffect(() => {
-        setCurrentPage(1);
-    }, [deferredSearch, itemsPerPage]);
+        if (currentPage !== 1) {
+            handleSetPage(1);
+        }
+    }, [deferredSearch]);
+
 
     // Pagination calculations
     const currentItemsPerPage = itemsPerPage === -1 ? (filteredEntries.length || 1) : itemsPerPage;
@@ -133,19 +172,22 @@ export default function DiaryListClient() {
     }, [router]);
 
     const handlePreviousPage = useCallback(() => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1));
+        const newPage = Math.max(currentPage - 1, 1);
+        handleSetPage(newPage);
         window.scrollTo({top: 0, behavior: 'smooth'});
-    }, []);
+    }, [currentPage, handleSetPage]);
 
     const handleNextPage = useCallback(() => {
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+        const newPage = Math.min(currentPage + 1, totalPages);
+        handleSetPage(newPage);
         window.scrollTo({top: 0, behavior: 'smooth'});
-    }, [totalPages]);
+    }, [currentPage, totalPages, handleSetPage]);
 
     const handlePageClick = useCallback((page: number) => {
-        setCurrentPage(page);
+        handleSetPage(page);
         window.scrollTo({top: 0, behavior: 'smooth'});
-    }, []);
+    }, [handleSetPage]);
+
 
     // Generate page numbers to display
     const getPageNumbers = () => {
@@ -196,6 +238,7 @@ export default function DiaryListClient() {
                     </Button>
                 </div>
             </div>
+            <PrayerLegend/>
 
             {/* Search */}
             <div>
@@ -226,7 +269,6 @@ export default function DiaryListClient() {
                 )}
             </div>
 
-            <PrayerLegend/>
 
             {/* Loading State */}
             {isLoading ? (
@@ -265,7 +307,7 @@ export default function DiaryListClient() {
                                 <div className="flex items-center gap-2">
                                     <Select
                                         value={itemsPerPage.toString()}
-                                        onValueChange={(val) => setItemsPerPage(Number(val))}
+                                        onValueChange={handleSetItemsPerPage}
                                     >
                                         <SelectTrigger className="w-[70px] h-8 text-sm">
                                             <SelectValue placeholder="7" />

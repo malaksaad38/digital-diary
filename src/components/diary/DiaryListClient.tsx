@@ -240,7 +240,7 @@ export default function DiaryListClient() {
             <PrayerLegend/>
 
             {/* Sticky Search & Pagination Header */}
-            <div className="sticky top-10 md:top-14 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 space-y-4 -mx-4 px-4 shadow-sm">
+            <div className="sticky top-10 md:top-[60px] z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 space-y-4 -mx-4 px-4 shadow-sm">
                 {/* Search */}
 
                 <div className="relative">
@@ -342,7 +342,7 @@ export default function DiaryListClient() {
 
                         {/* Sticky Bottom Pagination Controls */}
                         {totalPages > 1 && (
-                            <div className="sticky bottom-16 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 pb-4 -mx-4 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                            <div className="sticky bottom-16 md:bottom-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 pb-4 -mx-4 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                                 <div className="flex items-center justify-center gap-2">
                                     <Button
                                         variant="outline"

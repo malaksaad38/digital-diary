@@ -1,8 +1,9 @@
 // components/diary/DiaryListClient.tsx
 "use client";
 
-import React, {useState} from "react";
+import React, {useCallback, useDeferredValue, useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
 import {Calendar, ChevronLeft, ChevronRight, RefreshCw, Search, X} from "lucide-react";
 import {useRouter} from "next/navigation";
@@ -11,7 +12,6 @@ import PrayerLog from "./PrayerLog";
 import DiaryLog from "./DiaryLog";
 import PrayerLegend from "@/components/diary/PrayerLegend";
 import {LoadingState} from "@/components/LoadingStates";
-import prayer from "@/models/Prayer";
 import {
     Dialog,
     DialogContent,
@@ -20,14 +20,14 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog";
-import {refresh} from "next/cache";
-
-const ITEMS_PER_PAGE = 7;
 
 export default function DiaryListClient() {
     const router = useRouter();
     const [searchQuery, setSearchQuery] = React.useState("");
+    // useDeferredValue defers the expensive filter during rapid typing — UI stays responsive
+    const deferredSearch = useDeferredValue(searchQuery);
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(7);
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [deletePrayerId, setDeletePrayerId] = useState<string | null>(null);
@@ -35,11 +35,11 @@ export default function DiaryListClient() {
     // Use React Query hook with automatic caching
     const {data: combinedEntries = [], isLoading, refetch, isFetching} = useCombinedHistory();
 
-    // Filter entries based on search query
+    // Filter entries — uses deferred search so typing isn't blocked by heavy filtering
     const filteredEntries = React.useMemo(() => {
-        if (!searchQuery.trim()) return combinedEntries;
+        if (!deferredSearch.trim()) return combinedEntries;
 
-        const query = searchQuery.toLowerCase();
+        const query = deferredSearch.toLowerCase();
         return combinedEntries.filter((entry: any) => {
             const dateStr = new Date(entry.date).toLocaleDateString("en-US", {
                 weekday: "long",
@@ -50,17 +50,18 @@ export default function DiaryListClient() {
 
             return dateStr.includes(query) || entry.date.includes(query);
         });
-    }, [combinedEntries, searchQuery]);
+    }, [combinedEntries, deferredSearch]);
 
-    // Reset to page 1 when search query changes
+    // Reset to page 1 when search query or itemsPerPage changes
     React.useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery]);
+    }, [deferredSearch, itemsPerPage]);
 
     // Pagination calculations
-    const totalPages = Math.ceil(filteredEntries.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentItemsPerPage = itemsPerPage === -1 ? (filteredEntries.length || 1) : itemsPerPage;
+    const totalPages = Math.ceil(filteredEntries.length / currentItemsPerPage);
+    const startIndex = (currentPage - 1) * currentItemsPerPage;
+    const endIndex = startIndex + currentItemsPerPage;
     const paginatedEntries = filteredEntries.slice(startIndex, endIndex);
 
     const confirmPrayerDelete = async () => {
@@ -115,37 +116,37 @@ export default function DiaryListClient() {
             setIsDeleting(false);
         }
     };
-    const handleAddPrayer = (date: string) => {
+    const handleAddPrayer = useCallback((date: string) => {
         router.push(`/dashboard/entry?date=${date}#prayer`);
-    };
-    const handleEditPrayer = (date: string) => {
+    }, [router]);
+    const handleEditPrayer = useCallback((date: string) => {
         router.push(`/dashboard/entry?date=${date}#prayer`);
-    };
-    const handleAddDiary = (date: string) => {
+    }, [router]);
+    const handleAddDiary = useCallback((date: string) => {
         router.push(`/dashboard/entry?date=${date}#diary`);
-    };
-    const handleEditDiary = (date: string) => {
+    }, [router]);
+    const handleEditDiary = useCallback((date: string) => {
         router.push(`/dashboard/entry?date=${date}#diary`);
-    };
+    }, [router]);
 
-    const handleAddNewClick = () => {
+    const handleAddNewClick = useCallback(() => {
         router.push("/dashboard/entry");
-    };
+    }, [router]);
 
-    const handlePreviousPage = () => {
+    const handlePreviousPage = useCallback(() => {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
         window.scrollTo({top: 0, behavior: 'smooth'});
-    };
+    }, []);
 
-    const handleNextPage = () => {
+    const handleNextPage = useCallback(() => {
         setCurrentPage((prev) => Math.min(prev + 1, totalPages));
         window.scrollTo({top: 0, behavior: 'smooth'});
-    };
+    }, [totalPages]);
 
-    const handlePageClick = (page: number) => {
+    const handlePageClick = useCallback((page: number) => {
         setCurrentPage(page);
         window.scrollTo({top: 0, behavior: 'smooth'});
-    };
+    }, []);
 
     // Generate page numbers to display
     const getPageNumbers = () => {
@@ -261,14 +262,29 @@ export default function DiaryListClient() {
                 ) : (
                     <>
                         {/* Pagination Info */}
-                        <div className="flex items-center justify-between text-sm text-muted-foreground px-1">
-                            <p>
-                                Showing {startIndex + 1}-{Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length} entries
-                            </p>
-                            <p>
-                                Page {currentPage} of {totalPages}
-                            </p>
-                        </div>
+                        <div className="flex flex-row items-center justify-between gap-4 text-sm text-muted-foreground px-1">
+                                <div className="flex items-center gap-2">
+                                    <Select
+                                        value={itemsPerPage.toString()}
+                                        onValueChange={(val) => setItemsPerPage(Number(val))}
+                                    >
+                                        <SelectTrigger className="w-[70px] h-8 text-sm">
+                                            <SelectValue placeholder="7" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="7">7</SelectItem>
+                                            <SelectItem value="10">10</SelectItem>
+                                            <SelectItem value="30">30</SelectItem>
+                                            <SelectItem value="-1">All</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <p>
+                                        Showing {startIndex + 1}-{Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length} entries
+                                    </p>
+                                </div>
+                            </div>
 
                         {/* Combined Entries */}
                         <div className="space-y-4">

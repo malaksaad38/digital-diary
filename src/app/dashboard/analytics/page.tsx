@@ -11,30 +11,35 @@ import {
     Clock,
     Diamond,
     Loader2,
+    PieChart as PieChartIcon,
     TrendingUp,
     Users,
-    XCircle,
-    Activity,
-    BarChart3,
-    PieChart as PieChartIcon, BookOpen
+    XCircle
 } from "lucide-react";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
-import {ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent} from "@/components/ui/chart";
 import {
+    ChartContainer,
+    ChartLegend,
+    ChartLegendContent,
+    ChartTooltip,
+    ChartTooltipContent
+} from "@/components/ui/chart";
+import {
+    Area,
+    AreaChart,
     Bar,
     BarChart,
     CartesianGrid,
     Cell,
-    Pie,
-    PieChart,
-    XAxis,
-    YAxis,
+    Legend,
     Line,
     LineChart,
-    Area,
-    AreaChart,
+    Pie,
+    PieChart,
+    RadialBar,
     RadialBarChart,
-    RadialBar, Legend
+    XAxis,
+    YAxis
 } from "recharts";
 import {
     Dialog,
@@ -284,14 +289,15 @@ const updateStatsForStatus = (stats: PrayerStats, status: string): void => {
 // ============================================================================
 
 const StatCardSkeleton: React.FC = () => (
-    <div className="flex flex-col items-center justify-center rounded-xl bg-muted/30 py-3 sm:py-5 border border-border/50 animate-pulse">
+    <div
+        className="flex flex-col items-center justify-center rounded-xl bg-muted/30 py-3 sm:py-5 border border-border/50 animate-pulse">
         <div className="h-3 w-20 bg-muted rounded mb-2"/>
         <div className="h-8 w-12 bg-muted rounded mb-1"/>
         <div className="h-2 w-16 bg-muted rounded"/>
     </div>
 );
 
-const ChartSkeleton: React.FC<{ height?: string }> = ({ height = "h-[250px]" }) => (
+const ChartSkeleton: React.FC<{ height?: string }> = ({height = "h-[250px]"}) => (
     <div className={`w-full ${height} flex items-center justify-center`}>
         <Loader2 className="h-8 w-8 animate-spin text-primary"/>
     </div>
@@ -301,9 +307,10 @@ interface StatusBadgeProps {
     config: StatusBadgeConfig;
 }
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ config }) => (
+const StatusBadge: React.FC<StatusBadgeProps> = ({config}) => (
     <div className="flex justify-end z-10 absolute right-5 md:right-3.5 top-9">
-        <div className={`relative flex justify-center items-center gap-1.5 ${config.color} px-2 py-0.5 ${config.bgColor} rounded-full shadow-lg ${config.shadowColor} text-[9px]`}>
+        <div
+            className={`relative flex justify-center items-center gap-1.5 ${config.color} px-2 py-0.5 ${config.bgColor} rounded-full shadow-lg ${config.shadowColor} text-[9px]`}>
             <span className={`w-1.5 h-1.5 rounded-full ${config.dotColor} animate-ping`}/>
             <span className={`absolute left-2 w-1.5 h-1.5 rounded-full ${config.dotColor} animate-pulse`}/>
             <span>{config.label}</span>
@@ -315,7 +322,7 @@ interface InfoDialogProps {
     trigger: React.ReactNode;
 }
 
-const InfoDialog: React.FC<InfoDialogProps> = ({ trigger }) => (
+const InfoDialog: React.FC<InfoDialogProps> = ({trigger}) => (
     <Dialog>
         <DialogTrigger asChild>
             {trigger}
@@ -399,7 +406,8 @@ const OverallStatCard: React.FC<OverallStatCardProps> = ({
                                                              hoverBorder,
                                                              textColor
                                                          }) => (
-    <div className={`flex flex-col items-center justify-center rounded-xl bg-gradient-to-b ${gradientFrom} to-transparent py-3 sm:py-5 border border-transparent ${hoverBorder} transition-all duration-300`}>
+    <div
+        className={`flex flex-col items-center justify-center rounded-xl bg-gradient-to-b ${gradientFrom} to-transparent py-3 sm:py-5 border border-transparent ${hoverBorder} transition-all duration-300`}>
         <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
             {label}
         </p>
@@ -421,7 +429,7 @@ interface MonthlyStatItemProps {
     color: string;
 }
 
-const MonthlyStatItem: React.FC<MonthlyStatItemProps> = ({ icon, label, value, color }) => (
+const MonthlyStatItem: React.FC<MonthlyStatItemProps> = ({icon, label, value, color}) => (
     <div className="flex flex-col items-center sm:items-start space-y-1">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {icon}
@@ -437,7 +445,7 @@ interface PrayerCardSkeletonProps {
     prayer: PrayerName;
 }
 
-const PrayerCardSkeleton: React.FC<PrayerCardSkeletonProps> = ({ prayer }) => (
+const PrayerCardSkeleton: React.FC<PrayerCardSkeletonProps> = ({prayer}) => (
     <Card key={prayer} className="overflow-hidden">
         <CardHeader className="px-1 flex justify-between items-center">
             <div className="flex items-center justify-between">
@@ -462,17 +470,19 @@ interface PrayerCardProps {
     stats: PrayerStats;
 }
 
-const PrayerCard: React.FC<PrayerCardProps> = ({ prayer, stats }) => {
+const PrayerCard: React.FC<PrayerCardProps> = ({prayer, stats}) => {
     const prayerSuccessRate = calculateSuccessRate(stats);
     const badgeConfig = getStatusBadgeConfig(prayerSuccessRate);
     const progressColor = getProgressBarColor(prayerSuccessRate);
     const cardBgColor = getCardBackgroundColor(prayerSuccessRate);
 
     return (
-        <Card className={`${cardBgColor} group relative gap-5 md:gap-4 overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 p-4 px-6 md:px-4`}>
-            <StatusBadge config={badgeConfig} />
+        <Card
+            className={`${cardBgColor} group relative gap-5 md:gap-4 overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 p-4 px-6 md:px-4`}>
+            <StatusBadge config={badgeConfig}/>
 
-            <div className="inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"/>
+            <div
+                className="inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"/>
 
             <CardHeader className="px-0">
                 <div className="flex flex-col gap-1">
@@ -539,7 +549,7 @@ export default function PrayerAnalyticsDashboard() {
     const overallStats = React.useMemo((): PrayerStats => {
         if (!combinedEntries?.length) return EMPTY_PRAYER_STATS;
 
-        const stats = { ...EMPTY_PRAYER_STATS };
+        const stats = {...EMPTY_PRAYER_STATS};
 
         combinedEntries.forEach((entry: PrayerEntry) => {
             if (!entry.prayer) return;
@@ -555,10 +565,10 @@ export default function PrayerAnalyticsDashboard() {
 
     const monthlyStats = React.useMemo((): MonthlyStats => {
         if (!combinedEntries?.length) {
-            return { ...EMPTY_PRAYER_STATS, daysWithData: 0 };
+            return {...EMPTY_PRAYER_STATS, daysWithData: 0};
         }
 
-        const stats: MonthlyStats = { ...EMPTY_PRAYER_STATS, daysWithData: 0 };
+        const stats: MonthlyStats = {...EMPTY_PRAYER_STATS, daysWithData: 0};
 
         combinedEntries.forEach((entry: PrayerEntry) => {
             if (!isEntryInMonth(entry, selectedMonth) || !entry.prayer) return;
@@ -577,13 +587,13 @@ export default function PrayerAnalyticsDashboard() {
     const prayerWiseStats = React.useMemo((): Record<PrayerName, PrayerStats> => {
         if (!combinedEntries?.length) {
             return PRAYERS.reduce((acc, prayer) => {
-                acc[prayer] = { ...EMPTY_PRAYER_STATS };
+                acc[prayer] = {...EMPTY_PRAYER_STATS};
                 return acc;
             }, {} as Record<PrayerName, PrayerStats>);
         }
 
         const stats = PRAYERS.reduce((acc, prayer) => {
-            acc[prayer] = { ...EMPTY_PRAYER_STATS };
+            acc[prayer] = {...EMPTY_PRAYER_STATS};
             return acc;
         }, {} as Record<PrayerName, PrayerStats>);
 
@@ -696,7 +706,7 @@ export default function PrayerAnalyticsDashboard() {
     const cumulativeData = React.useMemo((): CumulativeData[] => {
         if (!combinedEntries?.length) return [];
 
-        const cumulative = { jamaat: 0, onTime: 0, missed: 0, alone: 0 };
+        const cumulative = {jamaat: 0, onTime: 0, missed: 0, alone: 0};
         const data: CumulativeData[] = [];
 
         const sortedEntries = [...combinedEntries]
@@ -841,7 +851,7 @@ export default function PrayerAnalyticsDashboard() {
                 {/* Overall Statistics Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 text-center">
                     {isLoading ? (
-                        Array.from({ length: 6 }).map((_, i) => <StatCardSkeleton key={i} />)
+                        Array.from({length: 6}).map((_, i) => <StatCardSkeleton key={i}/>)
                     ) : (
                         <>
                             <OverallStatCard
@@ -932,8 +942,9 @@ export default function PrayerAnalyticsDashboard() {
                     <CardContent className="p-4 sm:p-6">
                         {isLoading ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-                                {Array.from({ length: 6 }).map((_, i) => (
-                                    <div key={i} className="flex flex-col items-center sm:items-start space-y-2 animate-pulse">
+                                {Array.from({length: 6}).map((_, i) => (
+                                    <div key={i}
+                                         className="flex flex-col items-center sm:items-start space-y-2 animate-pulse">
                                         <div className="h-4 w-20 bg-muted rounded"/>
                                         <div className="h-6 w-12 bg-muted rounded"/>
                                     </div>
@@ -955,176 +966,197 @@ export default function PrayerAnalyticsDashboard() {
 
                     </CardContent>
 
-                    <Accordion type={"single"} collapsible defaultValue={false} >
+                    <Accordion type={"single"} collapsible defaultValue={false}>
 
-
-
-
-                        <AccordionItem value="monthly-charts" >
-                        <AccordionTrigger className="hover:no-underline px-6 flex-1">
-                            <div>
-                                <div className="flex items-center gap-2 text-lg sm:text-xl font-semibold pb-1">
-                                    <PieChartIcon className="h-5 w-5 text-primary"/>
-                                    Monthly Charts
+                        <AccordionItem value="monthly-charts">
+                            <AccordionTrigger className="hover:no-underline px-6 flex-1">
+                                <div>
+                                    <div className="flex items-center gap-2 text-lg sm:text-xl font-semibold pb-1">
+                                        <PieChartIcon className="h-5 w-5 text-primary"/>
+                                        Monthly Charts
+                                    </div>
+                                    <h2 className="text-muted-foreground flex items-center gap-2">
+                                        Monthly performance by charts
+                                    </h2>
                                 </div>
-                                <h2 className="text-muted-foreground flex items-center gap-2">
-                                   Monthly performance by charts
-                                </h2>
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                            <div className="space-y-4 pt-4">
-                                <div className="grid grid-cols-1 gap-4">
-                                    {/* Daily Success Rate Line Chart */}
-                                    <div>
-                                        <CardHeader className="pb-2">
-                                            <CardTitle className="text-sm font-semibold">Daily Success Rate Trend</CardTitle>
-                                            <CardDescription className="text-xs">
-                                                Track your daily performance throughout the month
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="p-4">
-                                            {isLoading ? (
-                                                <ChartSkeleton height="h-[300px]" />
-                                            ) : (
-                                                <ChartContainer
-                                                    config={{
-                                                        successRate: {label: "Success Rate %", color: STATUS_COLORS.jamaat},
-                                                    }}
-                                                    className="w-full h-[300px]"
-                                                >
-                                                    <LineChart data={dailyTrendData}>
-                                                        <CartesianGrid strokeDasharray="3 3" />
-                                                        <XAxis
-                                                            dataKey="day"
-                                                            label={{ value: 'Day of Month', position: 'insideBottom', offset: -5 }}
-                                                        />
-                                                        <YAxis
-                                                            label={{ value: 'Success Rate %', angle: -90, position: 'insideLeft' }}
-                                                        />
-                                                        <ChartTooltip content={<ChartTooltipContent />} />
-                                                        <Line
-                                                            type="monotone"
-                                                            dataKey="successRate"
-                                                            stroke={STATUS_COLORS.jamaat}
-                                                            strokeWidth={2}
-                                                            dot={{ r: 4 }}
-                                                            activeDot={{ r: 6 }}
-                                                        />
-                                                    </LineChart>
-                                                </ChartContainer>
-                                            )}
-                                        </CardContent>
-                                    </div>
-                                    <Separator/>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="space-y-4 pt-4">
+                                    <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
+                                        {/* Daily Success Rate Line Chart */}
+                                        <div>
+                                            <CardHeader className="pb-2">
+                                                <CardTitle className="text-sm font-semibold">Daily Success Rate
+                                                    Trend</CardTitle>
+                                                <CardDescription className="text-xs">
+                                                    Track your daily performance throughout the month
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="p-4">
+                                                {isLoading ? (
+                                                    <ChartSkeleton height="h-[300px]"/>
+                                                ) : (
+                                                    <ChartContainer
+                                                        config={{
+                                                            successRate: {
+                                                                label: "Success Rate %",
+                                                                color: STATUS_COLORS.jamaat
+                                                            },
+                                                        }}
+                                                        className="w-full h-[300px]"
+                                                    >
+                                                        <LineChart data={dailyTrendData}>
+                                                            <CartesianGrid strokeDasharray="3 3"/>
+                                                            <XAxis
+                                                                dataKey="day"
+                                                                label={{
+                                                                    value: 'Day of Month',
+                                                                    position: 'insideBottom',
+                                                                    offset: -5
+                                                                }}
+                                                            />
+                                                            <YAxis
+                                                                label={{
+                                                                    value: 'Success Rate %',
+                                                                    angle: -90,
+                                                                    position: 'insideLeft'
+                                                                }}
+                                                            />
+                                                            <ChartTooltip content={<ChartTooltipContent/>}/>
+                                                            <Line
+                                                                type="monotone"
+                                                                dataKey="successRate"
+                                                                stroke={STATUS_COLORS.jamaat}
+                                                                strokeWidth={2}
+                                                                dot={{r: 4}}
+                                                                activeDot={{r: 6}}
+                                                            />
+                                                        </LineChart>
+                                                    </ChartContainer>
+                                                )}
+                                            </CardContent>
+                                        </div>
 
-                                    {/* Cumulative Area Chart */}
-                                    <div>
-                                        <CardHeader className="pb-2">
-                                            <CardTitle className="text-sm font-semibold">Cumulative Prayer Progress</CardTitle>
-                                            <CardDescription className="text-xs">
-                                                See how your prayers accumulate over time
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="p-4">
-                                            {isLoading ? (
-                                                <ChartSkeleton height="h-[300px]" />
-                                            ) : (
-                                                <ChartContainer
-                                                    config={{
-                                                        jamaat: {label: "Jamaat", color: STATUS_COLORS.jamaat},
-                                                        onTime: {label: "On Time", color: STATUS_COLORS["on time"]},
-                                                        alone: {label: "Alone", color: STATUS_COLORS.alone},
-                                                        missed: {label: "Missed", color: STATUS_COLORS.missed},
-                                                    }}
-                                                    className="w-full h-[300px]"
-                                                >
-                                                    <AreaChart data={cumulativeData}>
-                                                        <CartesianGrid strokeDasharray="3 3" />
-                                                        <XAxis
-                                                            dataKey="day"
-                                                            label={{ value: 'Day of Month', position: 'insideBottom', offset: -3 }}
-                                                        />
-                                                        <YAxis
-                                                            label={{ value: 'Cumulative Count', angle: -90, position: 'insideLeft' }}
-                                                        />
-                                                        <ChartTooltip content={<ChartTooltipContent />} />
-                                                        <Area
-                                                            type="monotone"
-                                                            dataKey="onTime"
-                                                            stackId="1"
-                                                            stroke={STATUS_COLORS["on time"]}
-                                                            fill={STATUS_COLORS["on time"]}
-                                                        />
-                                                        <Area
-                                                            type="monotone"
-                                                            dataKey="jamaat"
-                                                            stackId="1"
-                                                            stroke={STATUS_COLORS.jamaat}
-                                                            fill={STATUS_COLORS.jamaat}
-                                                        />
-                                                        <Area
-                                                            type="monotone"
-                                                            dataKey="alone"
-                                                            stackId="1"
-                                                            stroke={STATUS_COLORS.alone}
-                                                            fill={STATUS_COLORS.alone}
-                                                        />
-                                                        <Area
-                                                            type="monotone"
-                                                            dataKey="missed"
-                                                            stackId="1"
-                                                            stroke={STATUS_COLORS.missed}
-                                                            fill={STATUS_COLORS.missed}
-                                                        />
-                                                    </AreaChart>
-                                                </ChartContainer>
-                                            )}
-                                        </CardContent>
-                                    </div>
-                                    <Separator/>
-                                    <div>
-                                        <CardHeader className="pb-2">
-                                            <CardTitle className="text-sm font-semibold">Weekly Comparison</CardTitle>
-                                            <CardDescription className="text-xs">
-                                                Performance breakdown by week
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="p-4">
-                                            {isLoading ? (
-                                                <ChartSkeleton height="h-[300px]" />
-                                            ) : (
-                                                <ChartContainer
-                                                    config={{
-                                                        missed: {label: "Missed", color: STATUS_COLORS.missed},
-                                                        alone: {label: "Alone", color: STATUS_COLORS.alone},
-                                                        jamaat: {label: "Jamaat", color: STATUS_COLORS.jamaat},
-                                                        onTime: {label: "On Time", color: STATUS_COLORS["on time"]},
-                                                    }}
-                                                    className="w-full h-[300px]"
-                                                >
-                                                    <BarChart data={weeklyComparisonData}>
-                                                        <CartesianGrid strokeDasharray="3 3"/>
-                                                        <XAxis dataKey="week" />
-                                                        <YAxis label={{ value: 'Prayers Count', angle: -90, position: 'insideLeft' }}/>
-                                                        <ChartTooltip content={<ChartTooltipContent/>}/>
-                                                        <ChartLegend content={<ChartLegendContent />} />
-                                                        <Bar dataKey="missed" fill={STATUS_COLORS.missed}/>
-                                                        <Bar dataKey="alone" fill={STATUS_COLORS.alone}/>
-                                                        <Bar dataKey="jamaat" fill={STATUS_COLORS.jamaat}/>
-                                                        <Bar dataKey="onTime" fill={STATUS_COLORS["on time"]}/>
-                                                    </BarChart>
-                                                </ChartContainer>
-                                            )}
-                                        </CardContent>
-                                    </div>
+                                        {/* Cumulative Area Chart */}
+                                        <div>
+                                            <CardHeader className="pb-2">
+                                                <CardTitle className="text-sm font-semibold">Cumulative Prayer
+                                                    Progress</CardTitle>
+                                                <CardDescription className="text-xs">
+                                                    See how your prayers accumulate over time
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="p-4">
+                                                {isLoading ? (
+                                                    <ChartSkeleton height="h-[300px]"/>
+                                                ) : (
+                                                    <ChartContainer
+                                                        config={{
+                                                            jamaat: {label: "Jamaat", color: STATUS_COLORS.jamaat},
+                                                            onTime: {label: "On Time", color: STATUS_COLORS["on time"]},
+                                                            alone: {label: "Alone", color: STATUS_COLORS.alone},
+                                                            missed: {label: "Missed", color: STATUS_COLORS.missed},
+                                                        }}
+                                                        className="w-full h-[300px]"
+                                                    >
+                                                        <AreaChart data={cumulativeData}>
+                                                            <CartesianGrid strokeDasharray="3 3"/>
+                                                            <XAxis
+                                                                dataKey="day"
+                                                                label={{
+                                                                    value: 'Day of Month',
+                                                                    position: 'insideBottom',
+                                                                    offset: -3
+                                                                }}
+                                                            />
+                                                            <YAxis
+                                                                label={{
+                                                                    value: 'Cumulative Count',
+                                                                    angle: -90,
+                                                                    position: 'insideLeft'
+                                                                }}
+                                                            />
+                                                            <ChartTooltip content={<ChartTooltipContent/>}/>
+                                                            <Area
+                                                                type="monotone"
+                                                                dataKey="onTime"
+                                                                stackId="1"
+                                                                stroke={STATUS_COLORS["on time"]}
+                                                                fill={STATUS_COLORS["on time"]}
+                                                            />
+                                                            <Area
+                                                                type="monotone"
+                                                                dataKey="jamaat"
+                                                                stackId="1"
+                                                                stroke={STATUS_COLORS.jamaat}
+                                                                fill={STATUS_COLORS.jamaat}
+                                                            />
+                                                            <Area
+                                                                type="monotone"
+                                                                dataKey="alone"
+                                                                stackId="1"
+                                                                stroke={STATUS_COLORS.alone}
+                                                                fill={STATUS_COLORS.alone}
+                                                            />
+                                                            <Area
+                                                                type="monotone"
+                                                                dataKey="missed"
+                                                                stackId="1"
+                                                                stroke={STATUS_COLORS.missed}
+                                                                fill={STATUS_COLORS.missed}
+                                                            />
+                                                        </AreaChart>
+                                                    </ChartContainer>
+                                                )}
+                                            </CardContent>
+                                        </div>
+                                        <div>
+                                            <CardHeader className="pb-2">
+                                                <CardTitle className="text-sm font-semibold">Weekly
+                                                    Comparison</CardTitle>
+                                                <CardDescription className="text-xs">
+                                                    Performance breakdown by week
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="p-4">
+                                                {isLoading ? (
+                                                    <ChartSkeleton height="h-[300px]"/>
+                                                ) : (
+                                                    <ChartContainer
+                                                        config={{
+                                                            missed: {label: "Missed", color: STATUS_COLORS.missed},
+                                                            alone: {label: "Alone", color: STATUS_COLORS.alone},
+                                                            jamaat: {label: "Jamaat", color: STATUS_COLORS.jamaat},
+                                                            onTime: {label: "On Time", color: STATUS_COLORS["on time"]},
+                                                        }}
+                                                        className="w-full h-[300px]"
+                                                    >
+                                                        <BarChart data={weeklyComparisonData}>
+                                                            <CartesianGrid strokeDasharray="3 3"/>
+                                                            <XAxis dataKey="week"/>
+                                                            <YAxis label={{
+                                                                value: 'Prayers Count',
+                                                                angle: -90,
+                                                                position: 'insideLeft'
+                                                            }}/>
+                                                            <ChartTooltip content={<ChartTooltipContent/>}/>
+                                                            <ChartLegend content={<ChartLegendContent/>}/>
+                                                            <Bar dataKey="missed" fill={STATUS_COLORS.missed}/>
+                                                            <Bar dataKey="alone" fill={STATUS_COLORS.alone}/>
+                                                            <Bar dataKey="jamaat" fill={STATUS_COLORS.jamaat}/>
+                                                            <Bar dataKey="onTime" fill={STATUS_COLORS["on time"]}/>
+                                                        </BarChart>
+                                                    </ChartContainer>
+                                                )}
+                                            </CardContent>
+                                        </div>
 
+                                    </div>
                                 </div>
-                            </div>
 
-                        </AccordionContent>
+                            </AccordionContent>
 
-                    </AccordionItem>
+                        </AccordionItem>
 
 
                     </Accordion>
@@ -1135,12 +1167,12 @@ export default function PrayerAnalyticsDashboard() {
                 <Tabs defaultValue="overview" className="w-full">
                     <TabsList className="grid w-full grid-cols-2 mb-4">
                         <TabsTrigger value="overview" className="flex items-center gap-2">
-                            <PieChartIcon className="h-4 w-4" />
-                            <span >Overview</span>
+                            <PieChartIcon className="h-4 w-4"/>
+                            <span>Overview</span>
                         </TabsTrigger>
                         <TabsTrigger value="prayers" className="flex items-center gap-2">
-                            <Users className="h-4 w-4" />
-                            <span >Prayers</span>
+                            <Users className="h-4 w-4"/>
+                            <span>Prayers</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -1157,7 +1189,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </CardHeader>
                                 <CardContent className="flex justify-center items-center p-4">
                                     {isLoading ? (
-                                        <ChartSkeleton />
+                                        <ChartSkeleton/>
                                     ) : (
                                         <ChartContainer
                                             config={{
@@ -1174,7 +1206,10 @@ export default function PrayerAnalyticsDashboard() {
                                                     cx="50%"
                                                     cy="50%"
                                                     labelLine={false}
-                                                    label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                    label={({
+                                                                name,
+                                                                percent
+                                                            }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                                                     outerRadius={60}
                                                     fill="#8884d8"
                                                     dataKey="value"
@@ -1200,7 +1235,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </CardHeader>
                                 <CardContent className="p-4">
                                     {isLoading ? (
-                                        <ChartSkeleton />
+                                        <ChartSkeleton/>
                                     ) : (
                                         <ChartContainer
                                             config={{
@@ -1215,7 +1250,7 @@ export default function PrayerAnalyticsDashboard() {
                                                 className={""}
                                             >
                                                 <RadialBar
-                                                    label={{ position: 'insideStart', fill: '#fff', fontSize: 10 }}
+                                                    label={{position: 'insideStart', fill: '#fff', fontSize: 10}}
                                                     background
                                                     dataKey="successRate"
                                                 />
@@ -1224,16 +1259,41 @@ export default function PrayerAnalyticsDashboard() {
                                                     layout="vertical"
                                                     verticalAlign="bottom"
                                                     align="left"
-                                                    wrapperStyle={{ fontSize: '12px' }}
+                                                    wrapperStyle={{fontSize: '12px'}}
                                                     payload={[
-                                                        { value: "Fajr " +  prayerSuccessRates[0]?.successRate, type: "circle", id: "Fajr", color: prayerSuccessRates[0]?.fill },
-                                                        { value: "Zuhr " +  prayerSuccessRates[1]?.successRate, type: "circle", id: "Zuhr", color: prayerSuccessRates[1]?.fill },
-                                                        { value: "Asar " +  prayerSuccessRates[2]?.successRate, type: "circle", id: "Asar", color: prayerSuccessRates[2]?.fill },
-                                                        { value: "Maghrib " +  prayerSuccessRates[3]?.successRate, type: "circle", id: "Maghrib", color: prayerSuccessRates[3]?.fill },
-                                                        { value: "Esha " +  prayerSuccessRates[4]?.successRate, type: "circle", id: "Esha", color: prayerSuccessRates[4]?.fill },
+                                                        {
+                                                            value: "Fajr " + prayerSuccessRates[0]?.successRate,
+                                                            type: "circle",
+                                                            id: "Fajr",
+                                                            color: prayerSuccessRates[0]?.fill
+                                                        },
+                                                        {
+                                                            value: "Zuhr " + prayerSuccessRates[1]?.successRate,
+                                                            type: "circle",
+                                                            id: "Zuhr",
+                                                            color: prayerSuccessRates[1]?.fill
+                                                        },
+                                                        {
+                                                            value: "Asar " + prayerSuccessRates[2]?.successRate,
+                                                            type: "circle",
+                                                            id: "Asar",
+                                                            color: prayerSuccessRates[2]?.fill
+                                                        },
+                                                        {
+                                                            value: "Maghrib " + prayerSuccessRates[3]?.successRate,
+                                                            type: "circle",
+                                                            id: "Maghrib",
+                                                            color: prayerSuccessRates[3]?.fill
+                                                        },
+                                                        {
+                                                            value: "Esha " + prayerSuccessRates[4]?.successRate,
+                                                            type: "circle",
+                                                            id: "Esha",
+                                                            color: prayerSuccessRates[4]?.fill
+                                                        },
                                                     ]}
                                                 />
-                                                <ChartTooltip content={<ChartTooltipContent />} />
+                                                <ChartTooltip content={<ChartTooltipContent/>}/>
                                             </RadialBarChart>
                                         </ChartContainer>
                                     )}
@@ -1248,7 +1308,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </CardHeader>
                                 <CardContent className="p-4">
                                     {isLoading ? (
-                                        <ChartSkeleton height="h-[300px]" />
+                                        <ChartSkeleton height="h-[300px]"/>
                                     ) : (
                                         <ChartContainer
                                             config={{
@@ -1261,14 +1321,18 @@ export default function PrayerAnalyticsDashboard() {
                                         >
                                             <BarChart data={prayerWiseChartData}>
                                                 <CartesianGrid strokeDasharray="3 3"/>
-                                                <XAxis dataKey="prayer" />
-                                                <YAxis label={{ value: 'Prayers Count Total', angle: -90, position: 'insideLeft' }}/>
+                                                <XAxis dataKey="prayer"/>
+                                                <YAxis label={{
+                                                    value: 'Prayers Count Total',
+                                                    angle: -90,
+                                                    position: 'insideLeft'
+                                                }}/>
                                                 <ChartTooltip content={<ChartTooltipContent/>}/>
-                                                <ChartLegend  content={<ChartLegendContent />} />
+                                                <ChartLegend content={<ChartLegendContent/>}/>
                                                 <Bar dataKey="missed" stackId="a" fill={STATUS_COLORS.missed}/>
                                                 <Bar dataKey="alone" stackId="a" fill={STATUS_COLORS.alone}/>
                                                 <Bar dataKey="jamaat" stackId="a" fill={STATUS_COLORS.jamaat}/>
-                                                <Bar dataKey="onTime" stackId="a"  fill={STATUS_COLORS["on time"]}/>
+                                                <Bar dataKey="onTime" stackId="a" fill={STATUS_COLORS["on time"]}/>
                                             </BarChart>
                                         </ChartContainer>
                                     )}
@@ -1282,7 +1346,7 @@ export default function PrayerAnalyticsDashboard() {
                         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-3">
                             {isLoading ? (
                                 PRAYERS.map((prayer) => (
-                                    <PrayerCardSkeleton key={prayer} prayer={prayer} />
+                                    <PrayerCardSkeleton key={prayer} prayer={prayer}/>
                                 ))
                             ) : (
                                 PRAYERS.map((prayer) => (

@@ -19,6 +19,7 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog";
+import {Separator} from "@/components/ui/separator";
 
 export default function DiaryListClient() {
     const router = useRouter();
@@ -214,10 +215,8 @@ export default function DiaryListClient() {
         }
 
         return pages;
-    };
-
-    return (
-        <>
+    };    return (
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h1 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
@@ -240,8 +239,10 @@ export default function DiaryListClient() {
             </div>
             <PrayerLegend/>
 
-            {/* Search */}
-            <div>
+            {/* Sticky Search & Pagination Header */}
+            <div className="sticky top-10 md:top-14 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 space-y-4 -mx-4 px-4 shadow-sm">
+                {/* Search */}
+
                 <div className="relative">
                     <Search
                         className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
@@ -263,18 +264,45 @@ export default function DiaryListClient() {
                     )}
                 </div>
                 {searchQuery && (
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-xs text-muted-foreground">
                         Found {filteredEntries.length} {filteredEntries.length === 1 ? 'entry' : 'entries'}
                     </p>
                 )}
+
+                {/* Pagination Info Control */}
+                {!isLoading && filteredEntries.length > 0 && (
+                    <div className="flex flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                            <Select
+                                value={itemsPerPage.toString()}
+                                onValueChange={handleSetItemsPerPage}
+                            >
+                                <SelectTrigger className="w-[70px] h-8 text-sm">
+                                    <SelectValue placeholder="7" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="7">7</SelectItem>
+                                    <SelectItem value="10">10</SelectItem>
+                                    <SelectItem value="30">30</SelectItem>
+                                    <SelectItem value="-1">All</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <span className="text-xs">per page</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <p>
+                                Showing {startIndex + 1}-{Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length}
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
 
-
-            {/* Loading State */}
-            {isLoading ? (
-                    <LoadingState label={"Loading data..."}/>)
-                : filteredEntries.length === 0 ? (
-                    // Empty State
+            {/* Content Area */}
+            <div className="relative">
+                {isLoading ? (
+                    <LoadingState label={"Loading data..."}/>
+                ) : filteredEntries.length === 0 ? (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
                             <Calendar className="h-16 w-16 text-muted-foreground/50"/>
@@ -289,46 +317,15 @@ export default function DiaryListClient() {
                                     }
                                 </p>
                             </div>
-                            {searchQuery ? (
-                                <Button onClick={() => setSearchQuery("")} variant="outline" className="mt-4">
-                                    Clear Search
-                                </Button>
-                            ) : (
-                                <Button onClick={handleAddNewClick} className="mt-4">
-                                    Add First Entry
-                                </Button>
-                            )}
+                            <Button onClick={searchQuery ? () => setSearchQuery("") : handleAddNewClick} variant="outline" className="mt-4">
+                                {searchQuery ? 'Clear Search' : 'Add First Entry'}
+                            </Button>
                         </CardContent>
                     </Card>
                 ) : (
-                    <>
-                        {/* Pagination Info */}
-                        <div className="flex flex-row items-center justify-between gap-4 text-sm text-muted-foreground px-1">
-                                <div className="flex items-center gap-2">
-                                    <Select
-                                        value={itemsPerPage.toString()}
-                                        onValueChange={handleSetItemsPerPage}
-                                    >
-                                        <SelectTrigger className="w-[70px] h-8 text-sm">
-                                            <SelectValue placeholder="7" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="7">7</SelectItem>
-                                            <SelectItem value="10">10</SelectItem>
-                                            <SelectItem value="30">30</SelectItem>
-                                            <SelectItem value="-1">All</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <p>
-                                        Showing {startIndex + 1}-{Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length} entries
-                                    </p>
-                                </div>
-                            </div>
-
-                        {/* Combined Entries */}
-                        <div className="space-y-4">
+                    <div className="space-y-8">
+                        {/* Combined Entries List */}
+                        <div className="space-y-4 mb-2">
                             {paginatedEntries.map((entry: any) => (
                                 <DiaryEntryCard
                                     key={entry.date}
@@ -343,11 +340,10 @@ export default function DiaryListClient() {
                             ))}
                         </div>
 
-                        {/* Pagination Controls */}
+                        {/* Sticky Bottom Pagination Controls */}
                         {totalPages > 1 && (
-                            <div>
+                            <div className="sticky bottom-16 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 pb-4 -mx-4 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                                 <div className="flex items-center justify-center gap-2">
-                                    {/* Previous Button */}
                                     <Button
                                         variant="outline"
                                         size="sm"
@@ -359,7 +355,6 @@ export default function DiaryListClient() {
                                         <span className="hidden sm:inline">Previous</span>
                                     </Button>
 
-                                    {/* Page Numbers */}
                                     <div className="flex items-center gap-1">
                                         {getPageNumbers().map((page, index) => (
                                             typeof page === 'number' ? (
@@ -373,14 +368,13 @@ export default function DiaryListClient() {
                                                     {page}
                                                 </Button>
                                             ) : (
-                                                <span key={index} className=" text-muted-foreground">
-                          {page}
-                        </span>
+                                                <span key={index} className="text-muted-foreground px-1">
+                                                    {page}
+                                                </span>
                                             )
                                         ))}
                                     </div>
 
-                                    {/* Next Button */}
                                     <Button
                                         variant="outline"
                                         size="sm"
@@ -394,44 +388,26 @@ export default function DiaryListClient() {
                                 </div>
                             </div>
                         )}
-                    </>
+                    </div>
                 )}
+            </div>
 
-             {/*Prayer Dialog*/}
-            <Dialog
-                open={!!deletePrayerId}
-                onOpenChange={() => setDeletePrayerId(null)}
-            >
+            {/* Dialogs */}
+            <Dialog open={!!deletePrayerId} onOpenChange={() => setDeletePrayerId(null)}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Delete prayer log?</DialogTitle>
                         <DialogDescription>
-                            This will permanently delete this day’s prayer record.
-                            This action cannot be undone.
+                            This will permanently delete this day’s prayer record. This action cannot be undone.
                         </DialogDescription>
                     </DialogHeader>
-
                     <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setDeletePrayerId(null)}
-                            disabled={isDeletingPrayer}
-                        >
-                            Cancel
-                        </Button>
-
-                        <Button
-                            variant="destructive"
-                            onClick={confirmPrayerDelete}
-                            disabled={isDeletingPrayer}
-                        >
-                            {isDeletingPrayer ? "Deleting..." : "Delete"}
-                        </Button>
+                        <Button variant="outline" onClick={() => setDeletePrayerId(null)} disabled={isDeletingPrayer}>Cancel</Button>
+                        <Button variant="destructive" onClick={confirmPrayerDelete} disabled={isDeletingPrayer}>{isDeletingPrayer ? "Deleting..." : "Delete"}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
 
-             {/*Diary Dialog*/}
             <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
                 <DialogContent>
                     <DialogHeader>
@@ -440,27 +416,12 @@ export default function DiaryListClient() {
                             This action cannot be undone. Your diary entry will be permanently removed.
                         </DialogDescription>
                     </DialogHeader>
-
                     <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setDeleteId(null)}
-                            disabled={isDeleting}
-                        >
-                            Cancel
-                        </Button>
-
-                        <Button
-                            variant="destructive"
-                            onClick={confirmDelete}
-                            disabled={isDeleting}
-                        >
-                            {isDeleting ? "Deleting..." : "Delete"}
-                        </Button>
+                        <Button variant="outline" onClick={() => setDeleteId(null)} disabled={isDeleting}>Cancel</Button>
+                        <Button variant="destructive" onClick={confirmDelete} disabled={isDeleting}>{isDeleting ? "Deleting..." : "Delete"}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
-        </>
+        </div>
     );
 }

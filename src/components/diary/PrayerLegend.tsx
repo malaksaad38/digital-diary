@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 
 export default function PrayerLegend() {
   return (
-    <Card className="bg-muted/30">
+    <Card className="bg-muted/30 mb-3" >
       <CardContent className="flex items-center justify-center gap-2">
         <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-5 text-xs sm:text-sm">
           <div className="flex gap-1 justify-center items-center">

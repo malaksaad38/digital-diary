@@ -14,7 +14,7 @@ const inter = Inter({
 });
 const noto_nastaliq_urdu = Noto_Nastaliq_Urdu({
     variable: "--font-noto_nastaliq",
-    subsets: ["latin"],
+    subsets: ["arabic", "latin"],
 });
 
 export const metadata: Metadata = {
@@ -62,7 +62,7 @@ export default function RootLayout({
             <meta name="apple-mobile-web-app-title" content="Digital Diary"/>
             <meta name="mobile-web-app-capable" content="yes"/>
         </head>
-        <body className={`${inter.variable} ${noto_nastaliq_urdu.variable} font-inter antialiased`}>
+        <body className={`${inter.variable} ${noto_nastaliq_urdu.variable} antialiased`}>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"

@@ -78,7 +78,7 @@
     --sidebar-accent-foreground: oklch(0.6723 0.1606 244.9955);
     --sidebar-border: oklch(0.9271 0.0101 238.5177);
     --sidebar-ring: oklch(0.6818 0.1584 243.3540);
-    --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
+    --font-sans: Inter, var(--font-noto_nastaliq), ui-sans-serif, sans-serif, system-ui;
     --font-serif: Georgia, serif;
     --font-mono: Menlo, monospace;
     --radius: 1.3rem;
@@ -133,7 +133,7 @@
     --sidebar-accent-foreground: oklch(0.6692 0.1607 245.0110);
     --sidebar-border: oklch(0.3795 0.0220 240.5943);
     --sidebar-ring: oklch(0.6818 0.1584 243.3540);
-    --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
+    --font-sans: Inter, var(--font-noto_nastaliq), ui-sans-serif, sans-serif, system-ui;
     --font-serif: Georgia, serif;
     --font-mono: Menlo, monospace;
     --radius: 1.3rem;
@@ -213,5 +213,6 @@
 
     body {
         @apply bg-background text-foreground;
+        font-family: var(--font-inter), var(--font-noto_nastaliq), ui-sans-serif, sans-serif, system-ui;
     }
 }

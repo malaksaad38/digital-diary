@@ -6,7 +6,7 @@ import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useTheme} from "next-themes";
 import {motion} from "framer-motion";
-import {Clock8, EllipsisVertical, Home, Moon, Notebook, PieChartIcon, PlusCircleIcon, Sun,} from "lucide-react";
+import {BookOpen, Clock8, EllipsisVertical, Home, Moon, Notebook, PieChartIcon, PlusCircleIcon, Sun,} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";
@@ -26,6 +26,7 @@ export default function Navbar({user}: { user: any }) {
         "/dashboard/diary": "Diary",
         "/dashboard/analytics": "Prayer Analytics",
         "/dashboard/prayer-times": "Prayer Times",
+        "/dashboard/diary/book": "Book Reader",
     };
 
     const currentPage =
@@ -64,6 +65,7 @@ export default function Navbar({user}: { user: any }) {
                         <NavLink href="/dashboard/prayer-times" label="Prayer Times" pathname={pathname}/>
                         <NavLink href="/dashboard/entry" label="Entry" pathname={pathname}/>
                         <NavLink href="/dashboard/diary" label="Diary" pathname={pathname}/>
+                        <NavLink href="/dashboard/diary/book" label="Book" pathname={pathname}/>
                     </div>
 
                     {/* Right: Clock + Theme */}

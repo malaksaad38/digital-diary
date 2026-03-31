@@ -5,7 +5,7 @@ import React, {useCallback, useDeferredValue, useState} from "react";
 import {Card, CardContent} from "@/components/ui/card";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
-import {Calendar, ChevronLeft, ChevronRight, RefreshCw, Search, X} from "lucide-react";
+import {BookOpen, Calendar, ChevronLeft, ChevronRight, RefreshCw, Search, X} from "lucide-react";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
 import PrayerLegend from "@/components/diary/PrayerLegend";
@@ -225,6 +225,14 @@ export default function DiaryListClient() {
                 <div className="flex gap-2">
                     <Button onClick={handleAddNewClick} className="w-full shrink-1">
                         + Add New Entry
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => router.push("/dashboard/diary/book")}
+                        title="Book Reader View"
+                    >
+                        <BookOpen className="h-4 w-4"/>
                     </Button>
                     <Button
                         variant="outline"

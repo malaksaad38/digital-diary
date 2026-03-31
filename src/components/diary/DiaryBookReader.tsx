@@ -70,11 +70,11 @@ function BookPageContent({ entry, pageNumber, totalPages }: {
   ];
 
   return (
-    <div className="flex flex-col h-full min-h-[70vh] sm:min-h-[75vh] bg-card rounded-xl border shadow-sm overflow-hidden relative select-none">
+    <div className="flex flex-col h-[500px] sm:h-[650px] bg-card rounded-xl border shadow-sm overflow-hidden relative select-none">
 
 
       {/* Page Header */}
-      <div className="relative z-10 px-5 sm:px-8 pt-5 sm:pt-7 pb-4 border-b bg-muted/20">
+      <div className="relative z-10 px-4 sm:px-8 pt-4 sm:pt-7 pb-3 border-b bg-muted/20">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[10px] sm:text-xs font-mono text-muted-foreground tracking-wider uppercase">
             {dayName}
@@ -90,7 +90,7 @@ function BookPageContent({ entry, pageNumber, totalPages }: {
       </div>
 
       {/* Scrollable Content */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-5 sm:px-8 py-4 sm:py-5 space-y-4 sm:space-y-5">
+      <div className="relative z-10 flex-1 overflow-y-auto px-4 sm:px-8 py-3 sm:py-5 space-y-4 sm:space-y-5">
 
         {/* Prayer Section */}
         {entry.prayer && (
@@ -188,7 +188,7 @@ function BookPageContent({ entry, pageNumber, totalPages }: {
       </div>
 
       {/* Page Footer */}
-      <div className="relative z-10 px-5 sm:px-8 py-3 border-t bg-muted/10 flex items-center justify-between">
+      <div className="relative z-10 px-4 sm:px-8 py-2.5 border-t bg-muted/10 flex items-center justify-between">
         <Button
           size="sm"
           variant="ghost"

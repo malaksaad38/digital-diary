@@ -223,7 +223,7 @@ export default function DiaryListClient() {
                     <Calendar className="h-5 w-5 sm:h-6 sm:w-6"/>My Prayer & Diary
                 </h1>
                 <div className="flex items-center gap-2">
-                    <Button  variant="outline"
+                    <Button  variant="default"
                              size="sm"
                              className="h-9 px-2.5 sm:px-4 gap-2"
                              onClick={handleAddNewClick}

@@ -364,20 +364,23 @@ export default function DiaryBookReader() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="icon"
+            size="sm"
+            className="h-9 px-2.5 sm:px-4 gap-2"
             onClick={() => router.push("/dashboard/diary")}
-
           >
-            <List className="h-3.5 w-3.5" />
+            <List className="h-4 w-4" />
+            <span className="hidden sm:inline">List View</span>
           </Button>
           <Button
             variant="outline"
-            size="icon"
+            size="sm"
+            className="h-9 px-2.5 sm:px-4 gap-2"
             onClick={() => refetch()}
             disabled={isFetching}
             title="Refresh"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
         </div>
       </div>

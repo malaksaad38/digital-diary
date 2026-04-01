@@ -224,19 +224,23 @@ export default function DiaryListClient() {
                 </h1>
                 <div className="flex items-center gap-2">
                     <Button  variant="outline"
-                             size="icon"
+                             size="sm"
+                             className="h-9 px-2.5 sm:px-4 gap-2"
                              onClick={handleAddNewClick}
                              title="Add New Diary">
                         <PlusIcon className="h-4 w-4" />
+                        <span className="hidden sm:inline">Add Entry</span>
                     </Button>
                     <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
+                        className="h-9 px-2.5 sm:px-4 gap-2"
                         onClick={() => refetch()}
                         disabled={isFetching}
                         title="Refresh data"
                     >
                         <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`}/>
+                        <span className="hidden sm:inline">Refresh</span>
                     </Button>
                 </div>
             </div>
@@ -270,11 +274,13 @@ export default function DiaryListClient() {
                     </div>
                     <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
+                        className="h-9 px-2.5 sm:px-4 gap-2"
                         onClick={() => router.push("/dashboard/diary/book")}
                         title="Book Reader View"
                     >
                         <BookOpen className="h-4 w-4"/>
+                        <span className="hidden sm:inline">Book View</span>
                     </Button>
 
                 </div>

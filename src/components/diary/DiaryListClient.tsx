@@ -220,7 +220,7 @@ export default function DiaryListClient() {
             {/* Header */}
             <div className="flex  items-center justify-between gap-4">
                 <h1 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-                    <Calendar className="h-5 w-5 sm:h-6 sm:w-6"/> Prayer & Diary
+                    <Calendar className="h-5 w-5 sm:h-6 sm:w-6"/>My Prayer & Diary
                 </h1>
                 <div className="flex items-center gap-2">
                     <Button  variant="outline"
@@ -228,14 +228,6 @@ export default function DiaryListClient() {
                              onClick={handleAddNewClick}
                              title="Add New Diary">
                         <PlusIcon className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => router.push("/dashboard/diary/book")}
-                        title="Book Reader View"
-                    >
-                        <BookOpen className="h-4 w-4"/>
                     </Button>
                     <Button
                         variant="outline"
@@ -254,26 +246,39 @@ export default function DiaryListClient() {
             <div className="sticky top-10 md:top-[60px] z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 space-y-4 -mx-4 px-4 shadow-sm">
                 {/* Search */}
 
-                <div className="relative">
-                    <Search
-                        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
-                    <input
-                        type="text"
-                        placeholder="Search by date (e.g., January, 2025, Monday)..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-10 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    />
-                    {searchQuery && (
-                        <button
-                            onClick={() => setSearchQuery("")}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            aria-label="Clear search"
-                        >
-                            <X className="h-4 w-4"/>
-                        </button>
-                    )}
+                <div className="flex items-center justify-between gap-2">
+                    <div className="relative flex-1">
+                        <Search
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+                        <input
+                            type="text"
+                            placeholder="Search by date (e.g., January, 2025, Monday)..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-10 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery("")}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                aria-label="Clear search"
+                            >
+                                <X className="h-4 w-4"/>
+                            </button>
+                        )}
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => router.push("/dashboard/diary/book")}
+                        title="Book Reader View"
+                    >
+                        <BookOpen className="h-4 w-4"/>
+                    </Button>
+
                 </div>
+
                 {searchQuery && (
                     <p className="text-xs text-muted-foreground">
                         Found {filteredEntries.length} {filteredEntries.length === 1 ? 'entry' : 'entries'}

@@ -70,7 +70,7 @@ function BookPageContent({ entry, pageNumber, totalPages }: {
   ];
 
   return (
-    <div className="flex flex-col h-[500px] sm:h-[650px] bg-card rounded-xl border shadow-sm overflow-hidden relative select-none">
+    <div className="flex flex-col min-h-[550px] sm:min-h-[700px] h-auto bg-card rounded-2xl border shadow-md overflow-hidden relative select-none transition-shadow hover:shadow-lg">
 
       {/* Page Header */}
       <div className="relative z-10 px-4 sm:px-8 pt-4 sm:pt-7 pb-3 border-b bg-muted/20">
@@ -89,7 +89,7 @@ function BookPageContent({ entry, pageNumber, totalPages }: {
       </div>
 
       {/* Scrollable Content */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 sm:px-8 py-3 sm:py-5 space-y-4 sm:space-y-5">
+      <div className="relative z-10 flex-grow px-4 sm:px-8 py-4 sm:py-5 space-y-4 sm:space-y-5">
 
         {/* Prayer Section */}
         {entry.prayer && (
@@ -261,8 +261,33 @@ export default function DiaryBookReader() {
   const { data: combinedEntries = [], isLoading, refetch, isFetching } = useCombinedHistory();
 
   // Date range state — default to last 30 days
-  const [fromDate, setFromDate] = useState(() => subDays(new Date(), 30));
-  const [toDate, setToDate] = useState(() => new Date());
+  const [fromDate, setFromDate] = useState<Date>(() => subDays(new Date(), 30));
+  const [toDate, setToDate] = useState<Date>(() => new Date());
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load saved dates on mount
+  useEffect(() => {
+    const savedFrom = localStorage.getItem("diary-book-from-date");
+    const savedTo = localStorage.getItem("diary-book-to-date");
+    
+    if (savedFrom) {
+      const parsedFrom = new Date(savedFrom);
+      if (!isNaN(parsedFrom.getTime())) setFromDate(parsedFrom);
+    }
+    if (savedTo) {
+      const parsedTo = new Date(savedTo);
+      if (!isNaN(parsedTo.getTime())) setToDate(parsedTo);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save dates when changed (only after initial load)
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("diary-book-from-date", fromDate.toISOString());
+      localStorage.setItem("diary-book-to-date", toDate.toISOString());
+    }
+  }, [fromDate, toDate, isLoaded]);
 
   // Filter entries by date range, sorted oldest → newest (chronological book order)
   const filteredEntries = useMemo(() => {
@@ -432,55 +457,57 @@ export default function DiaryBookReader() {
             </div>
           </div>
 
-          {/* Bottom Navigation */}
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => emblaApi?.scrollPrev()}
-              disabled={!canScrollPrev}
-              className="gap-1"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Prev</span>
-            </Button>
+          {/* Sticky Pagination (Reverted Style) */}
+          <div className="sticky bottom-[75px] md:bottom-2 z-40 mt-8 mx-auto flex flex-col items-center gap-3 bg-background/80 backdrop-blur-md px-6 py-3 rounded-2xl border shadow-lg w-fit">
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => emblaApi?.scrollPrev()}
+                disabled={!canScrollPrev}
+                className="gap-1.5 h-9"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Prev</span>
+              </Button>
 
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">{currentIndex + 1}</span>
-              <span>/</span>
-              <span>{filteredEntries.length}</span>
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground min-w-[50px] justify-center">
+                <span className="font-semibold text-foreground tabular-nums">{currentIndex + 1}</span>
+                <span>/</span>
+                <span className="tabular-nums">{filteredEntries.length}</span>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => emblaApi?.scrollNext()}
+                disabled={!canScrollNext}
+                className="gap-1.5 h-9"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => emblaApi?.scrollNext()}
-              disabled={!canScrollNext}
-              className="gap-1"
-            >
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            {/* Dot indicators (only show if <= 20 entries) */}
+            {filteredEntries.length <= 20 && (
+              <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                {filteredEntries.map((_: any, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => emblaApi?.scrollTo(index)}
+                    className={cn(
+                      "h-2 rounded-full transition-all duration-200",
+                      currentIndex === index
+                        ? "w-6 bg-foreground"
+                        : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                    )}
+                    aria-label={`Go to page ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-
-          {/* Dot indicators (only show if <= 20 entries) */}
-          {filteredEntries.length <= 20 && (
-            <div className="flex items-center justify-center gap-1.5 flex-wrap">
-              {filteredEntries.map((_: any, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => emblaApi?.scrollTo(index)}
-                  className={cn(
-                    "h-2 rounded-full transition-all duration-200",
-                    currentIndex === index
-                      ? "w-6 bg-foreground"
-                      : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                  )}
-                  aria-label={`Go to page ${index + 1}`}
-                />
-              ))}
-            </div>
-          )}
         </>
       )}
     </div>

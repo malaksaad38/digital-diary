@@ -5,7 +5,7 @@ import React, {useCallback, useDeferredValue, useState} from "react";
 import {Card, CardContent} from "@/components/ui/card";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
-import {BookOpen, Calendar, ChevronLeft, ChevronRight, RefreshCw, Search, X} from "lucide-react";
+import {BookOpen, Calendar, ChevronLeft, ChevronRight, PlusIcon, RefreshCw, Search, X} from "lucide-react";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useCombinedHistory} from "@/hooks/use-prayer-queries";
 import PrayerLegend from "@/components/diary/PrayerLegend";
@@ -218,13 +218,16 @@ export default function DiaryListClient() {
     };    return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex  items-center justify-between gap-4">
                 <h1 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-                    <Calendar className="h-5 w-5 sm:h-6 sm:w-6"/> My Prayer & Diary
+                    <Calendar className="h-5 w-5 sm:h-6 sm:w-6"/> Prayer & Diary
                 </h1>
-                <div className="flex gap-2">
-                    <Button onClick={handleAddNewClick} className="w-full shrink-1">
-                        + Add New Entry
+                <div className="flex items-center gap-2">
+                    <Button  variant="outline"
+                             size="icon"
+                             onClick={handleAddNewClick}
+                             title="Add New Diary">
+                        <PlusIcon className="h-4 w-4" />
                     </Button>
                     <Button
                         variant="outline"

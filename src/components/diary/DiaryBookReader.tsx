@@ -72,7 +72,6 @@ function BookPageContent({ entry, pageNumber, totalPages }: {
   return (
     <div className="flex flex-col h-[500px] sm:h-[650px] bg-card rounded-xl border shadow-sm overflow-hidden relative select-none">
 
-
       {/* Page Header */}
       <div className="relative z-10 px-4 sm:px-8 pt-4 sm:pt-7 pb-3 border-b bg-muted/20">
         <div className="flex items-center justify-between mb-2">
@@ -332,7 +331,7 @@ export default function DiaryBookReader() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex  items-center justify-between gap-3">
         <h1 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
           <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
           Book Reader
@@ -340,17 +339,15 @@ export default function DiaryBookReader() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="sm"
+            size="icon"
             onClick={() => router.push("/dashboard/diary")}
-            className="gap-1.5 h-8"
+
           >
             <List className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">List View</span>
           </Button>
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
             onClick={() => refetch()}
             disabled={isFetching}
             title="Refresh"

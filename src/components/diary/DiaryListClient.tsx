@@ -32,35 +32,35 @@ export default function DiaryListClient() {
     // Constants and URL State
     const ITEMS_PER_PAGE_KEY = 'diary_items_per_page';
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
-    const itemsPerPage = parseInt(searchParams.get('limit') || '7', 10);
+    const [itemsPerPage, setItemsPerPageState] = useState<number>(7);
 
-    // Sync state with URL when page or limit changes
-    const updateURL = useCallback((page: number, limit: number, replace = false) => {
+    // Sync state with URL when page changes
+    const updateURL = useCallback((page: number, replace = false) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('page', page.toString());
-        params.set('limit', limit.toString());
         const url = `${pathname}?${params.toString()}`;
         if (replace) router.replace(url, { scroll: false });
         else router.push(url, { scroll: false });
     }, [pathname, router, searchParams]);
 
-    // Initial Mount: Load saved preference if not in URL
+    // Initial Mount: Load saved preference
     React.useEffect(() => {
-        const urlLimit = searchParams.get('limit');
         const storedLimit = typeof window !== 'undefined' ? localStorage.getItem(ITEMS_PER_PAGE_KEY) : null;
         
-        if (!urlLimit && storedLimit) {
-            updateURL(1, parseInt(storedLimit, 10), true);
+        if (storedLimit) {
+            setItemsPerPageState(parseInt(storedLimit, 10));
         }
     }, []); // Only runs once on mount
 
     const handleSetItemsPerPage = (val: string) => {
+        const numVal = Number(val);
+        setItemsPerPageState(numVal);
         if (typeof window !== 'undefined') localStorage.setItem(ITEMS_PER_PAGE_KEY, val);
-        updateURL(1, Number(val));
+        updateURL(1); // Reset to page 1
     };
 
     const handleSetPage = (page: number) => {
-        updateURL(page, itemsPerPage);
+        updateURL(page);
     };
 
 

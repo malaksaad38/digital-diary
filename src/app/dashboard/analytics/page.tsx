@@ -4,11 +4,11 @@
 import React from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {
-    AlertCircle,
+    BookOpen,
     Calendar,
+    CheckCircle2,
     Circle,
     CircleHelp,
-    Clock,
     Diamond,
     Loader2,
     PieChart as PieChartIcon,
@@ -67,6 +67,8 @@ interface PrayerData {
     asar?: string;
     maghrib?: string;
     esha?: string;
+    recite?: string;
+    recitedParah?: number;
 }
 
 interface PrayerEntry {
@@ -143,6 +145,15 @@ interface StatusBadgeConfig {
     dotColor: string;
 }
 
+interface RecitationReport {
+    totalParahs: number;
+    completedQuranCount: number;
+    remainingParahs: number;
+    progressToNextQuran: number;
+    headline: string;
+    subline: string;
+}
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -181,6 +192,8 @@ const EMPTY_PRAYER_STATS: PrayerStats = {
     total: 0,
 };
 
+const COMPLETE_QURAN_PARAHS = 30;
+
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
@@ -205,6 +218,52 @@ const formatMonthLabel = (monthString: string): string => {
         year: "numeric",
         month: "long",
     });
+};
+
+const parseRecitedParah = (prayer?: PrayerData): number => {
+    if (!prayer) return 0;
+
+    if (typeof prayer.recitedParah === "number" && Number.isFinite(prayer.recitedParah)) {
+        return Math.max(prayer.recitedParah, 0);
+    }
+
+    if (!prayer.recite?.trim()) return 0;
+
+    const parsedValue = Number.parseFloat(prayer.recite.replace(/[^0-9.]/g, ""));
+    if (!Number.isFinite(parsedValue)) return 0;
+
+    return Math.max(parsedValue, 0);
+};
+
+const buildRecitationReport = (rawTotalParahs: number): RecitationReport => {
+    const totalParahs = Number(rawTotalParahs.toFixed(2));
+    const completedQuranCount = Math.floor(totalParahs / COMPLETE_QURAN_PARAHS);
+    const remainingParahs = Number((totalParahs % COMPLETE_QURAN_PARAHS).toFixed(2));
+    const progressToNextQuran = Number(
+        ((remainingParahs / COMPLETE_QURAN_PARAHS) * 100).toFixed(1)
+    );
+
+    if (completedQuranCount > 0) {
+        return {
+            totalParahs,
+            completedQuranCount,
+            remainingParahs,
+            progressToNextQuran,
+            headline: completedQuranCount === 1 ? "Completed Quran" : `${completedQuranCount} Completed Qurans`,
+            subline: remainingParahs > 0
+                ? `${remainingParahs} Parah in progress`
+                : "30 Parahs reached exactly",
+        };
+    }
+
+    return {
+        totalParahs,
+        completedQuranCount: 0,
+        remainingParahs: totalParahs,
+        progressToNextQuran,
+        headline: `${totalParahs} Parah`,
+        subline: `${Number((COMPLETE_QURAN_PARAHS - totalParahs).toFixed(2))} Parah left for Completed Quran`,
+    };
 };
 
 const calculateSuccessRate = (stats: PrayerStats): number => {
@@ -405,17 +464,17 @@ const OverallStatCard: React.FC<OverallStatCardProps> = ({
                                                              gradientFrom,
                                                              hoverBorder,
                                                              textColor
-                                                         }) => (
+                                                          }) => (
     <div
-        className={`flex flex-col items-center justify-center rounded-xl bg-gradient-to-b ${gradientFrom} to-transparent py-3 sm:py-5 border border-transparent ${hoverBorder} transition-all duration-300`}>
-        <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide">
+        className={`flex flex-col items-center justify-center rounded-xl bg-gradient-to-b ${gradientFrom} to-transparent px-2 py-3 sm:py-5 border border-transparent ${hoverBorder} transition-all duration-300`}>
+        <p className="text-[11px] sm:text-xs text-muted-foreground font-medium tracking-wide text-center">
             {label}
         </p>
-        <p className={`text-2xl sm:text-3xl font-semibold ${textColor} mt-1`}>
+        <p className={`text-lg sm:text-2xl lg:text-3xl font-semibold ${textColor} mt-1 text-center break-words`}>
             {value}
         </p>
         {percentage && (
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 text-center">
                 {percentage}
             </p>
         )}
@@ -430,12 +489,12 @@ interface MonthlyStatItemProps {
 }
 
 const MonthlyStatItem: React.FC<MonthlyStatItemProps> = ({icon, label, value, color}) => (
-    <div className="flex flex-col items-center sm:items-start space-y-1">
+    <div className="flex flex-col items-start space-y-1">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {icon}
             <span>{label}</span>
         </div>
-        <p className={`text-xl sm:text-2xl font-semibold ${color}`}>
+        <p className={`text-lg sm:text-xl lg:text-2xl font-semibold ${color} break-words`}>
             {value}
         </p>
     </div>
@@ -770,6 +829,27 @@ export default function PrayerAnalyticsDashboard() {
 
     const successRate = calculateSuccessRate(overallStats).toFixed(1);
     const monthlySuccessRate = calculateSuccessRate(monthlyStats).toFixed(1);
+    const overallRecitationReport = React.useMemo((): RecitationReport => {
+        let totalParahs = 0;
+
+        combinedEntries.forEach((entry: PrayerEntry) => {
+            if (!entry.prayer) return;
+            totalParahs += parseRecitedParah(entry.prayer);
+        });
+
+        return buildRecitationReport(totalParahs);
+    }, [combinedEntries]);
+
+    const monthlyRecitationReport = React.useMemo((): RecitationReport => {
+        let totalParahs = 0;
+
+        combinedEntries.forEach((entry: PrayerEntry) => {
+            if (!isEntryInMonth(entry, selectedMonth) || !entry.prayer) return;
+            totalParahs += parseRecitedParah(entry.prayer);
+        });
+
+        return buildRecitationReport(totalParahs);
+    }, [combinedEntries, selectedMonth]);
 
     const monthlyStatsData = React.useMemo(() => [
         {
@@ -785,22 +865,10 @@ export default function PrayerAnalyticsDashboard() {
             icon: <XCircle className="h-4 w-4 text-red-500"/>,
         },
         {
-            label: "Alone",
-            value: monthlyStats.alone,
-            color: "text-yellow-500",
-            icon: <AlertCircle className="h-4 w-4 text-yellow-500"/>,
-        },
-        {
             label: "Jamaat",
             value: monthlyStats.jamaat,
             color: "text-green-500",
             icon: <Users className="h-4 w-4 text-green-500"/>,
-        },
-        {
-            label: "On Time",
-            value: monthlyStats.onTime,
-            color: "text-sky-500",
-            icon: <Clock className="h-4 w-4 text-sky-500"/>,
         },
         {
             label: "Success Rate",
@@ -808,7 +876,21 @@ export default function PrayerAnalyticsDashboard() {
             color: "text-primary",
             icon: <TrendingUp className="h-4 w-4 text-primary"/>,
         },
-    ], [monthlyStats, monthlySuccessRate]);
+        {
+            label: "Completed Quran",
+            value: monthlyRecitationReport.completedQuranCount,
+            color: "text-green-600",
+            icon: <CheckCircle2 className="h-4 w-4 text-green-600"/>,
+        },
+        {
+            label: "Recitation",
+            value: monthlyRecitationReport.completedQuranCount > 0
+                ? monthlyRecitationReport.headline
+                : `${monthlyRecitationReport.totalParahs} Parah`,
+            color: monthlyRecitationReport.completedQuranCount > 0 ? "text-green-600" : "text-indigo-600",
+            icon: <BookOpen className="h-4 w-4 text-indigo-600"/>,
+        },
+    ], [monthlyStats, monthlySuccessRate, monthlyRecitationReport]);
 
     // Error state
     if (error) {
@@ -849,9 +931,9 @@ export default function PrayerAnalyticsDashboard() {
                 </div>
 
                 {/* Overall Statistics Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 text-center">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
                     {isLoading ? (
-                        Array.from({length: 6}).map((_, i) => <StatCardSkeleton key={i}/>)
+                        Array.from({length: 7}).map((_, i) => <StatCardSkeleton key={i}/>)
                     ) : (
                         <>
                             <OverallStatCard
@@ -902,9 +984,68 @@ export default function PrayerAnalyticsDashboard() {
                                 hoverBorder="hover:border-primary/40"
                                 textColor="text-primary"
                             />
+                            <OverallStatCard
+                                label="Quran Recitation"
+                                value={overallRecitationReport.completedQuranCount > 0
+                                    ? overallRecitationReport.headline
+                                    : `${overallRecitationReport.totalParahs} Parah`}
+                                percentage={overallRecitationReport.subline}
+                                gradientFrom="from-indigo-50/80 dark:from-indigo-950/20"
+                                hoverBorder="hover:border-indigo-200/40"
+                                textColor="text-indigo-600"
+                            />
                         </>
                     )}
                 </div>
+
+                <Card className="overflow-hidden border border-border/50 shadow-sm">
+                    <CardHeader className="bg-muted/30 border-b border-border/50 p-4 sm:p-6">
+                        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-semibold">
+                            <BookOpen className="h-5 w-5 text-indigo-600"/>
+                            Overall Recitation Analytics
+                        </CardTitle>
+                        <CardDescription className="text-sm text-muted-foreground">
+                            All-time Quran recitation progress from your logged entries
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-4 sm:p-6 space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div>
+                                <p className="text-sm text-muted-foreground">Total Recited</p>
+                                <p className="text-2xl sm:text-3xl font-semibold text-foreground">
+                                    {overallRecitationReport.totalParahs.toFixed(2)} Parah
+                                </p>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    {overallRecitationReport.headline}
+                                </p>
+                            </div>
+                            <div className="text-left sm:text-right">
+                                <p className="text-sm text-muted-foreground">Remaining in current cycle</p>
+                                <p className="text-xl font-semibold text-indigo-600">
+                                    {overallRecitationReport.remainingParahs.toFixed(2)} Parah
+                                </p>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    {overallRecitationReport.subline}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Progress to next Completed Quran</span>
+                                <span className="font-medium text-foreground">
+                                    {overallRecitationReport.progressToNextQuran}%
+                                </span>
+                            </div>
+                            <div className="h-2.5 rounded-full bg-muted overflow-hidden">
+                                <div
+                                    className="h-full bg-indigo-500 transition-all"
+                                    style={{width: `${overallRecitationReport.progressToNextQuran}%`}}
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
                 {/* Monthly Filter and Stats */}
                 <Card className="overflow-hidden border border-border/50 shadow-sm">
@@ -941,17 +1082,17 @@ export default function PrayerAnalyticsDashboard() {
 
                     <CardContent className="p-4 sm:p-6">
                         {isLoading ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                                 {Array.from({length: 6}).map((_, i) => (
                                     <div key={i}
-                                         className="flex flex-col items-center sm:items-start space-y-2 animate-pulse">
+                                         className="flex flex-col items-start space-y-2 animate-pulse">
                                         <div className="h-4 w-20 bg-muted rounded"/>
                                         <div className="h-6 w-12 bg-muted rounded"/>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                                 {monthlyStatsData.map((stat) => (
                                     <MonthlyStatItem
                                         key={stat.label}
@@ -963,6 +1104,43 @@ export default function PrayerAnalyticsDashboard() {
                                 ))}
                             </div>
                         )}
+
+                        <div className="mt-6 rounded-xl border border-border/60 bg-muted/20 p-4 sm:p-5 space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                <div className="space-y-1">
+                                    <p className="text-sm text-muted-foreground">Monthly Quran Recitation</p>
+                                    <p className="text-xl sm:text-2xl font-semibold text-foreground">
+                                        {monthlyRecitationReport.headline}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">{monthlyRecitationReport.subline}</p>
+                                </div>
+                                <div
+                                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium self-start ${
+                                        monthlyRecitationReport.completedQuranCount > 0
+                                            ? "border border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-300"
+                                            : "border border-indigo-500/20 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300"
+                                    }`}
+                                >
+                                    <CheckCircle2 className="h-3.5 w-3.5"/>
+                                    {monthlyRecitationReport.totalParahs.toFixed(2)} Parah Total
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Monthly progress to next Completed Quran</span>
+                                    <span className="font-medium text-foreground">
+                                        {monthlyRecitationReport.progressToNextQuran}%
+                                    </span>
+                                </div>
+                                <div className="h-2.5 rounded-full bg-muted overflow-hidden">
+                                    <div
+                                        className="h-full bg-indigo-500 transition-all"
+                                        style={{width: `${monthlyRecitationReport.progressToNextQuran}%`}}
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
                     </CardContent>
 

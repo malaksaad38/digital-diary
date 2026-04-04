@@ -944,7 +944,7 @@ export default function PrayerAnalyticsDashboard() {
                 {/* Overall Statistics Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
                     {isLoading ? (
-                        Array.from({length: 7}).map((_, i) => <StatCardSkeleton key={i}/>)
+                        Array.from({length: 8}).map((_, i) => <StatCardSkeleton key={i}/>)
                     ) : (
                         <>
                             <OverallStatCard

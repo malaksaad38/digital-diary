@@ -250,7 +250,7 @@ const buildRecitationReport = (rawTotalParahs: number): RecitationReport => {
             completedQuranCount,
             remainingParahs,
             progressToNextQuran,
-            headline: completedQuranCount === 1 ? "Completed Quran" : `${completedQuranCount} Completed Qurans`,
+            headline: completedQuranCount === 1 ? "Completed Quran" : `${completedQuranCount} Qurans`,
             subline: remainingParahs > 0
                 ? `${remainingParahs} Parah in progress`
                 : "30 Parahs reached exactly",
@@ -990,7 +990,7 @@ export default function PrayerAnalyticsDashboard() {
                                 textColor="text-primary"
                             />
                             <OverallStatCard
-                                label="Quran Recitation"
+                                label="Completed"
                                 value={overallRecitationReport.completedQuranCount > 0
                                     ? overallRecitationReport.headline
                                     : `${overallRecitationReport.totalParahs} Parah`}

@@ -118,6 +118,44 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
             ? ((overallStats.jamaat + overallStats.onTime) / overallStats.total) * 100
             : 0;
 
+    const recitationStats = useMemo(() => {
+        const COMPLETE_QURAN_PARAHS = 30;
+
+        const parseRecitedParah = (entry: any): number => {
+            const prayer = entry?.prayer;
+            if (!prayer) return 0;
+
+            if (typeof prayer.recitedParah === "number" && Number.isFinite(prayer.recitedParah)) {
+                return Math.max(prayer.recitedParah, 0);
+            }
+
+            const recite = prayer.recite;
+            if (typeof recite !== "string" || !recite.trim()) return 0;
+
+            const parsed = Number.parseFloat(recite.replace(/[^0-9.]/g, ""));
+            return Number.isFinite(parsed) ? Math.max(parsed, 0) : 0;
+        };
+
+        const totalParahs = Number(
+            combinedEntries.reduce((sum: number, entry: any) => sum + parseRecitedParah(entry), 0).toFixed(2)
+        );
+        const completedQuranCount = Math.floor(totalParahs / COMPLETE_QURAN_PARAHS);
+        const remainingParahs = Number((totalParahs % COMPLETE_QURAN_PARAHS).toFixed(2));
+        const progressToNextQuran = Number(((remainingParahs / COMPLETE_QURAN_PARAHS) * 100).toFixed(1));
+
+        return {
+            totalParahs,
+            completedQuranCount,
+            remainingParahs,
+            progressToNextQuran,
+            headline: completedQuranCount > 0
+                ? completedQuranCount === 1
+                    ? "Completed Quran"
+                    : `${completedQuranCount}`
+                : `${totalParahs} Parah`,
+        };
+    }, [combinedEntries]);
+
     // 🕒 Time helpers
     const convertTo24 = (time: string) => {
         if (!time) return "00:00";
@@ -218,16 +256,16 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
             {/* Prayer Analytics */}
             <Card className="shadow-md py-2 md:py-6 pt-2">
                 <CardContent className="p-3 md:p-6">
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex justify-between items-center mb-4 gap-2">
                         <p className="font-semibold ">Prayer Analytics</p>
                         <Link href="/dashboard/analytics">
-                            <Button size="sm" variant="outline" >
+                            <Button size="sm" variant="outline" className="text-xs md:text-sm">
                                 Details <ChevronRight  />
                             </Button>
                         </Link>
                     </div>
 
-                    <div className="flex justify-between text-xs md:text-base gap-1 md:gap-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 text-xs md:text-base gap-2 md:gap-4">
                         {[
                             {
                                 label: "On Time",
@@ -264,21 +302,54 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
                                 bg: "bg-indigo-100 dark:bg-indigo-900/20",
                                 color: "text-indigo-600"
                             },
+                            {
+                                label: "Recitation",
+                                value: recitationStats.completedQuranCount > 0
+                                    ? recitationStats.headline
+                                    : `${recitationStats.totalParahs} Parah`,
+                                icon: BookOpen,
+                                bg: recitationStats.completedQuranCount > 0
+                                    ? "bg-green-100 dark:bg-green-900/20"
+                                    : "bg-cyan-100 dark:bg-cyan-900/20",
+                                color: recitationStats.completedQuranCount > 0 ? "text-green-600" : "text-cyan-600"
+                            },
                         ].map((stat) => {
                             const Icon = stat.icon;
                             return (
                                 <div key={stat.label}
-                                    className={cn(stat.bg, "relative flex-1 rounded  p-2 md:p-4")}>
+                                    className={cn(stat.bg, "relative rounded p-2 md:p-4 min-h-[60px] md:min-h-[85px]")}>
                                     <Icon
                                         className={cn("mx-auto size-10 md:size-14 mb-1 absolute top-1 right-0 opacity-10", stat.color)} />
-                                    <p className="font-bold text-base">{stat.value}</p>
+                                    <p className="font-bold text-sm md:text-base break-words pr-8">{stat.value}</p>
                                     <p className="text-[10px] md:text-base text-muted-foreground">{stat.label}</p>
 
                                 </div>
                             );
                         })}
                     </div>
-                    <div className="flex justify-between mt-4 pt-4 border-t text-[10px]  md:text-base">
+                    <div className="mt-4 pt-4 border-t space-y-3 text-[10px] md:text-base">
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between gap-2">
+                                <span className="text-muted-foreground text-[10px] md:text-sm">
+                                    Quran progress to next completion
+                                </span>
+                                <span className="font-semibold text-cyan-600 text-[10px] md:text-sm">
+                                    {recitationStats.progressToNextQuran}%
+                                </span>
+                            </div>
+                            <div className="h-2 rounded-full bg-muted overflow-hidden">
+                                <div
+                                    className="h-full bg-cyan-500 transition-all"
+                                    style={{ width: `${recitationStats.progressToNextQuran}%` }}
+                                />
+                            </div>
+                            <p className="text-[10px] md:text-xs text-muted-foreground">
+                                {recitationStats.completedQuranCount > 0
+                                    ? `${recitationStats.remainingParahs} Parah in current cycle`
+                                    : `${Number((30 - recitationStats.totalParahs).toFixed(2))} Parah left for Completed Quran`}
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 md:flex md:justify-between">
                         <div className="flex items-center gap-2">
                             <CalendarDays className="size-3 md:size-4 text-blue-500" />
                             <span className="text-muted-foreground">Total Days</span>
@@ -288,6 +359,7 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
                             <Calendar className="size-3 md:size-4 text-cyan-500" />
                             <span className="text-muted-foreground">Total Prayers</span>
                             <span className="font-mono font-semibold">{overallStats.total}</span>
+                        </div>
                         </div>
                     </div>
 

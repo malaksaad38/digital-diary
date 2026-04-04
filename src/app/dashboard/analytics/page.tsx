@@ -6,7 +6,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {
     AlertCircle,
     BookOpen,
-    Calendar,
+    Calendar, CalendarDays,
     CheckCircle2,
     Circle,
     CircleHelp, Clock,
@@ -857,7 +857,13 @@ export default function PrayerAnalyticsDashboard() {
             label: "Days Tracked",
             value: monthlyStats.daysWithData,
             color: "text-foreground",
-            icon: <Calendar className="h-4 w-4 text-muted-foreground"/>,
+            icon: <CalendarDays className="h-4 w-4 text-muted-foreground"/>,
+        },
+        {
+            label: "Total Prayers",
+            value: monthlyStats.daysWithData * 5,
+            color: "text-cyan-500",
+            icon: <Calendar className="h-4 w-4 text-cyan-500"/>,
         },
         {
             label: "Missed",
@@ -890,7 +896,7 @@ export default function PrayerAnalyticsDashboard() {
             icon: <TrendingUp className="h-4 w-4 text-primary"/>,
         },
         {
-            label: "Completed Quran",
+            label: "Total Quran",
             value: monthlyRecitationReport.completedQuranCount,
             color: "text-green-600",
             icon: <CheckCircle2 className="h-4 w-4 text-green-600"/>,
@@ -942,6 +948,14 @@ export default function PrayerAnalyticsDashboard() {
                     ) : (
                         <>
                             <OverallStatCard
+                                label="Total Days"
+                                value={overallStats.total/5}
+                                percentage="Days count"
+                                gradientFrom="from-gray-50/80 dark:from-gray-950/20"
+                                hoverBorder="hover:border-gray-200/40"
+                                textColor="text-gray-500"
+                            />
+                            <OverallStatCard
                                 label="Total Prayers"
                                 value={overallStats.total}
                                 percentage="Prayer count"
@@ -949,6 +963,7 @@ export default function PrayerAnalyticsDashboard() {
                                 hoverBorder="hover:border-cyan-200/40"
                                 textColor="text-cyan-500"
                             />
+
                             <OverallStatCard
                                 label="Missed (Qaza)"
                                 value={overallStats.missed}
@@ -1097,7 +1112,7 @@ export default function PrayerAnalyticsDashboard() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                                 {monthlyStatsData.map((stat) => (
                                     <MonthlyStatItem
                                         key={stat.label}

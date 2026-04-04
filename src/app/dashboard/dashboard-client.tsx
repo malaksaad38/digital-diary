@@ -349,7 +349,7 @@ export default function ModernDashboard({ user, isAdmin }: { user: any, isAdmin?
                                     : `${Number((30 - recitationStats.totalParahs).toFixed(2))} Parah left for Completed Quran`}
                             </p>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 md:flex md:justify-between">
+                        <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <CalendarDays className="size-3 md:size-4 text-blue-500" />
                             <span className="text-muted-foreground">Total Days</span>

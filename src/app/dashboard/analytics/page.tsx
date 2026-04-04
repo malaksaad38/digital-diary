@@ -4,11 +4,12 @@
 import React from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {
+    AlertCircle,
     BookOpen,
     Calendar,
     CheckCircle2,
     Circle,
-    CircleHelp,
+    CircleHelp, Clock,
     Diamond,
     Loader2,
     PieChart as PieChartIcon,
@@ -871,6 +872,18 @@ export default function PrayerAnalyticsDashboard() {
             icon: <Users className="h-4 w-4 text-green-500"/>,
         },
         {
+            label: "Alone",
+            value: monthlyStats.alone,
+            color: "text-yellow-500",
+            icon: <AlertCircle className="h-4 w-4 text-yellow-500"/>,
+        },
+        {
+            label: "On Time",
+            value: monthlyStats.onTime,
+            color: "text-sky-500",
+            icon: <Clock className="h-4 w-4 text-sky-500"/>,
+        },
+        {
             label: "Success Rate",
             value: `${monthlySuccessRate}%`,
             color: "text-primary",
@@ -881,15 +894,7 @@ export default function PrayerAnalyticsDashboard() {
             value: monthlyRecitationReport.completedQuranCount,
             color: "text-green-600",
             icon: <CheckCircle2 className="h-4 w-4 text-green-600"/>,
-        },
-        {
-            label: "Recitation",
-            value: monthlyRecitationReport.completedQuranCount > 0
-                ? monthlyRecitationReport.headline
-                : `${monthlyRecitationReport.totalParahs} Parah`,
-            color: monthlyRecitationReport.completedQuranCount > 0 ? "text-green-600" : "text-indigo-600",
-            icon: <BookOpen className="h-4 w-4 text-indigo-600"/>,
-        },
+        }
     ], [monthlyStats, monthlySuccessRate, monthlyRecitationReport]);
 
     // Error state
@@ -1092,7 +1097,7 @@ export default function PrayerAnalyticsDashboard() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                                 {monthlyStatsData.map((stat) => (
                                     <MonthlyStatItem
                                         key={stat.label}

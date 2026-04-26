@@ -1,4 +1,4 @@
-const CACHE_NAME = "digital-diary-v2"; // Increment version to update old caches
+const CACHE_NAME = "digital-diary-v3"; // Increment version to update old caches
 
 // Files to pre-cache
 const PRECACHE_ASSETS = [
@@ -6,7 +6,7 @@ const PRECACHE_ASSETS = [
     "/login",
     "/dashboard",
     "/manifest.json",
-    "/icons/icon-192x192.png",
+    "/icon-192x192.png",
 ];
 
 // ------------------------

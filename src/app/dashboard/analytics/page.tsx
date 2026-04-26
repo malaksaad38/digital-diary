@@ -1146,20 +1146,7 @@ export default function PrayerAnalyticsDashboard() {
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">Monthly progress to next Completed Quran</span>
-                                    <span className="font-medium text-foreground">
-                                        {monthlyRecitationReport.progressToNextQuran}%
-                                    </span>
-                                </div>
-                                <div className="h-2.5 rounded-full bg-muted overflow-hidden">
-                                    <div
-                                        className="h-full bg-indigo-500 transition-all"
-                                        style={{width: `${monthlyRecitationReport.progressToNextQuran}%`}}
-                                    />
-                                </div>
-                            </div>
+
                         </div>
 
                     </CardContent>

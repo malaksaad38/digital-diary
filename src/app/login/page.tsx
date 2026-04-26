@@ -24,7 +24,7 @@ export default function LoginPage() {
                 <div className="flex flex-col items-center space-y-3">
                     <div className="relative w-16 h-16">
                         <Image
-                            src="/logo.png"
+                            src="/icon-192x192.png"
                             alt="App Logo"
                             fill
                             className="rounded-full object-cover"

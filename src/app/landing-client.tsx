@@ -123,7 +123,7 @@ export default function PrayerDiaryLanding() {
             >
                 <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                     <motion.div className="flex items-center gap-2" whileHover={{scale: 1.05}}>
-                        <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-full object-contain"/>
+                        <img src="/icon-192x192.png" alt="Logo" className="w-9 h-9 rounded-full object-contain"/>
                         <span
                             className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-blue-500 dark:from-green-400 dark:to-blue-400">
               Digital Diary
